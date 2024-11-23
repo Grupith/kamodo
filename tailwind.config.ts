@@ -6,6 +6,7 @@ export default {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  darkMode: "selector",
   theme: {
     extend: {
       colors: {
@@ -13,7 +14,7 @@ export default {
         foreground: "var(--foreground)",
       },
       backgroundImage: (theme) => ({
-        'hero-pattern': "url('/images/hero-bg.jpg')",
+        "hero-pattern": "url('/images/hero-bg.jpg')",
       }),
     },
   },

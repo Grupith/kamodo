@@ -1,8 +1,9 @@
 "use client";
-import React, { useState } from "react";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import React, { useState, useEffect } from "react";
+import { Bars3Icon, XMarkIcon, MoonIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import DashboadMockup from "../public/images/dashboard-mockup.svg";
+import DarkModeToggle from "./components/DarkModeToggle";
 
 const Home = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -12,9 +13,9 @@ const Home = () => {
   };
 
   return (
-    <div className="bg-gray-50 text-black">
+    <div className="bg-gray-50 text-black dark:bg-gray-900">
       {/* Header */}
-      <header className="bg-white shadow fixed w-full z-10">
+      <header className="bg-white shadow fixed w-full z-10 dark:bg-gray-900 dark:text-white">
         <nav className="container mx-auto flex items-center justify-between md:justify-around py-3 px-6">
           <a href="#">
             <div className="text-2xl font-semibold cursor-pointer">Kamodo</div>
@@ -30,9 +31,13 @@ const Home = () => {
               Contact
             </a>
           </div>
-          <button className="bg-blue-600 text-white px-6 py-2 rounded-lg shadow-sm hover:shadow-md hidden md:block">
-            Sign In
-          </button>
+
+          <div className="flex items-center space-x-4">
+            <DarkModeToggle />
+            <button className="bg-blue-600 text-white px-6 py-2 rounded-lg shadow-sm hover:shadow-md hidden md:block">
+              Sign In
+            </button>
+          </div>
           {/* Mobile Menu Button */}
           <div className="md:hidden">
             <button
@@ -71,23 +76,25 @@ const Home = () => {
             >
               Contact
             </a>
-            <button
-              onClick={closeMenu}
-              className="w-full bg-blue-600 text-white px-4 py-2"
-            >
-              Sign In
-            </button>
+            <div>
+              <button
+                onClick={closeMenu}
+                className="w-full bg-blue-600 text-white px-4 py-2"
+              >
+                Sign In
+              </button>
+            </div>
           </div>
         )}
       </header>
 
       {/* Hero Section */}
-      <section className="bg-gray-50 bg-cover bg-center flex items-start pt-32 sm:mb-60 justify-center h-screen text-center shadow-sm">
+      <section className="bg-gray-50 bg-cover bg-center flex items-start pt-32 sm:mb-60 justify-center h-screen text-center shadow-sm dark:bg-gray-900 dark:text-white">
         <div className="p-6 py-4 rounded-lg">
-          <h1 className="text-4xl md:text-5xl font-bold text-black mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-black mb-4 dark:text-gray-200">
             Simplify Your Business with Kamodo
           </h1>
-          <p className="text-xl md:text-2xl text-black mb-6">
+          <p className="text-xl md:text-2xl text-black mb-6 dark:text-gray-300">
             All-In-One Solution for Small Business Management
           </p>
           <button className="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg transition-all hover:shadow-md">
@@ -96,13 +103,16 @@ const Home = () => {
           <Image
             src={DashboadMockup}
             alt={"Dashboard mockup"}
-            className="py-10 shadow-md rounded-md"
+            className="py-10 shadow-md rounded-md dark:shadow-none"
           />
         </div>
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 sm:pt-52">
+      <section
+        id="features"
+        className="py-20 sm:mt-72 dark:bg-gray-900 dark:text-white"
+      >
         <div className="container mx-auto px-6">
           <h2 className="text-4xl font-bold text-center mb-12">
             Core Features
@@ -251,10 +261,10 @@ interface FeatureItemProps {
 }
 
 const FeatureItem: React.FC<FeatureItemProps> = ({ icon, title, features }) => (
-  <div className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow">
+  <div className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow dark:bg-gray-800 dark:text-white">
     <div className="text-4xl mb-4">{icon}</div>
     <h3 className="text-2xl font-semibold mb-4">{title}</h3>
-    <ul className="list-disc list-inside text-gray-700 space-y-2">
+    <ul className="list-disc list-inside text-gray-200 space-y-2">
       {features.map((feature, index) => (
         <li key={index}>{feature}</li>
       ))}
