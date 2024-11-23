@@ -11,7 +11,7 @@ const Home = () => {
     <div className="bg-gray-50 text-black">
       {/* Header */}
       <header className="bg-white shadow fixed w-full z-10">
-        <nav className="container mx-auto flex items-center justify-around py-3 px-6">
+        <nav className="container mx-auto flex items-center justify-between md:justify-around py-3 px-6">
           <a href="#">
             <div className="text-2xl font-bold cursor-pointer">Kamodo</div>
           </a>
