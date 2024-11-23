@@ -93,7 +93,7 @@ const Home = () => {
       {/* Hero Section */}
       <section className="bg-gray-50 bg-cover bg-center flex items-start pt-32 sm:mb-60 justify-center h-screen text-center shadow-sm dark:bg-gray-900 dark:text-white">
         <div className="p-6 py-4 rounded-lg">
-          <h1 className="text-4xl md:text-5xl font-bold text-black mb-4 dark:text-gray-200">
+          <h1 className="text-4xl md:text-5xl font-bold text-black mb-4 dark:text-gray-100">
             Simplify Your Business with Kamodo
           </h1>
           <p className="text-xl md:text-2xl text-black mb-6 dark:text-gray-300">
@@ -105,12 +105,12 @@ const Home = () => {
           <Image
             src={DashboardMockup}
             alt={"Dashboard mockup light"}
-            className="py-10 shadow-md rounded-md dark:shadow-none dark:hidden"
+            className="my-10 shadow-md rounded-lg dark:shadow-none dark:hidden"
           />
           <Image
             src={DashboardMockupDark}
             alt={"Dashboard mockup dark"}
-            className="py-10 shadow-md rounded-md hidden dark:shadow-md dark:block"
+            className="my-10 shadow-md rounded-lg hidden dark:shadow-md dark:block"
           />
         </div>
       </section>
