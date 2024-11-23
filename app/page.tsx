@@ -1,13 +1,14 @@
 "use client";
-
 import React, { useState } from "react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import Image from "next/image";
+import DashboadMockup from "../public/images/dashboard-mockup.svg";
 
 const Home = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <div className="bg-gray-50 text-gray-800">
+    <div className="bg-gray-50 text-black">
       {/* Header */}
       <header className="bg-white shadow fixed w-full z-10">
         <nav className="container mx-auto flex items-center justify-around py-3 px-6">
@@ -62,7 +63,7 @@ const Home = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="bg-white bg-cover bg-center flex items-start pt-32 justify-center h-screen text-center shadow-sm">
+      <section className="bg-gray-50 bg-cover bg-center flex items-start pt-32 sm:mb-60 justify-center h-screen text-center shadow-sm">
         <div className="p-6 py-4 rounded-lg">
           <h1 className="text-4xl md:text-5xl font-bold text-black mb-4">
             Simplify Your Business with Kamodo
@@ -73,11 +74,16 @@ const Home = () => {
           <button className="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg transition-all hover:shadow-md">
             Get Started for Free
           </button>
+          <Image
+            src={DashboadMockup}
+            alt={"Dashboard mockup"}
+            className="py-10 shadow-md rounded-md"
+          />
         </div>
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20">
+      <section id="features" className="py-20 sm:pt-52">
         <div className="container mx-auto px-6">
           <h2 className="text-4xl font-bold text-center mb-12">
             Core Features
