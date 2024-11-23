@@ -1,101 +1,269 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import React, { useState } from "react";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+
+const Home = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="bg-gray-50 text-gray-800">
+      {/* Header */}
+      <header className="bg-white shadow fixed w-full z-10">
+        <nav className="container mx-auto flex items-center justify-around py-3 px-6">
+          <a href="#">
+            <div className="text-2xl font-bold cursor-pointer">Kamodo</div>
+          </a>
+          <div className="hidden md:flex space-x-6 font-medium items-center">
+            <a href="#features" className="hover:text-blue-600">
+              Features
+            </a>
+            <a href="#pricing" className="hover:text-blue-600">
+              Pricing
+            </a>
+            <a href="#contact" className="hover:text-blue-600">
+              Contact
+            </a>
+          </div>
+          <button className="bg-blue-600 text-white px-6 py-2 rounded-lg shadow-sm hover:shadow-md">
+            Sign In
+          </button>
+          {/* Mobile Menu Button */}
+          <div className="md:hidden">
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-gray-800 focus:outline-none"
+            >
+              {isMenuOpen ? (
+                <XMarkIcon className="h-6 w-6" />
+              ) : (
+                <Bars3Icon className="h-6 w-6" />
+              )}
+            </button>
+          </div>
+        </nav>
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="md:hidden bg-white shadow-lg">
+            <a href="#features" className="block px-4 py-2 hover:bg-gray-100">
+              Features
+            </a>
+            <a href="#pricing" className="block px-4 py-2 hover:bg-gray-100">
+              Pricing
+            </a>
+            <a href="#contact" className="block px-4 py-2 hover:bg-gray-100">
+              Contact
+            </a>
+            <button className="w-full bg-blue-600 text-white px-4 py-2">
+              Sign In
+            </button>
+          </div>
+        )}
+      </header>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      {/* Hero Section */}
+      <section className="bg-white bg-cover bg-center flex items-center justify-center h-screen text-center shadow-sm">
+        <div className="p-6 py-4 rounded-lg">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+            Simplify Your Business with Kamodo
+          </h1>
+          <p className="text-xl md:text-2xl text-gray-800 mb-6">
+            All-In-One Solution for Small Business Management
+          </p>
+          <button className="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg transition-all hover:shadow-md">
+            Get Started for Free
+          </button>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+      </section>
+
+      {/* Features Section */}
+      <section id="features" className="py-20">
+        <div className="container mx-auto px-6">
+          <h2 className="text-4xl font-bold text-center mb-12">
+            Core Features
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+            {/* Feature Items */}
+            <FeatureItem
+              icon="👥"
+              title="Customer Management"
+              features={[
+                "Store customer contact information",
+                "View job history for each customer",
+              ]}
+            />
+            <FeatureItem
+              icon="👨‍💼"
+              title="Employee Management"
+              features={[
+                "Store employee information",
+                "Adjust roles of employees",
+              ]}
+            />
+            <FeatureItem
+              icon="🗓️"
+              title="Job Tracking"
+              features={[
+                "Create jobs with assigned dates",
+                "Assign jobs to employees",
+                "Track job status",
+                "Create recurring jobs",
+              ]}
+            />
+            <FeatureItem
+              icon="📝"
+              title="Job Task Assignment"
+              features={[
+                "Assign tasks to employees",
+                "Upload photos to tasks",
+                "View task status",
+              ]}
+            />
+            <FeatureItem
+              icon="⚙️"
+              title="Equipment Management"
+              features={[
+                "Track all equipment",
+                "Adjust equipment data",
+                "Assign equipment to jobs",
+              ]}
+            />
+            <FeatureItem
+              icon="🔔"
+              title="Real-Time Updates"
+              features={[
+                "Sync job and task updates",
+                "Push notifications for changes",
+              ]}
+            />
+            <FeatureItem
+              icon="📱"
+              title="Mobile-First Design"
+              features={[
+                "Responsive design for mobile users",
+                "Simple, clean UI",
+              ]}
+            />
+            <FeatureItem
+              icon="🔒"
+              title="Basic Authentication"
+              features={[
+                "Google Sign-in for onboarding",
+                "Secure login system",
+              ]}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section id="pricing" className="bg-gray-100 py-20">
+        <div className="container mx-auto px-6">
+          <h2 className="text-4xl font-bold text-center mb-12">
+            Pricing Plans
+          </h2>
+          <div className="flex flex-col md:flex-row justify-center items-center md:space-x-6 space-y-6 md:space-y-0">
+            {/* Pricing Cards */}
+            <PricingCard
+              plan="Free"
+              price="Free"
+              features={[
+                "Up to 2 employees",
+                "10 customers",
+                "5 jobs limit",
+                "10 tasks per job",
+                "No file uploads",
+              ]}
+            />
+            <PricingCard
+              plan="Pro"
+              price="$29/month"
+              features={[
+                "Up to 5 employees",
+                "Unlimited customers",
+                "Unlimited jobs",
+                "Unlimited tasks",
+                "Upload images/files",
+                "Equipment tracking",
+              ]}
+            />
+            <PricingCard
+              plan="Premium"
+              price="$79/month"
+              features={[
+                "Up to 25 employees",
+                "All Pro features",
+                "Sync with Google/Outlook",
+                "Quotes/invoicing tracking",
+                "Income/expenses tracking",
+                "Dedicated email support",
+              ]}
+            />
+            <PricingCard
+              plan="Enterprise"
+              price="$299/month"
+              features={[
+                "Unlimited employees",
+                "All Premium features",
+                "Customer payments via Stripe",
+                "White-label branding",
+                "Priority support",
+                "Onboarding assistance",
+              ]}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-white py-6">
+        <div className="container mx-auto text-center">
+          <p className="text-gray-600">
+            © {new Date().getFullYear()} Kamodo. All rights reserved.
+          </p>
+        </div>
       </footer>
     </div>
   );
+};
+
+interface FeatureItemProps {
+  icon: string;
+  title: string;
+  features: string[];
 }
+
+const FeatureItem: React.FC<FeatureItemProps> = ({ icon, title, features }) => (
+  <div className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow">
+    <div className="text-4xl mb-4">{icon}</div>
+    <h3 className="text-2xl font-semibold mb-4">{title}</h3>
+    <ul className="list-disc list-inside text-gray-700 space-y-2">
+      {features.map((feature, index) => (
+        <li key={index}>{feature}</li>
+      ))}
+    </ul>
+  </div>
+);
+
+interface PricingCardProps {
+  plan: string;
+  price: string;
+  features: string[];
+}
+
+const PricingCard: React.FC<PricingCardProps> = ({ plan, price, features }) => (
+  <div className="bg-white p-8 rounded-lg shadow hover:shadow-lg transition-shadow w-full md:w-1/4">
+    <h3 className="text-2xl font-semibold mb-4 text-blue-600">{plan} Plan</h3>
+    <p className="text-4xl font-bold mb-6">{price}</p>
+    <ul className="list-disc list-inside text-gray-700 space-y-2 mb-6">
+      {features.map((feature, index) => (
+        <li key={index}>{feature}</li>
+      ))}
+    </ul>
+    <button className="bg-blue-600 text-white px-4 py-2 rounded w-full">
+      Choose Plan
+    </button>
+  </div>
+);
+
+export default Home;
