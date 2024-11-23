@@ -1,8 +1,9 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { Bars3Icon, XMarkIcon, MoonIcon } from "@heroicons/react/24/outline";
+import React, { useState } from "react";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
-import DashboadMockup from "../public/images/dashboard-mockup.svg";
+import DashboardMockup from "../public/images/dashboard-mockup.svg";
+import DashboardMockupDark from "../public/images/dashboard-mockup-dark.svg";
 import DarkModeToggle from "./components/DarkModeToggle";
 
 const Home = () => {
@@ -31,48 +32,49 @@ const Home = () => {
               Contact
             </a>
           </div>
-
-          <div className="flex items-center space-x-4">
-            <DarkModeToggle />
-            <button className="bg-blue-600 text-white px-6 py-2 rounded-lg shadow-sm hover:shadow-md hidden md:block">
-              Sign In
-            </button>
-          </div>
-          {/* Mobile Menu Button */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-800 focus:outline-none"
-            >
-              {isMenuOpen ? (
-                <XMarkIcon className="h-6 w-6" />
-              ) : (
-                <Bars3Icon className="h-6 w-6" />
-              )}
-            </button>
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-4">
+              <DarkModeToggle />
+              <button className="bg-blue-600 text-white px-6 py-2 rounded-lg shadow-sm hover:shadow-md hidden md:block">
+                Sign In
+              </button>
+            </div>
+            {/* Mobile Menu Button */}
+            <div className="md:hidden">
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="text-gray-800 focus:outline-none dark:text-gray-100"
+              >
+                {isMenuOpen ? (
+                  <XMarkIcon className="h-6 w-6" />
+                ) : (
+                  <Bars3Icon className="h-6 w-6" />
+                )}
+              </button>
+            </div>
           </div>
         </nav>
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden bg-white shadow-lg">
+          <div className="md:hidden bg-white shadow-lg dark:bg-gray-900">
             <a
               href="#features"
               onClick={closeMenu}
-              className="block px-4 py-2 hover:bg-gray-100"
+              className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
             >
               Features
             </a>
             <a
               href="#pricing"
               onClick={closeMenu}
-              className="block px-4 py-2 hover:bg-gray-100"
+              className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
             >
               Pricing
             </a>
             <a
               href="#contact"
               onClick={closeMenu}
-              className="block px-4 py-2 hover:bg-gray-100"
+              className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
             >
               Contact
             </a>
@@ -101,9 +103,14 @@ const Home = () => {
             Get Started for Free
           </button>
           <Image
-            src={DashboadMockup}
-            alt={"Dashboard mockup"}
-            className="py-10 shadow-md rounded-md dark:shadow-none"
+            src={DashboardMockup}
+            alt={"Dashboard mockup light"}
+            className="py-10 shadow-md rounded-md dark:shadow-none dark:hidden"
+          />
+          <Image
+            src={DashboardMockupDark}
+            alt={"Dashboard mockup dark"}
+            className="py-10 shadow-md rounded-md hidden dark:shadow-md dark:block"
           />
         </div>
       </section>
@@ -184,7 +191,10 @@ const Home = () => {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="bg-gray-100 py-20">
+      <section
+        id="pricing"
+        className="bg-gray-100 py-20 dark:bg-gray-800 dark:text-gray-100"
+      >
         <div className="container mx-auto px-6">
           <h2 className="text-4xl font-bold text-center mb-12">
             Pricing Plans
@@ -243,9 +253,9 @@ const Home = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-white py-6">
+      <footer className="bg-white py-6 dark:bg-gray-900">
         <div className="container mx-auto text-center">
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-100">
             © {new Date().getFullYear()} Kamodo. All rights reserved.
           </p>
         </div>
@@ -264,7 +274,7 @@ const FeatureItem: React.FC<FeatureItemProps> = ({ icon, title, features }) => (
   <div className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow dark:bg-gray-800 dark:text-white">
     <div className="text-4xl mb-4">{icon}</div>
     <h3 className="text-2xl font-semibold mb-4">{title}</h3>
-    <ul className="list-disc list-inside text-gray-200 space-y-2">
+    <ul className="list-disc list-inside text-black dark:text-gray-200 space-y-2">
       {features.map((feature, index) => (
         <li key={index}>{feature}</li>
       ))}
@@ -279,15 +289,15 @@ interface PricingCardProps {
 }
 
 const PricingCard: React.FC<PricingCardProps> = ({ plan, price, features }) => (
-  <div className="bg-white p-8 rounded-lg shadow hover:shadow-lg transition-shadow w-full md:w-1/4">
+  <div className="bg-white p-8 rounded-lg shadow hover:shadow-lg transition-shadow w-full md:w-1/4 dark:bg-gray-900">
     <h3 className="text-2xl font-semibold mb-4 text-blue-600">{plan} Plan</h3>
     <p className="text-4xl font-bold mb-6">{price}</p>
-    <ul className="list-disc list-inside text-gray-700 space-y-2 mb-6">
+    <ul className="list-disc list-inside text-gray-900 space-y-2 mb-6 dark:text-gray-200">
       {features.map((feature, index) => (
         <li key={index}>{feature}</li>
       ))}
     </ul>
-    <button className="bg-blue-600 text-white px-4 py-2 rounded w-full">
+    <button className="bg-blue-600 text-white px-4 py-2 rounded-md w-full">
       Choose Plan
     </button>
   </div>
