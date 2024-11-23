@@ -7,13 +7,17 @@ import DashboadMockup from "../public/images/dashboard-mockup.svg";
 const Home = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
+
   return (
     <div className="bg-gray-50 text-black">
       {/* Header */}
       <header className="bg-white shadow fixed w-full z-10">
         <nav className="container mx-auto flex items-center justify-between md:justify-around py-3 px-6">
           <a href="#">
-            <div className="text-2xl font-bold cursor-pointer">Kamodo</div>
+            <div className="text-2xl font-semibold cursor-pointer">Kamodo</div>
           </a>
           <div className="hidden md:flex space-x-6 font-medium items-center">
             <a href="#features" className="hover:text-blue-600">
@@ -46,16 +50,31 @@ const Home = () => {
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden bg-white shadow-lg">
-            <a href="#features" className="block px-4 py-2 hover:bg-gray-100">
+            <a
+              href="#features"
+              onClick={closeMenu}
+              className="block px-4 py-2 hover:bg-gray-100"
+            >
               Features
             </a>
-            <a href="#pricing" className="block px-4 py-2 hover:bg-gray-100">
+            <a
+              href="#pricing"
+              onClick={closeMenu}
+              className="block px-4 py-2 hover:bg-gray-100"
+            >
               Pricing
             </a>
-            <a href="#contact" className="block px-4 py-2 hover:bg-gray-100">
+            <a
+              href="#contact"
+              onClick={closeMenu}
+              className="block px-4 py-2 hover:bg-gray-100"
+            >
               Contact
             </a>
-            <button className="w-full bg-blue-600 text-white px-4 py-2">
+            <button
+              onClick={closeMenu}
+              className="w-full bg-blue-600 text-white px-4 py-2"
+            >
               Sign In
             </button>
           </div>
@@ -148,14 +167,6 @@ const Home = () => {
               features={[
                 "Responsive design for mobile users",
                 "Simple, clean UI",
-              ]}
-            />
-            <FeatureItem
-              icon="🔒"
-              title="Basic Authentication"
-              features={[
-                "Google Sign-in for onboarding",
-                "Secure login system",
               ]}
             />
           </div>
