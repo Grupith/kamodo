@@ -25,7 +25,7 @@ const Home = () => {
               Contact
             </a>
           </div>
-          <button className="bg-blue-600 text-white px-6 py-2 rounded-lg shadow-sm hover:shadow-md">
+          <button className="bg-blue-600 text-white px-6 py-2 rounded-lg shadow-sm hover:shadow-md hidden md:block">
             Sign In
           </button>
           {/* Mobile Menu Button */}
@@ -62,12 +62,12 @@ const Home = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="bg-white bg-cover bg-center flex items-center justify-center h-screen text-center shadow-sm">
+      <section className="bg-white bg-cover bg-center flex items-start pt-32 justify-center h-screen text-center shadow-sm">
         <div className="p-6 py-4 rounded-lg">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-black mb-4">
             Simplify Your Business with Kamodo
           </h1>
-          <p className="text-xl md:text-2xl text-gray-800 mb-6">
+          <p className="text-xl md:text-2xl text-black mb-6">
             All-In-One Solution for Small Business Management
           </p>
           <button className="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg transition-all hover:shadow-md">
