@@ -93,8 +93,9 @@ const Home = () => {
       {/* Hero Section */}
       <section className="bg-gray-50 bg-cover bg-center flex items-start pt-32 sm:mb-60 justify-center h-screen text-center shadow-sm dark:bg-gray-900 dark:text-white">
         <div className="p-6 py-4 rounded-lg">
-          <h1 className="text-4xl md:text-5xl font-bold text-black mb-4 dark:text-gray-100">
-            Simplify Your Business with Kamodo
+          <h1 className="text-4xl md:text-5xl font-extrabold text-black mb-4 dark:text-gray-100">
+            Simplify Your Business with{" "}
+            <span className="text-blue-700">Kamodo</span>
           </h1>
           <p className="text-xl md:text-2xl font-normal text-gray-600 mb-6 dark:text-gray-400">
             All-In-One Solution for Small Business Management
@@ -114,11 +115,95 @@ const Home = () => {
           />
         </div>
       </section>
+      {/* About Section */}
+      <section id="about" className="bg-white sm:py-20 dark:bg-gray-900">
+        <div className="max-w-screen-xl px-20 pt-10 md:pt-20 pb-10 mt-10 mx-auto">
+          {/* Container for Flex Layout */}
+          <div className="flex flex-col lg:flex-row items-start">
+            {/* Left Side: Heading, Paragraph, and List */}
+            <div className="w-full lg:w-2/3 lg:pr-8">
+              <h2 className="text-4xl font-bold text-center lg:text-left mb-6 dark:text-gray-100">
+                Organize Your Small Business
+              </h2>
+              <p className="max-w-2xl mb-6 text-gray-800 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-200">
+                Avoid miscommunication and manage the logistics of your business
+                with one app.
+              </p>
+              <ul className="max-w-2xl space-y-4 py-2 text-gray-700 list-inside dark:text-gray-300">
+                <li className="flex items-center">
+                  <svg
+                    className="w-5 h-5 mr-2 text-blue-600 flex-shrink-0"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      d="M16.707 5.293a1 1 0 01.083 1.32l-.083.094L8.414 15l-4.707-4.707a1 1
+                0 011.32-1.497l.094.083L8.414 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    />
+                  </svg>
+                  Tracking job progress in real-time.
+                </li>
+                {/* Add other list items here */}
+                <li className="flex items-center">
+                  <svg
+                    className="w-5 h-5 mr-2 text-blue-600 flex-shrink-0"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      d="M16.707 5.293a1 1 0 01.083 1.32l-.083.094L8.414 15l-4.707-4.707a1 1
+                0 011.32-1.497l.094.083L8.414 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    />
+                  </svg>
+                  Setting up clear tasks for your employees, reducing confusion.
+                </li>
+                {/* Continue adding list items as needed */}
+                <li className="flex items-center">
+                  <svg
+                    className="w-5 h-5 mr-2 text-blue-600 flex-shrink-0"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      d="M16.707 5.293a1 1 0 01.083 1.32l-.083.094L8.414 15l-4.707-4.707a1 1
+                0 011.32-1.497l.094.083L8.414 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    />
+                  </svg>
+                  Manage your customer information
+                </li>
+                <li className="flex items-center">
+                  <svg
+                    className="w-5 h-5 mr-2 text-blue-600 flex-shrink-0"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      d="M16.707 5.293a1 1 0 01.083 1.32l-.083.094L8.414 15l-4.707-4.707a1 1
+                0 011.32-1.497l.094.083L8.414 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    />
+                  </svg>
+                  Track and assign equipment
+                </li>
+              </ul>
+            </div>
 
+            {/* Right Side: Card */}
+            <div className="w-full lg:w-1/3 lg:pl-8 mt-10 lg:mt-0">
+              <div className="bg-gray-200 dark:bg-gray-800 rounded-lg px-6 py-6">
+                <p className="text-gray-700 md:text-lg lg:text-lg dark:text-gray-200">
+                  Whether you’re organizing multiple projects, onboarding new
+                  employees, or just trying to keep things running smoothly,
+                  Kamodo is here to help you simplify your workflow.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
       {/* Features Section */}
       <section
         id="features"
-        className="py-20 sm:mt-72 dark:bg-gray-900 dark:text-white"
+        className="py-10 sm:mt-10 dark:bg-gray-900 dark:text-white"
       >
         <div className="container mx-auto px-6">
           <h2 className="text-4xl font-bold text-center mb-12">
