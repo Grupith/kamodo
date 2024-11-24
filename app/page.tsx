@@ -96,7 +96,7 @@ const Home = () => {
           <h1 className="text-4xl md:text-5xl font-bold text-black mb-4 dark:text-gray-100">
             Simplify Your Business with Kamodo
           </h1>
-          <p className="text-xl md:text-2xl text-black mb-6 dark:text-gray-300">
+          <p className="text-xl md:text-2xl font-normal text-gray-600 mb-6 dark:text-gray-400">
             All-In-One Solution for Small Business Management
           </p>
           <button className="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg transition-all hover:shadow-md">
