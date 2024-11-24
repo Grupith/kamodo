@@ -5,6 +5,7 @@ import Image from "next/image";
 import DashboardMockup from "../public/images/dashboard-mockup.svg";
 import DashboardMockupDark from "../public/images/dashboard-mockup-dark.svg";
 import DarkModeToggle from "./components/DarkModeToggle";
+import Checkmark from "./components/Checkmark";
 
 const Home = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -131,57 +132,21 @@ const Home = () => {
               </p>
               <ul className="max-w-2xl space-y-4 py-2 text-gray-700 list-inside dark:text-gray-300">
                 <li className="flex items-center">
-                  <svg
-                    className="w-5 h-5 mr-2 text-blue-600 flex-shrink-0"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      d="M16.707 5.293a1 1 0 01.083 1.32l-.083.094L8.414 15l-4.707-4.707a1 1
-                0 011.32-1.497l.094.083L8.414 12.586l7.293-7.293a1 1 0 011.414 0z"
-                    />
-                  </svg>
+                  <Checkmark />
                   Tracking job progress in real-time.
                 </li>
                 {/* Add other list items here */}
                 <li className="flex items-center">
-                  <svg
-                    className="w-5 h-5 mr-2 text-blue-600 flex-shrink-0"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      d="M16.707 5.293a1 1 0 01.083 1.32l-.083.094L8.414 15l-4.707-4.707a1 1
-                0 011.32-1.497l.094.083L8.414 12.586l7.293-7.293a1 1 0 011.414 0z"
-                    />
-                  </svg>
+                  <Checkmark />
                   Setting up clear tasks for your employees, reducing confusion.
                 </li>
                 {/* Continue adding list items as needed */}
                 <li className="flex items-center">
-                  <svg
-                    className="w-5 h-5 mr-2 text-blue-600 flex-shrink-0"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      d="M16.707 5.293a1 1 0 01.083 1.32l-.083.094L8.414 15l-4.707-4.707a1 1
-                0 011.32-1.497l.094.083L8.414 12.586l7.293-7.293a1 1 0 011.414 0z"
-                    />
-                  </svg>
+                  <Checkmark />
                   Manage your customer information
                 </li>
                 <li className="flex items-center">
-                  <svg
-                    className="w-5 h-5 mr-2 text-blue-600 flex-shrink-0"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      d="M16.707 5.293a1 1 0 01.083 1.32l-.083.094L8.414 15l-4.707-4.707a1 1
-                0 011.32-1.497l.094.083L8.414 12.586l7.293-7.293a1 1 0 011.414 0z"
-                    />
-                  </svg>
+                  <Checkmark />
                   Track and assign equipment
                 </li>
               </ul>
@@ -377,9 +342,12 @@ const PricingCard: React.FC<PricingCardProps> = ({ plan, price, features }) => (
   <div className="bg-white p-8 rounded-lg shadow hover:shadow-lg transition-shadow w-full md:w-1/4 dark:bg-gray-900">
     <h3 className="text-2xl font-semibold mb-4 text-blue-600">{plan} Plan</h3>
     <p className="text-4xl font-bold mb-6">{price}</p>
-    <ul className="list-disc list-inside text-gray-900 space-y-2 mb-6 dark:text-gray-200">
+    <ul className=" text-gray-900  dark:text-gray-200 space-y-4 py-8">
       {features.map((feature, index) => (
-        <li key={index}>{feature}</li>
+        <li key={index} className="flex items-start">
+          <Checkmark />
+          <span className="text-gray-900 dark:text-gray-200">{feature}</span>
+        </li>
       ))}
     </ul>
     <button className="bg-blue-600 text-white px-4 py-2 rounded-md w-full">
