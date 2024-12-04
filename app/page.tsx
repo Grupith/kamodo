@@ -6,6 +6,7 @@ import DashboardMockup from "../public/images/dashboard-mockup.svg";
 import DashboardMockupDark from "../public/images/dashboard-mockup-dark.svg";
 import DarkModeToggle from "./components/DarkModeToggle";
 import Checkmark from "./components/Checkmark";
+import { motion } from "motion/react";
 
 const Home = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -18,29 +19,15 @@ const Home = () => {
     <div className="bg-gray-50 text-black dark:bg-gray-900">
       {/* Header */}
       <header className="bg-white shadow fixed w-full z-10 dark:bg-gray-900 dark:text-white">
-        <nav className="container mx-auto flex items-center justify-between md:justify-around py-3 px-6">
+        <motion.nav
+          initial={{ opacity: 0, y: 2 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="container mx-auto flex items-center justify-between md:justify-around py-3 px-6"
+        >
           <a href="#">
-            <div className="flex align-middle space-x-1">
-              {/* Logo */}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="size-6"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M7.502 6h7.128A3.375 3.375 0 0 1 18 9.375v9.375a3 3 0 0 0 3-3V6.108c0-1.505-1.125-2.811-2.664-2.94a48.972 48.972 0 0 0-.673-.05A3 3 0 0 0 15 1.5h-1.5a3 3 0 0 0-2.663 1.618c-.225.015-.45.032-.673.05C8.662 3.295 7.554 4.542 7.502 6ZM13.5 3A1.5 1.5 0 0 0 12 4.5h4.5A1.5 1.5 0 0 0 15 3h-1.5Z"
-                  clipRule="evenodd"
-                />
-                <path
-                  fillRule="evenodd"
-                  d="M3 9.375C3 8.339 3.84 7.5 4.875 7.5h9.75c1.036 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-9.75A1.875 1.875 0 0 1 3 20.625V9.375Zm9.586 4.594a.75.75 0 0 0-1.172-.938l-2.476 3.096-.908-.907a.75.75 0 0 0-1.06 1.06l1.5 1.5a.75.75 0 0 0 1.116-.062l3-3.75Z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <div className="text-xl font-semibold">Kamodo</div>
-            </div>
+            <motion.div className="text-2xl font-bold">Kamodo</motion.div>
           </a>
           <div className="hidden md:flex space-x-6 font-medium items-center">
             <a href="#about" className="hover:text-green-600 transition-all">
@@ -77,7 +64,7 @@ const Home = () => {
               </button>
             </div>
           </div>
-        </nav>
+        </motion.nav>
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden bg-white shadow-lg dark:bg-gray-900">
@@ -123,9 +110,15 @@ const Home = () => {
 
       {/* Hero Section */}
       <section className="bg-gray-50 bg-cover bg-center flex items-start pt-32 sm:mb-60 justify-center h-screen text-center shadow-sm dark:bg-gray-900 dark:text-white">
-        <div className="p-6 py-4 rounded-lg">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="p-6 py-4 rounded-lg"
+        >
           <h1 className="text-4xl md:text-5xl font-extrabold text-black mb-4 dark:text-gray-100">
-            Simplify Your Business with{" "}
+            Organize Your Business with{" "}
             <span className="text-green-700 pt-4">Kamodo</span>
           </h1>
           <p className="text-xl md:text-2xl font-normal text-gray-600 mb-6 mt-4 dark:text-gray-400">
@@ -144,11 +137,17 @@ const Home = () => {
             alt={"Dashboard mockup dark"}
             className="my-10 shadow-md rounded-lg hidden dark:shadow-md dark:block"
           />
-        </div>
+        </motion.div>
       </section>
       {/* About Section */}
-      <section id="about" className="bg-white sm:py-20 dark:bg-gray-900">
-        <div className="max-w-screen-xl px-20 pt-10 md:pt-32 pb-10 mt-10 mx-auto">
+      <section id="about" className="bg-white sm:py-12 dark:bg-gray-900">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="max-w-screen-xl px-10 pt-10 md:pt-32 pb-10 mt-10 mx-auto"
+        >
           {/* Container for Flex Layout */}
           <div className="flex flex-col lg:flex-row items-start">
             {/* Left Side: Heading, Paragraph, and List */}
@@ -157,40 +156,40 @@ const Home = () => {
                 Why use Kamodo?
               </h2>
               <p className="max-w-2xl mb-6 text-gray-900 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-200">
-                Disorganized? Starting a Small Business? Let us do the hard work
-                and manage your business within one app.
+                Confused with other CRMS? Starting a Small Business? Let us do
+                the hard work and manage your business with ease.
               </p>
-              <ul className="max-w-2xl space-y-4 text-gray-800 text-lg list-inside dark:text-gray-300">
+              <ul className="max-w-xl space-y-4 text-gray-800 bg-gray-200 shadow-sm rounded-md p-4 py-6 text-lg list-inside dark:text-gray-300 dark:bg-gray-800">
                 <li className="flex items-center">
                   <Checkmark />
-                  Manage Your Customers
+                  Manage your customers
                 </li>
                 <li className="flex items-center">
                   <Checkmark />
-                  Create and Track Jobs
+                  Create and track jobs
                 </li>
                 <li className="flex items-center">
                   <Checkmark />
-                  Add Tasks for Each Job and Monitor Progress
+                  Add tasks for each job and monitor progress
                 </li>
                 <li className="flex items-center">
                   <Checkmark />
-                  Manage Your Employees and Assign Them To Jobs
+                  Manage your employees and assign them to jobs
                 </li>
                 <li className="flex items-center">
                   <Checkmark />
-                  Track and Assign Equipment
+                  Track and assign equipment
                 </li>
                 <li className="flex items-center">
                   <Checkmark />
-                  Create Invoices for Jobs
+                  Create and send out invoices for jobs
                 </li>
               </ul>
             </div>
 
             {/* Right Side: Card */}
             <div className="w-full lg:w-1/3 lg:pl-8 mt-10 lg:mt-0">
-              <div className="bg-gray-200 dark:bg-gray-800 shadow-md rounded-md px-6 py-10">
+              <div className="bg-gray-200 dark:bg-gray-800 shadow-sm rounded-md px-6 py-10">
                 <p className="text-gray-900 mb-4 font-semibold md:text-xl lg:text-xl dark:text-gray-200">
                   The Benefit
                 </p>
@@ -202,17 +201,21 @@ const Home = () => {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </section>
       {/* Features Section */}
       <section
         id="features"
         className="py-10 sm:mt-2 dark:bg-gray-900 dark:text-white"
       >
-        <div className="container mx-auto px-6">
-          <h2 className="text-4xl font-bold text-center mb-12">
-            Core Features
-          </h2>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="container mx-auto px-10"
+        >
+          <h2 className="text-4xl font-bold mb-12 text-center">Features</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
             {/* Feature Items */}
             <FeatureItem
@@ -276,19 +279,25 @@ const Home = () => {
               ]}
             />
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Pricing Section */}
       <section
         id="pricing"
-        className="bg-gray-100 py-20 dark:bg-gray-800 dark:text-gray-100"
+        className="bg-gray-100 pt-10 pb-20 dark:bg-gray-800 dark:text-gray-100"
       >
-        <div className="container mx-auto px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="container mx-auto px-6"
+        >
           <h2 className="text-4xl font-bold text-center mb-12">
             Pricing Plans
           </h2>
-          <div className="flex flex-col md:flex-row justify-center items-center md:space-x-6 space-y-6 md:space-y-0">
+          <div className="flex flex-col md:flex-row justify-center items-start md:space-x-6 space-y-6 md:space-y-0">
             {/* Pricing Cards */}
             <PricingCard
               plan="Free"
@@ -338,7 +347,7 @@ const Home = () => {
               ]}
             />
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Footer */}
@@ -379,17 +388,18 @@ interface PricingCardProps {
 
 const PricingCard: React.FC<PricingCardProps> = ({ plan, price, features }) => (
   <div className="bg-white p-8 rounded-lg shadow hover:shadow-lg transition-shadow w-full md:w-1/4 dark:bg-gray-900">
-    <h3 className="text-2xl font-semibold mb-4 text-green-700">{plan} Plan</h3>
-    <p className="text-4xl font-bold mb-6">{price}</p>
-    <ul className=" text-gray-900  dark:text-gray-200 space-y-4 py-8">
+    <h3 className="text-2xl font-semibold mb-2 text-green-700">{plan} Plan</h3>
+    <p className="text-3xl font-bold mb-2">{price}</p>
+    <hr />
+    <ul className=" text-gray-900  dark:text-gray-400 space-y-4 py-6">
       {features.map((feature, index) => (
         <li key={index} className="flex items-start">
           <Checkmark />
-          <span className="text-gray-900 dark:text-gray-200">{feature}</span>
+          <span className="text-gray-900 dark:text-gray-300">{feature}</span>
         </li>
       ))}
     </ul>
-    <button className="bg-green-700 text-white px-4 py-2 rounded-md w-full">
+    <button className="bg-green-700 text-white px-4 py-2 shadow-sm rounded-md w-full">
       Choose Plan
     </button>
   </div>
