@@ -20,23 +20,46 @@ const Home = () => {
       <header className="bg-white shadow fixed w-full z-10 dark:bg-gray-900 dark:text-white">
         <nav className="container mx-auto flex items-center justify-between md:justify-around py-3 px-6">
           <a href="#">
-            <div className="text-2xl font-semibold cursor-pointer">Kamodo</div>
+            <div className="flex align-middle space-x-1">
+              {/* Logo */}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="size-6"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M7.502 6h7.128A3.375 3.375 0 0 1 18 9.375v9.375a3 3 0 0 0 3-3V6.108c0-1.505-1.125-2.811-2.664-2.94a48.972 48.972 0 0 0-.673-.05A3 3 0 0 0 15 1.5h-1.5a3 3 0 0 0-2.663 1.618c-.225.015-.45.032-.673.05C8.662 3.295 7.554 4.542 7.502 6ZM13.5 3A1.5 1.5 0 0 0 12 4.5h4.5A1.5 1.5 0 0 0 15 3h-1.5Z"
+                  clipRule="evenodd"
+                />
+                <path
+                  fillRule="evenodd"
+                  d="M3 9.375C3 8.339 3.84 7.5 4.875 7.5h9.75c1.036 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-9.75A1.875 1.875 0 0 1 3 20.625V9.375Zm9.586 4.594a.75.75 0 0 0-1.172-.938l-2.476 3.096-.908-.907a.75.75 0 0 0-1.06 1.06l1.5 1.5a.75.75 0 0 0 1.116-.062l3-3.75Z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <div className="text-xl font-semibold">Kamodo</div>
+            </div>
           </a>
           <div className="hidden md:flex space-x-6 font-medium items-center">
-            <a href="#features" className="hover:text-blue-600">
+            <a href="#about" className="hover:text-green-600 transition-all">
+              About
+            </a>
+            <a href="#features" className="hover:text-green-600 transition-all">
               Features
             </a>
-            <a href="#pricing" className="hover:text-blue-600">
+            <a href="#pricing" className="hover:text-green-600 transition-all">
               Pricing
             </a>
-            <a href="#contact" className="hover:text-blue-600">
+            <a href="#contact" className="hover:text-green-600 transition-all">
               Contact
             </a>
           </div>
           <div className="flex items-center space-x-3">
             <div className="flex items-center space-x-4">
               <DarkModeToggle />
-              <button className="bg-blue-600 text-white px-6 py-2 rounded-lg shadow-sm hover:shadow-md hidden md:block">
+              <button className="bg-green-700 text-white px-6 py-2 rounded-md shadow-lg transition-all hover:shadow-xl hidden md:block hover:scale-105">
                 Sign In
               </button>
             </div>
@@ -58,6 +81,13 @@ const Home = () => {
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden bg-white shadow-lg dark:bg-gray-900">
+            <a
+              href="#about"
+              onClick={closeMenu}
+              className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              About
+            </a>
             <a
               href="#features"
               onClick={closeMenu}
@@ -96,12 +126,12 @@ const Home = () => {
         <div className="p-6 py-4 rounded-lg">
           <h1 className="text-4xl md:text-5xl font-extrabold text-black mb-4 dark:text-gray-100">
             Simplify Your Business with{" "}
-            <span className="text-blue-700">Kamodo</span>
+            <span className="text-green-700 pt-4">Kamodo</span>
           </h1>
-          <p className="text-xl md:text-2xl font-normal text-gray-600 mb-6 dark:text-gray-400">
-            All-In-One Solution for Small Business Management
+          <p className="text-xl md:text-2xl font-normal text-gray-600 mb-6 mt-4 dark:text-gray-400">
+            Manage Customers, Employees, Jobs, and More—All in One Place
           </p>
-          <button className="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg transition-all hover:shadow-md">
+          <button className="bg-green-700 text-white px-6 py-3 mb-10 shadow-lg rounded-md text-lg transition-all hover:shadow-xl hover:scale-105">
             Get Started for Free
           </button>
           <Image
@@ -118,47 +148,56 @@ const Home = () => {
       </section>
       {/* About Section */}
       <section id="about" className="bg-white sm:py-20 dark:bg-gray-900">
-        <div className="max-w-screen-xl px-20 pt-10 md:pt-20 pb-10 mt-10 mx-auto">
+        <div className="max-w-screen-xl px-20 pt-10 md:pt-32 pb-10 mt-10 mx-auto">
           {/* Container for Flex Layout */}
           <div className="flex flex-col lg:flex-row items-start">
             {/* Left Side: Heading, Paragraph, and List */}
             <div className="w-full lg:w-2/3 lg:pr-8">
               <h2 className="text-4xl font-bold text-center lg:text-left mb-6 dark:text-gray-100">
-                Organize Your Small Business
+                Why use Kamodo?
               </h2>
-              <p className="max-w-2xl mb-6 text-gray-800 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-200">
-                Avoid miscommunication and manage the logistics of your business
-                with one app.
+              <p className="max-w-2xl mb-6 text-gray-900 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-200">
+                Disorganized? Starting a Small Business? Let us do the hard work
+                and manage your business within one app.
               </p>
-              <ul className="max-w-2xl space-y-4 py-2 text-gray-700 list-inside dark:text-gray-300">
+              <ul className="max-w-2xl space-y-4 text-gray-800 text-lg list-inside dark:text-gray-300">
                 <li className="flex items-center">
                   <Checkmark />
-                  Tracking job progress in real-time.
-                </li>
-                {/* Add other list items here */}
-                <li className="flex items-center">
-                  <Checkmark />
-                  Setting up clear tasks for your employees, reducing confusion.
-                </li>
-                {/* Continue adding list items as needed */}
-                <li className="flex items-center">
-                  <Checkmark />
-                  Manage your customer information
+                  Manage Your Customers
                 </li>
                 <li className="flex items-center">
                   <Checkmark />
-                  Track and assign equipment
+                  Create and Track Jobs
+                </li>
+                <li className="flex items-center">
+                  <Checkmark />
+                  Add Tasks for Each Job and Monitor Progress
+                </li>
+                <li className="flex items-center">
+                  <Checkmark />
+                  Manage Your Employees and Assign Them To Jobs
+                </li>
+                <li className="flex items-center">
+                  <Checkmark />
+                  Track and Assign Equipment
+                </li>
+                <li className="flex items-center">
+                  <Checkmark />
+                  Create Invoices for Jobs
                 </li>
               </ul>
             </div>
 
             {/* Right Side: Card */}
             <div className="w-full lg:w-1/3 lg:pl-8 mt-10 lg:mt-0">
-              <div className="bg-gray-200 dark:bg-gray-800 rounded-lg px-6 py-6">
-                <p className="text-gray-700 md:text-lg lg:text-lg dark:text-gray-200">
-                  Whether you’re organizing multiple projects, onboarding new
-                  employees, or just trying to keep things running smoothly,
-                  Kamodo is here to help you simplify your workflow.
+              <div className="bg-gray-200 dark:bg-gray-800 rounded-md px-6 py-10">
+                <p className="text-gray-900 mb-4 font-semibold md:text-xl lg:text-xl dark:text-gray-200">
+                  The Benefit
+                </p>
+                <p className="text-gray-800 font-normal md:text-md lg:text-md dark:text-gray-400">
+                  Employees waiting on a text for a customers address? Save time
+                  and assign them to your job with ready to go tasks to
+                  complete.
                 </p>
               </div>
             </div>
@@ -168,7 +207,7 @@ const Home = () => {
       {/* Features Section */}
       <section
         id="features"
-        className="py-10 sm:mt-10 dark:bg-gray-900 dark:text-white"
+        className="py-10 sm:mt-2 dark:bg-gray-900 dark:text-white"
       >
         <div className="container mx-auto px-6">
           <h2 className="text-4xl font-bold text-center mb-12">
@@ -340,7 +379,7 @@ interface PricingCardProps {
 
 const PricingCard: React.FC<PricingCardProps> = ({ plan, price, features }) => (
   <div className="bg-white p-8 rounded-lg shadow hover:shadow-lg transition-shadow w-full md:w-1/4 dark:bg-gray-900">
-    <h3 className="text-2xl font-semibold mb-4 text-blue-600">{plan} Plan</h3>
+    <h3 className="text-2xl font-semibold mb-4 text-green-700">{plan} Plan</h3>
     <p className="text-4xl font-bold mb-6">{price}</p>
     <ul className=" text-gray-900  dark:text-gray-200 space-y-4 py-8">
       {features.map((feature, index) => (
@@ -350,7 +389,7 @@ const PricingCard: React.FC<PricingCardProps> = ({ plan, price, features }) => (
         </li>
       ))}
     </ul>
-    <button className="bg-blue-600 text-white px-4 py-2 rounded-md w-full">
+    <button className="bg-green-700 text-white px-4 py-2 rounded-md w-full">
       Choose Plan
     </button>
   </div>
