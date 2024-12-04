@@ -59,7 +59,7 @@ const Home = () => {
           <div className="flex items-center space-x-3">
             <div className="flex items-center space-x-4">
               <DarkModeToggle />
-              <button className="bg-green-700 text-white px-6 py-2 rounded-md shadow-lg transition-all hover:shadow-xl hidden md:block hover:scale-105">
+              <button className="bg-green-700 text-white px-6 py-2 rounded-md shadow-md transition-all hover:shadow-xl hidden md:block hover:scale-105">
                 Sign In
               </button>
             </div>
@@ -112,7 +112,7 @@ const Home = () => {
             <div>
               <button
                 onClick={closeMenu}
-                className="w-full bg-blue-600 text-white px-4 py-2"
+                className="w-full bg-green-600 text-white px-4 py-2"
               >
                 Sign In
               </button>
@@ -131,7 +131,7 @@ const Home = () => {
           <p className="text-xl md:text-2xl font-normal text-gray-600 mb-6 mt-4 dark:text-gray-400">
             Manage Customers, Employees, Jobs, and More—All in One Place
           </p>
-          <button className="bg-green-700 text-white px-6 py-3 mb-10 shadow-lg rounded-md text-lg transition-all hover:shadow-xl hover:scale-105">
+          <button className="bg-green-700 text-white px-10 py-2.5 mb-10 shadow-lg rounded-md text-lg transition-all hover:shadow-xl hover:scale-105">
             Get Started for Free
           </button>
           <Image
@@ -190,7 +190,7 @@ const Home = () => {
 
             {/* Right Side: Card */}
             <div className="w-full lg:w-1/3 lg:pl-8 mt-10 lg:mt-0">
-              <div className="bg-gray-200 dark:bg-gray-800 rounded-md px-6 py-10">
+              <div className="bg-gray-200 dark:bg-gray-800 shadow-md rounded-md px-6 py-10">
                 <p className="text-gray-900 mb-4 font-semibold md:text-xl lg:text-xl dark:text-gray-200">
                   The Benefit
                 </p>
