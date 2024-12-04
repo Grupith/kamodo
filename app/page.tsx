@@ -7,6 +7,7 @@ import DashboardMockupDark from "../public/images/dashboard-mockup-dark.svg";
 import DarkModeToggle from "./components/DarkModeToggle";
 import Checkmark from "./components/Checkmark";
 import { motion } from "motion/react";
+import Check from "../public/images/check.png";
 
 const Home = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -27,7 +28,10 @@ const Home = () => {
           className="container mx-auto flex items-center justify-between md:justify-around py-3 px-6"
         >
           <a href="#">
-            <motion.div className="text-2xl font-bold">Kamodo</motion.div>
+            <div className="flex space-x-1 items-center">
+              <Image alt="logo placeholder" src={Check} className="w-7 h-7" />
+              <motion.div className="text-2xl font-bold">Kamodo</motion.div>
+            </div>
           </a>
           <div className="hidden md:flex space-x-6 font-medium items-center">
             <a href="#about" className="hover:text-green-600 transition-all">
