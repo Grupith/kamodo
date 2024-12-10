@@ -1,6 +1,17 @@
 "use client";
 import React, { useState } from "react";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import {
+  Bars3Icon,
+  XMarkIcon,
+  UserGroupIcon,
+  BriefcaseIcon,
+  CalendarIcon,
+  ClipboardDocumentListIcon,
+  Cog6ToothIcon,
+  BellAlertIcon,
+  DevicePhoneMobileIcon,
+  CheckIcon,
+} from "@heroicons/react/24/outline";
 import Image from "next/image";
 import DashboardMockup from "../public/images/dashboard-mockup.svg";
 import DashboardMockupDark from "../public/images/dashboard-mockup-dark.svg";
@@ -220,54 +231,58 @@ const Home = () => {
           className="container mx-auto px-10"
         >
           <h2 className="text-4xl font-bold mb-12 text-center">Features</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Feature Items */}
             <FeatureItem
-              icon="👥"
+              Icon={UserGroupIcon}
               title="Customer Management"
               features={[
                 "Store customer contact information",
                 "View job history for each customer",
+                "Add notes to customers profile",
               ]}
             />
             <FeatureItem
-              icon="👨‍💼"
+              Icon={BriefcaseIcon}
               title="Employee Management"
               features={[
                 "Store employee information",
+                "Track employee progress",
                 "Adjust roles of employees",
               ]}
             />
             <FeatureItem
-              icon="🗓️"
+              Icon={CalendarIcon}
               title="Job Tracking"
               features={[
                 "Create jobs with assigned dates",
-                "Assign jobs to employees",
+                "Setup recurring jobs",
+                "Assign employees to jobs",
+                "Employees only view the jobs they are assigned to",
                 "Track job status",
-                "Create recurring jobs",
               ]}
             />
             <FeatureItem
-              icon="📝"
+              Icon={ClipboardDocumentListIcon}
               title="Job Task Assignment"
               features={[
-                "Assign tasks to employees",
+                "Create tasks for employees to complete",
+                "Get notifed when tasks completed",
                 "Upload photos to tasks",
                 "View task status",
               ]}
             />
             <FeatureItem
-              icon="⚙️"
+              Icon={Cog6ToothIcon}
               title="Equipment Management"
               features={[
                 "Track all equipment",
-                "Adjust equipment data",
+                "Equipment page with history, info, etc.",
                 "Assign equipment to jobs",
               ]}
             />
             <FeatureItem
-              icon="🔔"
+              Icon={BellAlertIcon}
               title="Real-Time Updates"
               features={[
                 "Sync job and task updates",
@@ -275,7 +290,7 @@ const Home = () => {
               ]}
             />
             <FeatureItem
-              icon="📱"
+              Icon={DevicePhoneMobileIcon}
               title="Mobile-First Design"
               features={[
                 "Responsive design for mobile users",
@@ -367,18 +382,25 @@ const Home = () => {
 };
 
 interface FeatureItemProps {
-  icon: string;
+  Icon: React.ElementType;
   title: string;
   features: string[];
 }
 
-const FeatureItem: React.FC<FeatureItemProps> = ({ icon, title, features }) => (
-  <div className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow dark:bg-gray-800 dark:text-white">
-    <div className="text-4xl mb-4">{icon}</div>
+const FeatureItem: React.FC<FeatureItemProps> = ({ Icon, title, features }) => (
+  <div className="bg-white p-6 rounded-lg shadow hover:shadow-xl transition-shadow dark:bg-gray-800 dark:text-white">
+    <div className="mb-4">
+      <Icon className="h-12 w-12 text-green-600" />
+    </div>
     <h3 className="text-2xl font-semibold mb-4">{title}</h3>
-    <ul className="list-disc list-inside text-black dark:text-gray-200 space-y-2">
+    <ul className="space-y-2">
       {features.map((feature, index) => (
-        <li key={index}>{feature}</li>
+        <li key={index} className="flex items-start">
+          <CheckIcon className="h-5 w-5 text-green-600 flex-shrink-0 mt-1" />
+          <span className="ml-2 text-gray-700 dark:text-gray-300">
+            {feature}
+          </span>
+        </li>
       ))}
     </ul>
   </div>
