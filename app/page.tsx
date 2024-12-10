@@ -370,6 +370,95 @@ const Home = () => {
         </motion.div>
       </section>
 
+      {/* Contact Section */}
+      <section
+        id="contact"
+        className="bg-gray-50 py-20 dark:bg-gray-900 dark:text-white"
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="container mx-auto px-6 max-w-screen-lg"
+        >
+          <h2 className="text-5xl font-extrabold text-center mb-6 text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-teal-400">
+            Get in Touch
+          </h2>
+          <p className="text-center text-lg mb-12 text-gray-700 dark:text-gray-300">
+            We'd love to hear from you! Fill out the form below and we'll get
+            back to you shortly.
+          </p>
+          <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-8 sm:p-12">
+            <form className="space-y-8">
+              {/* Name Field */}
+              <div className="relative">
+                <label
+                  htmlFor="name"
+                  className="absolute -top-3 left-3 text-sm bg-white px-2 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+                >
+                  Name
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  className="w-full px-4 py-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-green-500 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  placeholder="Your Name"
+                  required
+                />
+              </div>
+
+              {/* Email Field */}
+              <div className="relative">
+                <label
+                  htmlFor="email"
+                  className="absolute -top-3 left-3 text-sm bg-white px-2 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+                >
+                  Email
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  className="w-full px-4 py-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-green-500 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  placeholder="you@example.com"
+                  required
+                />
+              </div>
+
+              {/* Message Field */}
+              <div className="relative">
+                <label
+                  htmlFor="message"
+                  className=" absolute -top-3 left-3 text-sm bg-white px-2 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+                >
+                  Message
+                </label>
+                <textarea
+                  id="message"
+                  name="message"
+                  rows={5}
+                  className="w-full px-4 py-3 resize-none rounded-md border border-gray-300 focus:ring-2 focus:ring-green-500 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  placeholder="Your Message"
+                  required
+                ></textarea>
+              </div>
+
+              {/* Submit Button */}
+              <div className="text-center">
+                <button
+                  type="submit"
+                  className="px-8 py-3 bg-gradient-to-tr from-green-700 to-green-800 text-white font-semibold rounded-md shadow-md hover:shadow-lg hover:scale-105 transition-transform focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-offset-gray-900"
+                >
+                  Send Message
+                </button>
+              </div>
+            </form>
+          </div>
+        </motion.div>
+      </section>
+
       {/* Footer */}
       <footer className="bg-white py-6 dark:bg-gray-900">
         <div className="container mx-auto text-center">
