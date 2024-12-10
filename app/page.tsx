@@ -302,6 +302,7 @@ const Home = () => {
       </section>
 
       {/* Pricing Section */}
+
       <section
         id="pricing"
         className="bg-gray-100 pt-10 pb-20 dark:bg-gray-800 dark:text-gray-100"
