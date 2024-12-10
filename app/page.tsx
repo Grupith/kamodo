@@ -386,8 +386,8 @@ const Home = () => {
             Get in Touch
           </h2>
           <p className="text-center text-lg mb-12 text-gray-700 dark:text-gray-300">
-            We'd love to hear from you! Fill out the form below and we'll get
-            back to you shortly.
+            {`We'd love to hear from you! Fill out the form below and we'll get
+            back to you shortly.`}
           </p>
           <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-8 sm:p-12">
             <form className="space-y-8">
