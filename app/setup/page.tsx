@@ -1,7 +1,4 @@
-// src/app/setup/page.tsx
-
 "use client";
-
 import React from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { signOutUser } from "@/lib/auth";
@@ -35,15 +32,15 @@ function Setup() {
         <nav className="flex justify-end px-4">
           <button
             onClick={handleSignOut}
-            className="bg-green-600 dark:bg-green-500 hover:bg-green-700 dark:hover:bg-green-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
+            className="bg-green-600 dark:bg-green-600 hover:bg-green-700 dark:hover:bg-green-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
           >
-            Sign Out
+            Logout
           </button>
         </nav>
 
         {/* Main Content */}
         <div className="flex items-center justify-center flex-col mt-10">
-          <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-4">
+          <h1 className="text-4xl text-center font-bold text-gray-800 dark:text-white mb-4">
             Get Started with Kamodo
           </h1>
           <p className="text-center text-gray-600 dark:text-gray-300 mb-8 max-w-md">

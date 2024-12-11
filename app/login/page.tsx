@@ -1,16 +1,15 @@
-// src/app/login/page.tsx
-
 "use client";
-
 import React, { useEffect } from "react";
 import { auth } from "@/firebase/firebase";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAlert } from "@/contexts/AlertContext";
 
 const LoginPage: React.FC = () => {
   const router = useRouter();
   const { user, loading } = useAuth();
+  const { showAlert } = useAlert();
 
   const handleGoogleLogin = async () => {
     const provider = new GoogleAuthProvider();
@@ -27,6 +26,7 @@ const LoginPage: React.FC = () => {
   useEffect(() => {
     if (!loading && user) {
       router.push("/setup");
+      showAlert("success", "Logged in!");
     }
   }, [user, loading, router]);
 

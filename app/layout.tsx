@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { AlertProvider } from "@/contexts/AlertContext";
 
 export const metadata: Metadata = {
   title: "Kamodo",
@@ -29,7 +30,9 @@ export default function RootLayout({
           defaultTheme="system" // Defaults to system preference
           enableSystem={true} // Enables automatic theme detection
         >
-          <AuthProvider>{children}</AuthProvider>
+          <AlertProvider>
+            <AuthProvider>{children}</AuthProvider>
+          </AlertProvider>
           <Analytics />
           <SpeedInsights />
         </NextThemesProvider>
