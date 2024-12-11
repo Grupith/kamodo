@@ -15,16 +15,31 @@ import {
 import Image from "next/image";
 import DashboardMockup from "../public/images/dashboard-mockup.svg";
 import DashboardMockupDark from "../public/images/dashboard-mockup-dark.svg";
-import DarkModeToggle from "./components/DarkModeToggle";
-import Checkmark from "./components/Checkmark";
+import DarkModeToggle from "../components/DarkModeToggle";
+import Checkmark from "../components/Checkmark";
 import { motion } from "motion/react";
 import Check from "../public/images/check.png";
+import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext";
+import { signOutUser } from "@/lib/auth";
+import { useRouter } from "next/navigation";
 
 const Home = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user } = useAuth();
+  const router = useRouter();
 
   const closeMenu = () => {
     setIsMenuOpen(false);
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOutUser();
+      router.push("/");
+    } catch (error) {
+      alert("Failed to signout");
+    }
   };
 
   return (
@@ -61,9 +76,20 @@ const Home = () => {
           <div className="flex items-center space-x-3">
             <div className="flex items-center space-x-4">
               <DarkModeToggle />
-              <button className="bg-green-700 text-white px-6 py-2 rounded-md shadow-md transition-all hover:shadow-xl hidden md:block hover:scale-105">
-                Sign In
-              </button>
+              {!user ? (
+                <Link href="/login">
+                  <button className="bg-green-700 text-white px-6 py-2 rounded-md shadow-md transition-all hover:shadow-xl hidden md:block hover:scale-105">
+                    Login
+                  </button>
+                </Link>
+              ) : (
+                <button
+                  onClick={handleSignOut}
+                  className="bg-green-700 text-white px-6 py-2 rounded-md shadow-md transition-all hover:shadow-xl hidden md:block hover:scale-105"
+                >
+                  Logout
+                </button>
+              )}
             </div>
             {/* Mobile Menu Button */}
             <div className="md:hidden">
@@ -112,12 +138,23 @@ const Home = () => {
               Contact
             </a>
             <div>
-              <button
-                onClick={closeMenu}
-                className="w-full bg-green-600 text-white px-4 py-2"
-              >
-                Sign In
-              </button>
+              {!user ? (
+                <Link href="/login">
+                  <button
+                    onClick={closeMenu}
+                    className="w-full bg-green-600 text-white px-4 py-2"
+                  >
+                    Login
+                  </button>
+                </Link>
+              ) : (
+                <button
+                  onClick={handleSignOut}
+                  className="w-full bg-green-600 text-white px-4 py-2"
+                >
+                  Logout
+                </button>
+              )}
             </div>
           </div>
         )}
