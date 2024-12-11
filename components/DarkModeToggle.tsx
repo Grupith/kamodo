@@ -20,8 +20,10 @@ const DarkModeToggle: React.FC = () => {
   const toggleDarkMode = () => {
     if (resolvedTheme === "dark") {
       setTheme("light");
+      console.log("switched to", theme);
     } else {
       setTheme("dark");
+      console.log("switched to", theme);
     }
   };
 
