@@ -20,7 +20,6 @@ const LoginPage: React.FC = () => {
       // Redirect will be handled by useEffect below
     } catch (error) {
       console.error("Error during sign-in:", error);
-      alert("Failed to sign in. Please try again.");
     }
   };
 

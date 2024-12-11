@@ -38,7 +38,7 @@ const Home = () => {
       await signOutUser();
       router.push("/");
     } catch (error) {
-      alert("Failed to signout");
+      console.log("Error trying to sign out", error);
     }
   };
 

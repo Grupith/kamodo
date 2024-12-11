@@ -12,7 +12,7 @@ function Setup() {
       await signOutUser();
       router.push("/");
     } catch (error) {
-      alert("Error trying to sign out");
+      console.log("Error trying to sign out", error);
     }
   };
   return (
