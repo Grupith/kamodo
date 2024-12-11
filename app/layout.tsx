@@ -4,6 +4,7 @@ import { Figtree } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
 
 export const metadata: Metadata = {
   title: "Kamodo",
@@ -21,11 +22,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${figTree.className} dark:bg-gray-800`}>
-        <AuthProvider>{children}</AuthProvider>
-        <Analytics />
-        <SpeedInsights />
+        <NextThemesProvider
+          attribute="class" // Uses class-based theming
+          defaultTheme="system" // Defaults to system preference
+          enableSystem={true} // Enables automatic theme detection
+        >
+          <AuthProvider>{children}</AuthProvider>
+          <Analytics />
+          <SpeedInsights />
+        </NextThemesProvider>
       </body>
     </html>
   );

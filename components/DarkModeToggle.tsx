@@ -1,36 +1,37 @@
+// src/components/DarkModeToggle.tsx
+
 "use client";
+
 import React, { useEffect, useState } from "react";
 import { MoonIcon, SunIcon } from "@heroicons/react/24/outline"; // Or solid if you prefer
+import { useTheme } from "next-themes";
 
 const DarkModeToggle: React.FC = () => {
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
-  // Load the theme from localStorage on component mount
+  // Ensure the component is mounted to avoid hydration issues
   useEffect(() => {
-    const savedTheme = localStorage.getItem("darkMode") === "true";
-    setIsDarkMode(savedTheme);
-    document.documentElement.classList.toggle("dark", savedTheme);
+    setMounted(true);
   }, []);
 
-  // Toggle dark mode
+  if (!mounted) return null; // Avoid rendering until mounted
+
   const toggleDarkMode = () => {
-    const newTheme = !isDarkMode; // newTheme is boolean
-    setIsDarkMode(newTheme);
-
-    // Save as string for localStorage
-    localStorage.setItem("darkMode", newTheme.toString());
-
-    // Update the document class
-    document.documentElement.classList.toggle("dark", newTheme);
+    if (resolvedTheme === "dark") {
+      setTheme("light");
+    } else {
+      setTheme("dark");
+    }
   };
 
   return (
     <button
       onClick={toggleDarkMode}
-      className="flex items-center justify-center p-2 rounded-lg focus:outline-none bg-white hover:bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-white dark:hover:bg-gray-700 transition-all duration-200"
+      className="flex items-center justify-center p-2 rounded-lg focus:outline-none bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white transition-all duration-200"
       aria-label="Toggle Dark Mode"
     >
-      {isDarkMode ? (
+      {resolvedTheme === "dark" ? (
         <SunIcon className="h-6 w-6" />
       ) : (
         <MoonIcon className="h-6 w-6" />
