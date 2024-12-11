@@ -5,6 +5,7 @@ import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAlert } from "@/contexts/AlertContext";
+import { checkOrCreateUserDoc } from "@/firebase/firestore";
 
 const LoginPage: React.FC = () => {
   const router = useRouter();
@@ -14,9 +15,15 @@ const LoginPage: React.FC = () => {
   const handleGoogleLogin = async () => {
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
-      // The user is now signed in
-      // Redirect will be handled by useEffect below
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // Check or Create user document
+      const userDoc = await checkOrCreateUserDoc(
+        user.uid,
+        user.displayName,
+        user.email
+      );
     } catch (error) {
       console.error("Error during sign-in:", error);
     }
