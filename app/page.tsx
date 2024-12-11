@@ -176,9 +176,11 @@ const Home = () => {
           <p className="text-xl md:text-2xl font-normal text-gray-600 mb-6 mt-4 dark:text-gray-400">
             Manage Customers, Employees, Jobs, and More—All in One Place
           </p>
-          <button className="bg-green-700 text-white px-10 py-2.5 mb-10 shadow-lg rounded-md text-lg transition-all hover:shadow-xl hover:scale-105">
-            Get Started for Free
-          </button>
+          <Link href="/login">
+            <button className="bg-green-700 text-white px-10 py-2.5 mb-10 shadow-lg rounded-md text-lg transition-all hover:shadow-xl hover:scale-105">
+              Get Started for Free
+            </button>
+          </Link>
           <Image
             src={DashboardMockup}
             alt={"Dashboard mockup light"}
@@ -342,7 +344,7 @@ const Home = () => {
 
       <section
         id="pricing"
-        className="bg-gray-100 pt-10 pb-20 dark:bg-gray-800 dark:text-gray-100"
+        className="bg-gray-100 pt-10 pb-20 mx-6 md:mx-0 dark:bg-gray-800 dark:text-gray-100"
       >
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -358,32 +360,35 @@ const Home = () => {
             {/* Pricing Cards */}
             <PricingCard
               plan="Free"
-              price="Free"
+              bio="Try Kamodo, No 14-day trial! No Risk!"
+              price="$0"
               features={[
-                "Up to 2 employees",
-                "10 customers",
-                "5 jobs limit",
-                "10 tasks per job",
-                "No file uploads",
+                "Up to 3 employees",
+                "20 customers",
+                "20 jobs limit",
+                "20 tasks per job",
               ]}
             />
             <PricingCard
-              plan="Pro"
-              price="$29/month"
+              plan="Starter"
+              bio={`More features, Perfect for a Small Business.`}
+              price="$29"
               features={[
-                "Up to 5 employees",
+                "Up to 6 employees",
                 "Unlimited customers",
                 "Unlimited jobs",
                 "Unlimited tasks",
                 "Upload images/files",
                 "Equipment tracking",
+                "Chat",
               ]}
             />
             <PricingCard
-              plan="Premium"
-              price="$79/month"
+              plan="Pro"
+              bio="Finance package, easy invocies, send qoutes, etc."
+              price="$99"
               features={[
-                "Up to 25 employees",
+                "Up to 30 employees",
                 "All Pro features",
                 "Sync with Google/Outlook",
                 "Quotes/invoicing tracking",
@@ -393,7 +398,8 @@ const Home = () => {
             />
             <PricingCard
               plan="Enterprise"
-              price="$299/month"
+              bio="Larger companies, custom needs, priority support."
+              price="$399"
               features={[
                 "Unlimited employees",
                 "All Premium features",
@@ -537,13 +543,28 @@ interface PricingCardProps {
   plan: string;
   price: string;
   features: string[];
+  bio: string;
 }
 
-const PricingCard: React.FC<PricingCardProps> = ({ plan, price, features }) => (
-  <div className="bg-white p-8 rounded-lg shadow hover:shadow-lg transition-shadow w-full md:w-1/4 dark:bg-gray-900">
-    <h3 className="text-2xl font-semibold mb-2 text-green-700">{plan} Plan</h3>
-    <p className="text-3xl font-bold mb-2">{price}</p>
-    <hr />
+const PricingCard: React.FC<PricingCardProps> = ({
+  plan,
+  price,
+  features,
+  bio,
+}) => (
+  <div className="bg-white p-8 rounded-lg shadow hover:shadow-lg transition-shadow w-full md:w-1/4 border dark:border-gray-700/90 dark:bg-gray-900">
+    <h3 className="text-4xl text-center font-medium mb-2 text-black dark:text-white">
+      {plan}
+    </h3>
+    <p className="text-md text-center py-2 pb-6 text-gray-800 dark:text-gray-300">
+      {bio}{" "}
+    </p>
+    <p className="text-5xl text-center font-bold mb-1">
+      {price}
+      <span className="text-lg font-normal text-gray-600 dark:text-gray-500">
+        /month
+      </span>
+    </p>
     <ul className=" text-gray-900  dark:text-gray-400 space-y-4 py-6">
       {features.map((feature, index) => (
         <li key={index} className="flex items-start">
