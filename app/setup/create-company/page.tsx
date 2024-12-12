@@ -3,13 +3,14 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 
 type FormValues = {
   companyName: string;
   numberOfEmployees: number;
   website: string;
   state: string;
-  businessType: string[];
+  businessType: string;
 };
 
 const states = ["California", "Texas", "New York", "Florida", "Wisconsin"]; // Example states
@@ -26,10 +27,7 @@ function CreateCompany() {
   const onSubmit = async (data: FormValues) => {
     try {
       console.log("Form Data:", data);
-
       // TODO: Implement company creation logic (e.g., Firebase Firestore)
-      // Example: await createNewCompany(data);
-
       alert(`Company "${data.companyName}" created successfully!`);
       router.push("/dashboard"); // Redirect to dashboard after creation
     } catch (error) {
@@ -38,19 +36,55 @@ function CreateCompany() {
     }
   };
 
+  // Animation Variants
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.8, ease: "easeOut" },
+    },
+  };
+
+  const fieldVariants = {
+    hidden: { opacity: 0, y: 15 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: { delay: i * 0.1 + 0.5, duration: 0.6, ease: "easeOut" },
+    }),
+  };
+
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 flex flex-col items-center justify-center">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 max-w-md w-full">
-          <h2 className="text-2xl font-semibold text-center text-gray-800 dark:text-white mb-6">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4 flex flex-col items-center justify-center">
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 max-w-md w-full"
+        >
+          <motion.h2
+            initial={{ opacity: 0, y: -15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="text-3xl font-bold text-center text-gray-800 dark:text-white mb-8"
+          >
             Create a New Company
-          </h2>
-          <form onSubmit={handleSubmit(onSubmit)} noValidate>
-            {/* Company Name */}
-            <div className="mb-4">
+          </motion.h2>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            noValidate
+            className="space-y-6"
+          >
+            <motion.div
+              custom={0}
+              variants={fieldVariants}
+              className="flex flex-col"
+            >
               <label
                 htmlFor="companyName"
-                className="block text-gray-700 dark:text-gray-300 mb-2"
+                className="block text-gray-700 dark:text-gray-300 mb-2 font-medium"
               >
                 Company Name
               </label>
@@ -59,7 +93,7 @@ function CreateCompany() {
                 {...register("companyName", {
                   required: "Company name is required",
                 })}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white transition"
                 placeholder="Enter your company name"
               />
               {errors.companyName && (
@@ -67,13 +101,16 @@ function CreateCompany() {
                   {errors.companyName.message}
                 </p>
               )}
-            </div>
+            </motion.div>
 
-            {/* Number of Employees */}
-            <div className="mb-4">
+            <motion.div
+              custom={1}
+              variants={fieldVariants}
+              className="flex flex-col"
+            >
               <label
                 htmlFor="numberOfEmployees"
-                className="block text-gray-700 dark:text-gray-300 mb-2"
+                className="block text-gray-700 dark:text-gray-300 mb-2 font-medium"
               >
                 Number of Employees
               </label>
@@ -84,7 +121,7 @@ function CreateCompany() {
                   required: "Number of employees is required",
                   valueAsNumber: true,
                 })}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white transition"
                 placeholder="Enter the number of employees"
               />
               {errors.numberOfEmployees && (
@@ -92,13 +129,16 @@ function CreateCompany() {
                   {errors.numberOfEmployees.message}
                 </p>
               )}
-            </div>
+            </motion.div>
 
-            {/* Website */}
-            <div className="mb-4">
+            <motion.div
+              custom={2}
+              variants={fieldVariants}
+              className="flex flex-col"
+            >
               <label
                 htmlFor="website"
-                className="block text-gray-700 dark:text-gray-300 mb-2"
+                className="block text-gray-700 dark:text-gray-300 mb-2 font-medium"
               >
                 Company Website
               </label>
@@ -109,11 +149,11 @@ function CreateCompany() {
                   required: "Company website is required",
                   pattern: {
                     value:
-                      /^(https?:\/\/)?([\w-]+)+[\w-]+(.[\w-]+)+[\w-]+(.[\w]{2,})+$/,
+                      /^(https?:\/\/)?([\w-]+)+[\w-]+(\.[\w-]+)+[\w-]+(.[\w]{2,})+$/,
                     message: "Invalid website URL",
                   },
                 })}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white transition"
                 placeholder="Enter your company website"
               />
               {errors.website && (
@@ -121,20 +161,23 @@ function CreateCompany() {
                   {errors.website.message}
                 </p>
               )}
-            </div>
+            </motion.div>
 
-            {/* State */}
-            <div className="mb-4">
+            <motion.div
+              custom={3}
+              variants={fieldVariants}
+              className="flex flex-col"
+            >
               <label
                 htmlFor="state"
-                className="block text-gray-700 dark:text-gray-300 mb-2"
+                className="block text-gray-700 dark:text-gray-300 mb-2 font-medium"
               >
                 State
               </label>
               <select
                 id="state"
                 {...register("state", { required: "State is required" })}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white transition"
               >
                 <option value="">Select a state</option>
                 {states.map((state) => (
@@ -148,13 +191,16 @@ function CreateCompany() {
                   {errors.state.message}
                 </p>
               )}
-            </div>
+            </motion.div>
 
-            {/* Business Type */}
-            <div className="mb-6">
+            <motion.div
+              custom={4}
+              variants={fieldVariants}
+              className="flex flex-col"
+            >
               <label
                 htmlFor="businessType"
-                className="block text-gray-700 dark:text-gray-300 mb-2"
+                className="block text-gray-700 dark:text-gray-300 mb-2 font-medium"
               >
                 Business Type
               </label>
@@ -163,7 +209,7 @@ function CreateCompany() {
                 {...register("businessType", {
                   required: "Business type is required",
                 })}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white transition"
               >
                 <option value="">Select a business type</option>
                 {businessTypes.map((type) => (
@@ -177,17 +223,18 @@ function CreateCompany() {
                   {errors.businessType.message}
                 </p>
               )}
-            </div>
+            </motion.div>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              className="w-full bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-200"
-            >
-              Create Company
-            </button>
+            <motion.div custom={5} variants={fieldVariants}>
+              <button
+                type="submit"
+                className="w-full bg-blue-600 dark:bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+              >
+                Create Company
+              </button>
+            </motion.div>
           </form>
-        </div>
+        </motion.div>
       </div>
     </ProtectedRoute>
   );

@@ -100,7 +100,7 @@ const LandingPage = () => {
                 <DarkModeToggle />
                 {!user ? (
                   <Link href="/login">
-                    <button className="bg-green-700 text-white px-6 py-2 rounded-md shadow-md transition-transform hover:shadow-xl hidden md:block hover:scale-105">
+                    <button className="bg-blue-600 dark:bg-blue-800 text-white px-6 py-2 rounded-md shadow-md transition-transform hover:shadow-xl hidden md:block hover:scale-105">
                       Login
                     </button>
                   </Link>
@@ -201,7 +201,7 @@ const LandingPage = () => {
               Manage Customers, Employees, Jobs, and More—All in One Place
             </p>
             <Link href="/login">
-              <button className="bg-green-700 text-white px-10 py-3 mb-10 shadow-lg rounded-md text-lg transition-transform hover:shadow-xl hover:scale-105">
+              <button className="bg-green-600 dark:bg-green-800 text-white px-10 py-4 mb-10 shadow-lg rounded-md text-lg transition-transform hover:shadow-xl hover:scale-105">
                 Get Started for Free
               </button>
             </Link>
@@ -510,7 +510,7 @@ const LandingPage = () => {
                 <div className="text-center">
                   <button
                     type="submit"
-                    className="px-8 py-3 bg-gradient-to-tr from-green-700 to-green-800 text-white font-semibold rounded-md shadow-md hover:shadow-lg hover:scale-105 transition-transform focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-offset-gray-900"
+                    className="px-8 py-3 bg-green-600 dark:bg-green-800 text-white font-semibold rounded-md shadow-md hover:shadow-lg hover:scale-105 transition-transform focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-offset-gray-900"
                   >
                     Send Message
                   </button>
@@ -610,7 +610,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
       </ul>
     </div>
     {/* Button at the bottom */}
-    <button className="mt-auto bg-green-700 text-white px-4 py-2 shadow-sm rounded-md w-full transition-transform hover:shadow-md hover:scale-105">
+    <button className="mt-auto bg-green-600 dark:bg-green-800 text-white px-4 py-2 shadow-sm rounded-md w-full transition-transform hover:shadow-md hover:scale-105">
       Choose Plan
     </button>
   </motion.div>

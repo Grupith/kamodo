@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAlert } from "@/contexts/AlertContext";
 import { checkOrCreateUserDoc } from "@/firebase/firestore";
+import { motion } from "framer-motion";
 
 const LoginPage: React.FC = () => {
   const router = useRouter();
@@ -48,23 +49,53 @@ const LoginPage: React.FC = () => {
     );
   }
 
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 max-w-md w-full">
-        {/* Optional Logo */}
-        {/* <div className="flex justify-center mb-6">
-          <img src="/logo.png" alt="Kamodo Logo" className="h-12 w-12" />
-        </div> */}
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.8, ease: "easeOut" },
+    },
+  };
 
-        <h1 className="text-3xl font-semibold text-center mb-4 text-gray-800 dark:text-white">
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+        className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 max-w-md w-full"
+      >
+        {/* Optional Logo */}
+        {/* 
+        <div className="flex justify-center mb-6">
+          <img src="/logo.png" alt="Kamodo Logo" className="h-12 w-12" />
+        </div> 
+        */}
+
+        <motion.h1
+          initial={{ opacity: 0, y: -15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-3xl font-bold text-center mb-4 text-gray-800 dark:text-white"
+        >
           Welcome to Kamodo
-        </h1>
-        <p className="text-center text-gray-600 dark:text-gray-300 mb-6">
-          Currently, we only offer Google email for signing up.
-        </p>
-        <button
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+          className="text-center text-gray-600 dark:text-gray-300 mb-6"
+        >
+          Currently, we only offer Google sign in.
+        </motion.p>
+        <motion.button
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 }}
           onClick={handleGoogleLogin}
-          className="flex items-center justify-center w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 text-gray-700 dark:text-gray-200 font-medium py-2 px-4 rounded-lg shadow-sm transition duration-200"
+          className="flex items-center justify-center w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 text-gray-700 dark:text-gray-200 font-medium py-2 px-4 rounded-lg shadow-sm transition-transform transform hover:scale-105 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800"
         >
           {/* Google Icon */}
           <svg
@@ -90,8 +121,8 @@ const LoginPage: React.FC = () => {
             />
           </svg>
           Sign in with Google
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
     </div>
   );
 };
