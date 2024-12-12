@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { MoonIcon, SunIcon } from "@heroicons/react/24/outline";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
@@ -15,13 +15,14 @@ const DarkModeToggle: React.FC = () => {
     setMounted(true);
   }, []);
 
-  const toggleDarkMode = () => {
+  // Wrap toggleDarkMode in useCallback
+  const toggleDarkMode = useCallback(() => {
     if (resolvedTheme === "dark") {
       setTheme("light");
     } else {
       setTheme("dark");
     }
-  };
+  }, [resolvedTheme, setTheme]);
 
   // Add hotkey logic
   useEffect(() => {
@@ -37,7 +38,7 @@ const DarkModeToggle: React.FC = () => {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [resolvedTheme, setTheme, toggleDarkMode]);
+  }, [toggleDarkMode]);
 
   if (!mounted) return null;
 
