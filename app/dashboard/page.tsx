@@ -3,17 +3,6 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import { useCompany } from "@/contexts/CompanyContext";
 import React from "react";
 
-interface Company {
-  id: string;
-  name: string;
-  numberOfEmployees?: number;
-  website?: string;
-  state?: string;
-  businessType?: string;
-  ownerId: string;
-  createdAt?: any; // Use Firebase Timestamp if applicable
-}
-
 const Dashboard = () => {
   const company = useCompany();
   return (

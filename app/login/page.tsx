@@ -4,7 +4,7 @@
 
 import React, { useEffect } from "react";
 import { auth, db, googleProvider } from "@/firebase/firebase"; // Ensure this path is correct
-import { signInWithPopup, GoogleAuthProvider, User } from "firebase/auth";
+import { signInWithPopup } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAlert } from "@/contexts/AlertContext"; // Ensure you have an AlertContext

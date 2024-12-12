@@ -29,7 +29,7 @@ interface Company {
   state?: string;
   businessType?: string;
   ownerId: string;
-  createdAt?: any; // Use Firebase Timestamp if applicable
+  createdAt?: string; // Use Firebase Timestamp if applicable
 }
 
 const MOBILE_BREAKPOINT = 768; // Example breakpoint for mobile
