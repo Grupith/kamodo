@@ -75,9 +75,8 @@ function CreateCompany() {
         `Company "${data.companyName}" created successfully!`
       );
       router.push("/dashboard"); // Redirect to dashboard after creation
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error creating company:", error);
-      alert(error.message || "Failed to create company. Please try again.");
     }
   };
 

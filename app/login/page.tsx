@@ -44,7 +44,7 @@ const LoginPage: React.FC = () => {
         // Existing user with a company
         router.push("/dashboard");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error during sign-in:", error);
       showAlert("danger", "Failed to sign in. Please try again.");
     }

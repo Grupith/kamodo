@@ -158,9 +158,14 @@ export default function DashboardLayout({
         const companyData = await fetchCompanyDataByOwnerId(user.uid);
         setCompany(companyData);
         console.log(companyData.name);
-      } catch (err: any) {
-        console.error("Error fetching company data:", err);
-        setError(err.message);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          console.error("Error fetching company data:", err.message);
+          setError(err.message); // Now TypeScript knows `err` is an `Error`
+        } else {
+          console.error("Unexpected error:", err);
+          setError("An unknown error occurred");
+        }
       } finally {
         setLoading(false);
       }
