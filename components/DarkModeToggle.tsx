@@ -37,7 +37,7 @@ const DarkModeToggle: React.FC = () => {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [resolvedTheme, setTheme]);
+  }, [resolvedTheme, setTheme, toggleDarkMode]);
 
   if (!mounted) return null;
 

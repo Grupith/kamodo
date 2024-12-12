@@ -23,13 +23,11 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { signOutUser } from "@/lib/auth";
 import { useRouter } from "next/navigation";
-import { useAlert } from "@/contexts/AlertContext";
 
 const Home = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user } = useAuth();
   const router = useRouter();
-  const { showAlert } = useAlert();
 
   const closeMenu = () => {
     setIsMenuOpen(false);
