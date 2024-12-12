@@ -1,12 +1,16 @@
+// pages/login.tsx
+
 "use client";
+
 import React, { useEffect } from "react";
-import { auth } from "@/firebase/firebase";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth, db, googleProvider } from "@/firebase/firebase"; // Ensure this path is correct
+import { signInWithPopup, GoogleAuthProvider, User } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { useAlert } from "@/contexts/AlertContext";
-import { checkOrCreateUserDoc } from "@/firebase/firestore";
+import { useAlert } from "@/contexts/AlertContext"; // Ensure you have an AlertContext
+import { checkOrCreateUserDoc } from "@/firebase/firestore"; // Adjust the import path as needed
 import { motion } from "framer-motion";
+import { doc, getDoc } from "firebase/firestore";
 
 const LoginPage: React.FC = () => {
   const router = useRouter();
@@ -14,30 +18,65 @@ const LoginPage: React.FC = () => {
   const { showAlert } = useAlert();
 
   const handleGoogleLogin = async () => {
-    const provider = new GoogleAuthProvider();
     try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
+      const result = await signInWithPopup(auth, googleProvider);
+      const firebaseUser = result.user;
 
       // Check or Create user document
-      const userDoc = await checkOrCreateUserDoc(
-        user.uid,
-        user.displayName,
-        user.email
+      const { newUser, userData } = await checkOrCreateUserDoc(
+        firebaseUser.uid,
+        firebaseUser.displayName || "",
+        firebaseUser.email || ""
       );
-      showAlert("success", `Logged in as: ${userDoc?.email}`);
-      console.log("Logged in as:", userDoc?.email);
-    } catch (error) {
-      console.error("Error during sign-in: ", error);
+
+      // Show success alert
+      showAlert(
+        "success",
+        `Logged in as: ${userData?.email || firebaseUser.email}`
+      );
+      console.log("Logged in as:", userData?.email || firebaseUser.email);
+
+      // Redirect based on user status
+      if (newUser || !userData?.companyId) {
+        // New user or user without a company
+        router.push("/setup");
+      } else {
+        // Existing user with a company
+        router.push("/dashboard");
+      }
+    } catch (error: any) {
+      console.error("Error during sign-in:", error);
+      showAlert("danger", "Failed to sign in. Please try again.");
     }
   };
 
-  // Redirect authenticated users
+  // Redirect authenticated users (handles page refreshes)
   useEffect(() => {
     if (!loading && user) {
-      router.push("/setup");
+      // Since we don't have userData here, fetch it
+      const fetchUserDataAndRedirect = async () => {
+        try {
+          const userDocSnap = await getDoc(doc(db, "users", user.uid));
+          if (userDocSnap.exists()) {
+            const userData = userDocSnap.data();
+            if (userData.companyId) {
+              router.push("/dashboard");
+            } else {
+              router.push("/setup");
+            }
+          } else {
+            // If user doc doesn't exist, this shouldn't happen because checkOrCreateUserDoc should have created it
+            router.push("/setup");
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+          showAlert("danger", "Failed to retrieve user data.");
+        }
+      };
+
+      fetchUserDataAndRedirect();
     }
-  }, [user, loading, router]);
+  }, [user, loading, router, showAlert]);
 
   if (loading) {
     return (
@@ -112,11 +151,11 @@ const LoginPage: React.FC = () => {
               fill="#34A853"
             />
             <path
-              d="M124.5 323.5c-10.7-31.8-10.7-66.1 0-97.9V155H40c-39.2 76.8-39.2 168.1 0 244.9l84.5-68.4z"
+              d="M96.7 301.2c-5.5-16.4-5.5-34 0-50.4V200H48v101.2c0 16.4 0 34 0 50.4l48.7-0z"
               fill="#FBBC05"
             />
             <path
-              d="M272 107.7c37.2 0 70.7 12.8 96.9 37.9l72.5-72.5C402.6 25.9 344.2 0 272 0 171.5 0 83.4 38.8 40 107.7l84.5 68.4c20.8-61.8 79-108.1 147.5-108.1z"
+              d="M272 112c35.2 0 66.8 12.3 91.5 36.2l68.4-68.4C384.7 43.4 336.9 32 272 32 171.5 32 83.4 38.8 40 107.7l84.5 68.4c20.8-61.8 79-108.1 147.5-108.1z"
               fill="#EA4335"
             />
           </svg>

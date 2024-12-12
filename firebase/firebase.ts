@@ -1,6 +1,6 @@
 // src/lib/firebase/client.ts
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 // Firebase configuration using environment variables
@@ -16,7 +16,11 @@ const firebaseConfig = {
 // Initialize Firebase only once
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-const auth = getAuth(app);
-const db = getFirestore(app);
+// Initialize Firestore
+export const db = getFirestore(app);
 
-export { app, auth, db };
+// Initialize Firebase Auth
+export const auth = getAuth(app);
+
+// Initialize Google Auth Provider
+export const googleProvider = new GoogleAuthProvider();

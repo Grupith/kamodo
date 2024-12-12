@@ -1,9 +1,15 @@
+// pages/setup/create-company.tsx
+
 "use client";
-import React from "react";
+
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext"; // Ensure you have AuthContext
+import { checkOrCreateUserDoc, createCompany } from "@/firebase/firestore";
+import { useAlert } from "@/contexts/AlertContext";
 
 type FormValues = {
   companyName: string;
@@ -18,21 +24,60 @@ const businessTypes = ["Tech", "Healthcare", "Retail", "Construction", "Other"];
 
 function CreateCompany() {
   const router = useRouter();
+  const { showAlert } = useAlert();
+  const { user, loading: authLoading } = useAuth(); // Get user from AuthContext
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<FormValues>();
 
+  useEffect(() => {
+    if (!authLoading && !user) {
+      // If not loading and no user, redirect to login
+      router.push("/login");
+    }
+  }, [user, authLoading, router]);
+
   const onSubmit = async (data: FormValues) => {
     try {
-      console.log("Form Data:", data);
-      // TODO: Implement company creation logic (e.g., Firebase Firestore)
-      alert(`Company "${data.companyName}" created successfully!`);
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
+      // Ensure user document exists
+      const { newUser } = await checkOrCreateUserDoc(
+        user.uid,
+        user.displayName || "",
+        user.email || ""
+      );
+
+      if (newUser) {
+        // If new user, redirect to setup page
+        router.push("/setup");
+        return;
+      }
+
+      // Create the company with form data
+      const companyId = await createCompany(
+        user.uid,
+        data.companyName,
+        data.numberOfEmployees,
+        data.website,
+        data.state,
+        data.businessType
+      );
+
+      console.log("Company created with ID:", companyId);
+
+      showAlert(
+        "success",
+        `Company "${data.companyName}" created successfully!`
+      );
       router.push("/dashboard"); // Redirect to dashboard after creation
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating company:", error);
-      alert("Failed to create company. Please try again.");
+      alert(error.message || "Failed to create company. Please try again.");
     }
   };
 
@@ -54,6 +99,14 @@ function CreateCompany() {
       transition: { delay: i * 0.1 + 0.5, duration: 0.6, ease: "easeOut" },
     }),
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <ProtectedRoute>
@@ -120,6 +173,10 @@ function CreateCompany() {
                 {...register("numberOfEmployees", {
                   required: "Number of employees is required",
                   valueAsNumber: true,
+                  min: {
+                    value: 1,
+                    message: "At least one employee is required",
+                  },
                 })}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white transition"
                 placeholder="Enter the number of employees"
