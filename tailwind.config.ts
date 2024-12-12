@@ -7,6 +7,14 @@ export default {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   darkMode: "selector",
+  safelist: [
+    {
+      pattern: /bg-(green|red|yellow|blue)-(100|900)/, // Safelist dynamic backgrounds
+    },
+    {
+      pattern: /text-(green|red|yellow|blue)-(300|800)/, // Safelist dynamic text colors
+    },
+  ],
   theme: {
     extend: {
       colors: {

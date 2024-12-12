@@ -17,17 +17,19 @@ import DashboardMockup from "../public/images/dashboard-mockup.svg";
 import DashboardMockupDark from "../public/images/dashboard-mockup-dark.svg";
 import DarkModeToggle from "../components/DarkModeToggle";
 import Checkmark from "../components/Checkmark";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import Check from "../public/images/check.png";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { signOutUser } from "@/lib/auth";
 import { useRouter } from "next/navigation";
+import { useAlert } from "@/contexts/AlertContext";
 
 const Home = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user } = useAuth();
   const router = useRouter();
+  const { showAlert } = useAlert();
 
   const closeMenu = () => {
     setIsMenuOpen(false);

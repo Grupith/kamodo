@@ -33,9 +33,9 @@ export default function RootLayout({
           <AlertProvider>
             <AuthProvider>{children}</AuthProvider>
           </AlertProvider>
-          <Analytics />
-          <SpeedInsights />
         </NextThemesProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
