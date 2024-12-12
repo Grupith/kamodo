@@ -210,18 +210,18 @@ const Home = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="max-w-screen-xl px-10 pt-10 md:pt-32 pb-10 mt-10 mx-auto"
+            className="max-w-screen-xl px-10 pt-32 md:pt-32 pb-10 mt-2 md:mt-10 mx-auto"
           >
             {/* Container for Flex Layout */}
             <div className="flex flex-col lg:flex-row items-start">
               {/* Left Side: Heading, Paragraph, and List */}
               <div className="w-full lg:w-2/3 lg:pr-8">
                 <h2 className="text-4xl font-bold text-center lg:text-left mb-6 dark:text-gray-100">
-                  Why use Kamodo?
+                  Easy Small Business Management
                 </h2>
-                <p className="max-w-2xl mb-6 text-gray-900 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-200">
-                  Confused with other CRMS? Starting a Small Business? Let us do
-                  the hard work and manage your business with ease.
+                <p className="max-w-2xl text-center md:text-start font-normal mb-6 py-3 text-gray-900 lg:mb-8 md:text-lg dark:text-gray-200">
+                  Overwhelmed by CRMs? Kamodo makes business management simple
+                  and stress-free.
                 </p>
                 <ul className="max-w-xl space-y-4 text-gray-800 bg-gray-200 shadow-sm rounded-md p-4 py-6 text-lg list-inside dark:text-gray-300 dark:bg-gray-800">
                   <li className="flex items-center">
@@ -255,12 +255,12 @@ const Home = () => {
               <div className="w-full lg:w-1/3 lg:pl-8 mt-10 lg:mt-0">
                 <div className="bg-gray-200 dark:bg-gray-800 shadow-sm rounded-md px-6 py-10">
                   <p className="text-gray-900 mb-4 font-semibold md:text-xl lg:text-xl dark:text-gray-200">
-                    The Benefit
+                    Why Choose Kamodo?
                   </p>
                   <p className="text-gray-800 font-normal md:text-md lg:text-md dark:text-gray-400">
-                    Employees waiting on a text for a customers address? Save
-                    time and assign them to your job with ready to go tasks to
-                    complete.
+                    Eliminate confusion and save time. Assign employees to jobs
+                    with clear tasks and keep your business running smoothly—no
+                    delays, no guesswork.
                   </p>
                 </div>
               </div>
@@ -354,7 +354,7 @@ const Home = () => {
 
         <section
           id="pricing"
-          className="bg-gray-100 pt-10 pb-20 mx-6 md:mx-0 dark:bg-gray-800 dark:text-gray-100"
+          className="bg-gray-100 pb-10 px-4 lg:px-0 md:mx-0 dark:bg-gray-800 dark:text-gray-100"
         >
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -363,14 +363,14 @@ const Home = () => {
             viewport={{ once: true }}
             className="container mx-auto px-6"
           >
-            <h2 className="text-4xl font-bold text-center mb-12">
+            <h2 className="text-4xl font-bold text-center py-12">
               Pricing Plans
             </h2>
-            <div className="flex flex-col md:flex-row justify-center items-start md:space-x-6 space-y-6 md:space-y-0">
+            <div className="flex flex-col md:flex-col lg:flex-row justify-center items-start md:space-x-6 space-y-6 md:space-y-8">
               {/* Pricing Cards */}
               <PricingCard
                 plan="Free"
-                bio="Try Kamodo, No 14-day trial! No Risk!"
+                bio="Essential tools to keep your business on track—for free."
                 price="$0"
                 features={[
                   "Up to 3 employees",
@@ -381,7 +381,7 @@ const Home = () => {
               />
               <PricingCard
                 plan="Starter"
-                bio={`More features, Perfect for a Small Business.`}
+                bio={`Upgrade to the essentials and take control of your business operations.`}
                 price="$29"
                 features={[
                   "Up to 6 employees",
@@ -390,16 +390,16 @@ const Home = () => {
                   "Unlimited tasks",
                   "Upload images/files",
                   "Equipment tracking",
-                  "Chat",
+                  "In-app messaging",
                 ]}
               />
               <PricingCard
                 plan="Pro"
-                bio="Finance package, easy invocies, send qoutes, etc."
+                bio="Powerful financial tools to manage invoices, quotes, and track growth with ease."
                 price="$99"
                 features={[
                   "Up to 30 employees",
-                  "All Pro features",
+                  "All Starter features",
                   "Sync with Google/Outlook",
                   "Quotes/invoicing tracking",
                   "Income/expenses tracking",
@@ -408,11 +408,11 @@ const Home = () => {
               />
               <PricingCard
                 plan="Enterprise"
-                bio="Larger companies, custom needs, priority support."
+                bio="Designed for larger organizations needing advanced tools and premium care."
                 price="$399"
                 features={[
                   "Unlimited employees",
-                  "All Premium features",
+                  "All Pro features",
                   "Customer payments via Stripe",
                   "White-label branding",
                   "Priority support",
@@ -563,7 +563,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
   features,
   bio,
 }) => (
-  <div className="bg-white p-8 rounded-lg shadow hover:shadow-lg transition-shadow w-full md:w-1/4 border dark:border-gray-700/90 dark:bg-gray-900">
+  <div className="bg-white p-8 rounded-lg shadow hover:shadow-lg transition-shadow w-full md:w-5/6 border dark:border-gray-700/95 dark:bg-gray-900">
     <h3 className="text-4xl text-center font-medium mb-2 text-black dark:text-white">
       {plan}
     </h3>

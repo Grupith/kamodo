@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useRouter } from "next/navigation";
 
@@ -20,7 +20,6 @@ function CreateCompany() {
   const {
     register,
     handleSubmit,
-    control,
     formState: { errors },
   } = useForm<FormValues>();
 

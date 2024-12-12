@@ -24,8 +24,10 @@ const LoginPage: React.FC = () => {
         user.displayName,
         user.email
       );
+      showAlert("success", `Logged in as: ${userDoc?.email}`);
+      console.log("Logged in as:", userDoc?.email);
     } catch (error) {
-      console.error("Error during sign-in:", error);
+      console.error("Error during sign-in: ", error);
     }
   };
 
@@ -33,7 +35,6 @@ const LoginPage: React.FC = () => {
   useEffect(() => {
     if (!loading && user) {
       router.push("/setup");
-      showAlert("success", "Logged in!");
     }
   }, [user, loading, router]);
 
