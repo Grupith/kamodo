@@ -16,7 +16,7 @@ interface Company {
   state?: string;
   businessType?: string;
   ownerId: string;
-  createdAt?: any; // Use Firebase Timestamp if applicable
+  createdAt?: string; // Use Firebase Timestamp if applicable
 }
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
