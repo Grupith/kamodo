@@ -43,6 +43,11 @@ export const fetchCompanyDataByOwnerId = async (
   const companyDoc = querySnapshot.docs[0];
   const companyData = companyDoc.data();
 
+  // Convert Firestore Timestamp to JavaScript Date
+  if (companyData.createdAt?.toDate) {
+    companyData.createdAt = companyData.createdAt.toDate();
+  }
+
   // Ensure the return value matches the Company type
   return {
     id: companyDoc.id,
