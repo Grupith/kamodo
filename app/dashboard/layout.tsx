@@ -27,13 +27,23 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showAccountMenu, setShowAccountMenu] = useState(false);
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
-  const toggleSidebar = () => setSidebarOpen((prev) => !prev);
+  const toggleSidebar = (open?: boolean) => {
+    setSidebarOpen((prev) => {
+      const newState = typeof open === "boolean" ? open : !prev;
+      try {
+        localStorage.setItem("sidebarOpen", JSON.stringify(newState));
+      } catch (error) {
+        console.error("Error saving sidebar state to localStorage:", error);
+      }
+      return newState;
+    });
+  };
 
   const handleLinkClick = () => {
-    if (isMobile) {
-      setSidebarOpen(false);
+    if (window.innerWidth < 768) {
+      // Assuming 768px is your mobile breakpoint
+      toggleSidebar(false);
     }
   };
 
@@ -96,7 +106,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         <div className="flex h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden relative">
           <Sidebar
             sidebarOpen={sidebarOpen}
-            toggleSidebar={toggleSidebar}
+            setSidebarOpen={setSidebarOpen}
             handleLinkClick={handleLinkClick}
             companyName={company?.name || "Your Company"}
           />

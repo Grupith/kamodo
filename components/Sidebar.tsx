@@ -1,7 +1,5 @@
-// components/Sidebar.tsx
 "use client";
-
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -13,7 +11,7 @@ import {
 
 interface SidebarProps {
   sidebarOpen: boolean;
-  toggleSidebar: () => void;
+  setSidebarOpen: (state: boolean) => void; // Add this to the props
   handleLinkClick: () => void;
   companyName?: string;
   isMobile?: boolean;
@@ -26,6 +24,8 @@ interface SidebarLinkProps {
   active: boolean;
   onClick?: () => void;
 }
+
+const MOBILE_BREAKPOINT = 768; // Mobile screen breakpoint in px
 
 const SidebarLink = ({
   href,
@@ -51,6 +51,7 @@ const SidebarLink = ({
 const Sidebar = ({
   sidebarOpen,
   handleLinkClick,
+  setSidebarOpen,
   companyName,
   isMobile,
 }: SidebarProps) => {
@@ -70,6 +71,18 @@ const Sidebar = ({
       transition: { duration: 0.4, ease: "easeInOut" },
     },
   };
+
+  useEffect(() => {
+    const savedState = localStorage.getItem("sidebarOpen");
+    if (savedState !== null) {
+      try {
+        setSidebarOpen(JSON.parse(savedState));
+      } catch (error) {
+        console.error("Error parsing sidebar state:", error);
+        setSidebarOpen(false); // Default to closed on error
+      }
+    }
+  }, []);
 
   return (
     <AnimatePresence>
