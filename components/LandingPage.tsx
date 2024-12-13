@@ -125,12 +125,11 @@ const LandingPage = () => {
                     Login
                   </button>
                 ) : (
-                  <button
-                    onClick={handleSignOut}
-                    className="bg-blue-600 dark:bg-blue-800 text-white px-6 py-2 rounded-md shadow-md transition-transform hover:shadow-xl hidden md:block hover:scale-105"
-                  >
-                    Logout
-                  </button>
+                  <Link href="/dashboard">
+                    <button className="bg-blue-600 dark:bg-blue-800 text-white px-6 py-2 rounded-md shadow-md transition-transform hover:shadow-xl hidden md:block hover:scale-105">
+                      Go to Dashboard
+                    </button>
+                  </Link>
                 )}
               </div>
               {/* Mobile Menu Button */}
