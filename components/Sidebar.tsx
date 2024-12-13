@@ -25,8 +25,6 @@ interface SidebarLinkProps {
   onClick?: () => void;
 }
 
-const MOBILE_BREAKPOINT = 768; // Mobile screen breakpoint in px
-
 const SidebarLink = ({
   href,
   icon,
@@ -82,7 +80,7 @@ const Sidebar = ({
         setSidebarOpen(false); // Default to closed on error
       }
     }
-  }, []);
+  }, [setSidebarOpen]);
 
   return (
     <AnimatePresence>
