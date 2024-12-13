@@ -1,7 +1,39 @@
 "use client";
 import { signOut } from "firebase/auth";
-import { auth } from "@/firebase/firebase";
+import { auth, googleProvider } from "@/firebase/firebase";
+import { signInWithPopup } from "firebase/auth";
+import { checkOrCreateUserDoc } from "@/firebase/firestore";
 
+// Handle the google sign in process
+export const handleGoogleLogin = async ({
+  onLoginSuccess,
+  onError,
+}: {
+  onLoginSuccess: (newUser: boolean, companyId?: string) => void;
+  onError: (message: string) => void;
+}) => {
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    const firebaseUser = result.user;
+
+    // Check or Create user document
+    const { newUser, userData } = await checkOrCreateUserDoc(
+      firebaseUser.uid,
+      firebaseUser.displayName || "",
+      firebaseUser.email || ""
+    );
+
+    // Trigger success callback
+    onLoginSuccess(newUser, userData?.companyId);
+  } catch (error: unknown) {
+    // Trigger error callback
+    if (error instanceof Error) {
+      onError(error.message);
+    } else {
+      onError("An unknown error occurred during login.");
+    }
+  }
+};
 // Sign out user
 // returns A promise that resolves when the sign-out is complete.
 export const signOutUser = async (): Promise<void> => {

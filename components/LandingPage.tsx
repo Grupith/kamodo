@@ -21,7 +21,7 @@ import { motion } from "framer-motion";
 import Check from "../public/images/check.png";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
-import { signOutUser } from "@/lib/auth";
+import { handleGoogleLogin, signOutUser } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 
 const LandingPage = () => {
@@ -30,6 +30,25 @@ const LandingPage = () => {
   const router = useRouter();
 
   const closeMenu = () => setIsMenuOpen(false);
+
+  const handleLoginClick = async () => {
+    try {
+      await handleGoogleLogin({
+        onLoginSuccess: (newUser, companyId) => {
+          if (newUser || !companyId) {
+            router.push("/setup"); // Redirect to setup page
+          } else {
+            router.push("/dashboard"); // Redirect to dashboard
+          }
+        },
+        onError: (message) => {
+          console.error("Login error:", message);
+        },
+      });
+    } catch (error) {
+      console.error("Error during login:", error);
+    }
+  };
 
   const handleSignOut = async () => {
     try {
@@ -99,15 +118,16 @@ const LandingPage = () => {
               <div className="flex items-center space-x-4">
                 <DarkModeToggle />
                 {!user ? (
-                  <Link href="/login">
-                    <button className="bg-blue-600 dark:bg-blue-800 text-white px-6 py-2 rounded-md shadow-md transition-transform hover:shadow-xl hidden md:block hover:scale-105">
-                      Login
-                    </button>
-                  </Link>
+                  <button
+                    onClick={handleLoginClick}
+                    className="bg-blue-600 dark:bg-blue-800 text-white px-6 py-2 rounded-md shadow-md transition-transform hover:shadow-xl hidden md:block hover:scale-105"
+                  >
+                    Login
+                  </button>
                 ) : (
                   <button
                     onClick={handleSignOut}
-                    className="bg-green-700 text-white px-6 py-2 rounded-md shadow-md transition-transform hover:shadow-xl hidden md:block hover:scale-105"
+                    className="bg-blue-600 dark:bg-blue-800 text-white px-6 py-2 rounded-md shadow-md transition-transform hover:shadow-xl hidden md:block hover:scale-105"
                   >
                     Logout
                   </button>
@@ -161,14 +181,15 @@ const LandingPage = () => {
               </a>
               <div>
                 {!user ? (
-                  <Link href="/login">
-                    <button
-                      onClick={closeMenu}
-                      className="w-full bg-green-600 text-white px-4 py-2 rounded-md"
-                    >
-                      Login
-                    </button>
-                  </Link>
+                  <button
+                    onClick={() => {
+                      handleLoginClick();
+                      closeMenu();
+                    }}
+                    className="w-full bg-green-600 text-white px-4 py-2 rounded-md"
+                  >
+                    Login
+                  </button>
                 ) : (
                   <button
                     onClick={handleSignOut}
