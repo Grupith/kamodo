@@ -90,7 +90,7 @@ const CustomersPage: React.FC = () => {
           <motion.div
             key={customer.id}
             variants={cardVariants}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 flex flex-col items-center"
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col items-center transform transition-transform hover:scale-105"
           >
             {/* Profile Image Placeholder */}
             <div className="w-24 h-24 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mb-4">

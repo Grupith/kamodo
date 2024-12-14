@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { CompanyProvider } from "@/contexts/CompanyContext";
 import { fetchCompanyDataByOwnerId } from "@/firebase/firestore";
@@ -7,6 +7,7 @@ import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
 import { motion } from "framer-motion";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 interface Company {
   id: string;
@@ -61,7 +62,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const fetchCompany = async () => {
       if (authLoading || !user) return;
-
+      console.log("Fetching company data...");
       try {
         const companyData = await fetchCompanyDataByOwnerId(user.uid);
         setCompany(companyData);
@@ -75,27 +76,23 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         setLoading(false);
       }
     };
-
     fetchCompany();
   }, [authLoading, user]);
 
+  const notifications = useMemo(
+    () => [
+      { id: 114212512, message: "New customer signed up", time: "2h ago" },
+      {
+        id: 2163426243632,
+        message: "Employee submitted a report",
+        time: "5h ago",
+      },
+    ],
+    []
+  );
+
   if (authLoading || loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-200">
-        <div role="status">
-          <svg
-            aria-hidden="true"
-            className="inline w-12 h-12 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
-            viewBox="0 0 100 101"
-            fill="none"
-          >
-            <path d="..." fill="currentColor" />
-            <path d="..." fill="currentFill" />
-          </svg>
-          <span className="sr-only">Loading...</span>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (error) {
@@ -106,14 +103,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  const notifications = [
-    { id: 1, message: "New customer signed up", time: "2h ago" },
-    { id: 2, message: "Employee submitted a report", time: "5h ago" },
-  ];
-
-  // Animate main content container
-  // On desktop, shift content to the right when sidebar is open
-  // On mobile, no shift since sidebar overlays
   const contentVariants = {
     open: {
       x: !isMobile ? 0 : 0,

@@ -10,6 +10,8 @@ import {
 } from "@heroicons/react/24/outline";
 import DarkModeToggle from "@/components/DarkModeToggle";
 import { signOutUser } from "@/lib/auth";
+import Image from "next/image";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface NavbarProps {
   sidebarOpen: boolean;
@@ -30,6 +32,7 @@ const Navbar: React.FC<NavbarProps> = ({
   showAccountMenu,
   notifications = [],
 }) => {
+  const { user } = useAuth();
   const isMobile = window.innerWidth < 768;
   const isOverlayVisible =
     (isMobile && sidebarOpen) || showNotifications || showAccountMenu;
@@ -105,18 +108,18 @@ const Navbar: React.FC<NavbarProps> = ({
                           No notifications
                         </div>
                       ) : (
-                        notifications.map((note) => (
-                          <div
-                            key={note.id}
+                        notifications.map((notification) => (
+                          <li
+                            key={notification.id.toString()}
                             className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
                           >
                             <p className="text-gray-700 dark:text-gray-200">
-                              {note.message}
+                              {notification.message}
                             </p>
                             <span className="text-xs text-gray-500">
-                              {note.time}
+                              {notification.time}
                             </span>
-                          </div>
+                          </li>
                         ))
                       )}
                     </div>
@@ -131,9 +134,19 @@ const Navbar: React.FC<NavbarProps> = ({
                 onClick={handleAccountMenuToggle}
                 className="flex items-center p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition"
               >
-                <UserCircleIcon className="w-8 h-8 text-gray-700 dark:text-gray-200" />
+                {user && user.photoURL ? (
+                  <Image
+                    src={user.photoURL}
+                    alt="user"
+                    width={32}
+                    height={32}
+                    className="w-8 h-8 rounded-full"
+                  />
+                ) : (
+                  <UserCircleIcon className="w-8 h-8 text-gray-700 dark:text-gray-200" />
+                )}
               </button>
-
+              {/* Show user account menu */}
               {showAccountMenu && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
@@ -159,6 +172,7 @@ const Navbar: React.FC<NavbarProps> = ({
                       <span className="text-gray-700 dark:text-gray-200">
                         Dark Mode
                       </span>
+
                       <DarkModeToggle />
                     </div>
                     <a

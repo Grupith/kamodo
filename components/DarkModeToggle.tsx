@@ -60,9 +60,9 @@ const DarkModeToggle: React.FC = () => {
         )}
       </button>
 
-      {/* Tooltip with Framer Motion */}
+      {/* Tooltip to show theme hotkey with Framer Motion */}
       <AnimatePresence>
-        {isHovered && (
+        {isHovered && window.innerWidth >= 1024 && (
           <motion.div
             initial={{ opacity: 0, x: -10, scale: 0.95 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}

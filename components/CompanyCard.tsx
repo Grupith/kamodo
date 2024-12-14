@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import Switcher from "./Switcher";
 
 interface Company {
   name: string;
@@ -71,6 +72,7 @@ const CompanyCard = ({ company }: { company: Company | null }) => {
               : "Unknown"}
           </span>
         </div>
+        <Switcher />
       </div>
     </motion.div>
   );
