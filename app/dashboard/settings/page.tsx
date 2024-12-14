@@ -2,6 +2,8 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
+import Image from "next/image";
+import { UserCircleIcon } from "@heroicons/react/24/outline";
 
 const AccountSettings = () => {
   const { user } = useAuth();
@@ -35,14 +37,24 @@ const AccountSettings = () => {
           >
             <div className="flex items-center space-x-4">
               <div className="flex-shrink-0">
-                {/* Placeholder Avatar (replace with user photo if available) */}
-                <div className="h-16 w-16 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                  <span className="text-gray-500 dark:text-gray-300 font-bold">
-                    {user?.displayName
-                      ? user.displayName.charAt(0).toUpperCase()
-                      : "U"}
-                  </span>
-                </div>
+                {user && user.photoURL ? (
+                  <Image
+                    src={user.photoURL}
+                    alt="user"
+                    width={32}
+                    height={32}
+                    className="w-14 h-14 rounded-full"
+                    priority
+                  />
+                ) : (
+                  <div className="h-16 w-16 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                    <span className="text-gray-500 dark:text-gray-300 font-bold">
+                      {user?.displayName
+                        ? user.displayName.charAt(0).toUpperCase()
+                        : "U"}
+                    </span>
+                  </div>
+                )}
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
