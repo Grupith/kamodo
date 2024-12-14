@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Bars3Icon,
   XMarkIcon,
@@ -30,6 +30,15 @@ const LandingPage = () => {
   const router = useRouter();
 
   const closeMenu = () => setIsMenuOpen(false);
+
+  useEffect(() => {
+    if (user) {
+      console.log(
+        `${user.displayName} already is logged in, navigate to dashboard...`
+      );
+      router.push("/dashboard");
+    }
+  }, [user, router]);
 
   const handleLoginClick = async () => {
     try {
