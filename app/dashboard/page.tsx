@@ -5,6 +5,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import CompanyCard from "@/components/CompanyCard";
 import { useCompany } from "@/contexts/CompanyContext";
 import { motion } from "framer-motion";
+import JobProgressChart from "@/components/JobProgressChart";
 
 const Dashboard = () => {
   const company = useCompany();
@@ -52,6 +53,8 @@ const Dashboard = () => {
           <motion.div variants={cardVariants}>
             <CompanyCard company={company} />
           </motion.div>
+
+          <JobProgressChart />
 
           {/* Example of a smaller info card */}
           <motion.div
