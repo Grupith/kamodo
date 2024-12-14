@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -55,6 +55,7 @@ const Sidebar = ({
 }: SidebarProps) => {
   const sidebarRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+  const [showCTA, setShowCTA] = useState(true);
 
   const sidebarVariants = {
     hidden: { x: -200, opacity: 0 },
@@ -126,6 +127,55 @@ const Sidebar = ({
               onClick={handleLinkClick}
             />
           </nav>
+          {/* Sidebar CTA */}
+          {showCTA && (
+            <motion.div
+              id="sidebar-cta"
+              className="p-3 m-3 mb-12 rounded-lg bg-blue-50 dark:bg-blue-900"
+              role="alert"
+              initial={{ opacity: 1 }}
+              animate={{ opacity: showCTA ? 1 : 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="flex items-center mb-2">
+                <span className="bg-green-100 text-green-800 text-xs font-semibold me-2 px-2 py-0.5 rounded dark:bg-green-200 dark:text-green-900">
+                  Upgrade
+                </span>
+                <button
+                  type="button"
+                  className="ms-auto text-blue-900 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-200"
+                  data-dismiss-target="#sidebar-cta"
+                  aria-label="Close"
+                  onClick={() => setShowCTA(false)}
+                >
+                  <svg
+                    className="w-4 h-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 14 14"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M1 1l6 6m0 0l6 6M7 7L1 13M7 7L13 1"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <p className="text-xs text-blue-800 dark:text-blue-400 mb-2">
+                Unlock all the features of Kamodo with the Starter plan. Get
+                enhanced tools to manage your small business more effectively.
+              </p>
+              <a
+                href="/pricing"
+                className="text-xs text-blue-800 underline font-medium hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+              >
+                Upgrade to Starter
+              </a>
+            </motion.div>
+          )}
           <div className="text-center py-2">{companyName}</div>
         </motion.aside>
       )}

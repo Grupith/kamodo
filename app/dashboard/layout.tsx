@@ -30,6 +30,18 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
+  // Add resize handler
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1024) {
+        setSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const toggleSidebar = (open?: boolean) => {
     setSidebarOpen((prev) => {
       const newState = typeof open === "boolean" ? open : !prev;
