@@ -78,11 +78,6 @@ const LandingPage = () => {
     },
   };
 
-  //   const fadeInVariants = {
-  //     hidden: { opacity: 0 },
-  //     visible: { opacity: 1, transition: { duration: 0.8, ease: "easeOut" } },
-  //   };
-
   return (
     <>
       <div className="bg-gray-50 text-black dark:bg-gray-900">
@@ -268,7 +263,7 @@ const LandingPage = () => {
                   Overwhelmed by CRMs? Kamodo makes business management simple
                   and stress-free.
                 </p>
-                <ul className="max-w-xl space-y-4 text-gray-800 bg-gray-200 shadow-sm rounded-md p-6 text-lg list-inside dark:text-gray-300 dark:bg-gray-800">
+                <ul className="max-w-xl space-y-4 text-gray-800 bg-gray-100 border border-gray-200 shadow-lg rounded-md p-6 text-lg list-inside dark:text-gray-300 dark:bg-gray-800">
                   <li className="flex items-center">
                     <Checkmark />
                     Manage your customers
@@ -298,7 +293,7 @@ const LandingPage = () => {
 
               {/* Right Side */}
               <div className="w-full lg:w-1/3 lg:pl-8 mt-10 lg:mt-0">
-                <div className="bg-gray-200 dark:bg-gray-800 shadow-sm rounded-md px-6 py-10">
+                <div className="bg-gray-100 dark:bg-gray-800 border border-gray-200 shadow-sm rounded-md px-6 py-10">
                   <p className="text-gray-900 mb-4 font-semibold md:text-xl lg:text-xl dark:text-gray-200">
                     Why Choose Kamodo?
                   </p>
@@ -464,10 +459,7 @@ const LandingPage = () => {
         </section>
 
         {/* Contact Section */}
-        <section
-          id="contact"
-          className="bg-gray-50 py-20 dark:bg-gray-900 dark:text-white"
-        >
+        <section id="contact" className="bg-gray-50 py-20 dark:bg-gray-900">
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -475,20 +467,20 @@ const LandingPage = () => {
             viewport={{ once: true }}
             className="container mx-auto px-6 max-w-screen-lg"
           >
-            <h2 className="text-5xl font-extrabold text-center mb-6 text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-teal-400">
+            <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-6 text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-teal-400">
               Get in Touch
             </h2>
-            <p className="text-center text-lg mb-12 text-gray-700 dark:text-gray-300">
-              We’d love to hear from you! Fill out the form below and we’ll get
-              back to you shortly.
+            <p className="text-center text-lg mb-12 text-gray-600 dark:text-gray-400">
+              We’d love to hear from you. Fill out the form below, and we’ll get
+              back to you as soon as possible.
             </p>
-            <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-8 sm:p-12">
-              <form className="space-y-8">
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-xl rounded-xl p-6 md:p-10">
+              <form className="space-y-6">
                 {/* Name Field */}
-                <div className="relative">
+                <div>
                   <label
                     htmlFor="name"
-                    className="absolute -top-3 left-3 text-sm bg-white px-2 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+                    className="block text-md font-medium text-gray-700 dark:text-gray-300"
                   >
                     Name
                   </label>
@@ -496,16 +488,16 @@ const LandingPage = () => {
                     type="text"
                     id="name"
                     name="name"
-                    className="w-full px-4 py-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-green-500 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                     placeholder="Your Name"
                     required
+                    className="mt-1 p-3 block w-full rounded-lg border border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:ring-green-500 focus:border-green-500 sm:text-sm"
                   />
                 </div>
                 {/* Email Field */}
-                <div className="relative">
+                <div>
                   <label
                     htmlFor="email"
-                    className="absolute -top-3 left-3 text-sm bg-white px-2 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+                    className="block text-md font-medium text-gray-700 dark:text-gray-300"
                   >
                     Email
                   </label>
@@ -513,16 +505,16 @@ const LandingPage = () => {
                     type="email"
                     id="email"
                     name="email"
-                    className="w-full px-4 py-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-green-500 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                     placeholder="you@example.com"
                     required
+                    className="mt-1 p-3 block w-full rounded-lg border border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:ring-green-500 focus:border-green-500 sm:text-sm"
                   />
                 </div>
                 {/* Message Field */}
-                <div className="relative">
+                <div>
                   <label
                     htmlFor="message"
-                    className="absolute -top-3 left-3 text-sm bg-white px-2 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+                    className="blocktext-sm font-medium text-gray-700 dark:text-gray-300"
                   >
                     Message
                   </label>
@@ -530,16 +522,16 @@ const LandingPage = () => {
                     id="message"
                     name="message"
                     rows={5}
-                    className="w-full px-4 py-3 resize-none rounded-md border border-gray-300 focus:ring-2 focus:ring-green-500 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                     placeholder="Your Message"
                     required
+                    className="mt-1 p-3 block w-full rounded-lg border border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:ring-green-500 focus:border-green-500 sm:text-sm resize-none"
                   ></textarea>
                 </div>
                 {/* Submit Button */}
                 <div className="text-center">
                   <button
                     type="submit"
-                    className="px-8 py-3 bg-green-600 dark:bg-green-800 text-white font-semibold rounded-md shadow-md hover:shadow-lg hover:scale-105 transition-transform focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-offset-gray-900"
+                    className="inline-block px-6 py-3 font-medium text-white bg-gradient-to-r from-green-500 to-teal-400 rounded-lg shadow-lg hover:scale-105 hover:shadow-xl transform transition-all focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-offset-gray-900"
                   >
                     Send Message
                   </button>
@@ -574,7 +566,7 @@ const FeatureItem: React.FC<FeatureItemProps> = ({ Icon, title, features }) => (
     whileInView={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.8, ease: "easeOut" }}
     viewport={{ once: true }}
-    className="bg-white p-6 rounded-md shadow hover:shadow-xl transition-transform hover:scale-[1.02] dark:bg-gray-800 dark:text-white"
+    className="bg-white border border-gray-200 p-6 rounded-md shadow-lg hover:shadow-xl transition-transform hover:scale-[1.02] dark:bg-gray-800 dark:text-white"
   >
     <div className="mb-4">
       <Icon className="h-12 w-12 text-green-600" />
@@ -611,7 +603,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
     whileInView={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.8, ease: "easeOut" }}
     viewport={{ once: true }}
-    className="flex flex-col bg-white p-8 rounded-md shadow hover:shadow-lg transition-transform hover:scale-[1.02] border dark:border-gray-700/95 dark:bg-gray-900 h-full"
+    className="flex flex-col bg-white p-8 rounded-md shadow-lg hover:shadow-xl transition-transform hover:scale-[1.02] border dark:border-gray-700/95 dark:bg-gray-900 h-full"
   >
     {/* Inner container to manage spacing and alignment */}
     <div className="flex flex-col flex-grow">

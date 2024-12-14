@@ -20,7 +20,7 @@ const CompanyCard = ({ company }: { company: Company | null }) => {
     >
       {/* Header */}
       <div className="mb-4 border-b pb-4 border-gray-200 dark:border-gray-700">
-        <h2 className="text-3xl font-bold text-gray-800 dark:text-white">
+        <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">
           {company?.name || "No Company Name Available"}
         </h2>
         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -44,7 +44,13 @@ const CompanyCard = ({ company }: { company: Company | null }) => {
             Website:
           </span>
           <a
-            href={company?.website || "#"}
+            href={
+              company?.website
+                ? company.website.startsWith("http")
+                  ? company.website
+                  : `https://${company.website}`
+                : "#"
+            }
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-600 dark:text-blue-400 hover:underline"

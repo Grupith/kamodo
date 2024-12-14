@@ -99,7 +99,7 @@ const Sidebar = ({
           {/* Sidebar header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
             <h2 className="text-xl font-bold text-gray-800 dark:text-white">
-              Kamodo
+              {companyName}
             </h2>
           </div>
 
@@ -164,7 +164,7 @@ const Sidebar = ({
                   </svg>
                 </button>
               </div>
-              <p className="text-xs text-blue-800 dark:text-blue-400 mb-2">
+              <p className="text-xs text-blue-800 dark:text-blue-400 py-3">
                 Unlock all the features of Kamodo with the Starter plan. Get
                 enhanced tools to manage your small business more effectively.
               </p>
@@ -176,7 +176,6 @@ const Sidebar = ({
               </a>
             </motion.div>
           )}
-          <div className="text-center py-2">{companyName}</div>
         </motion.aside>
       )}
     </AnimatePresence>
