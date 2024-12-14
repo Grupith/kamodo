@@ -3,7 +3,6 @@ import React from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import Image from "next/image";
-import { UserCircleIcon } from "@heroicons/react/24/outline";
 
 const AccountSettings = () => {
   const { user } = useAuth();
