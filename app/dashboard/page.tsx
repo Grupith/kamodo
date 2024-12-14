@@ -56,7 +56,7 @@ const Dashboard = () => {
           {/* Example of a smaller info card */}
           <motion.div
             variants={cardVariants}
-            className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 flex flex-col justify-center items-start"
+            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md rounded-lg p-4 flex flex-col justify-center items-start"
           >
             <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
               Quick Stats
@@ -72,7 +72,7 @@ const Dashboard = () => {
           {/* Example wide card */}
           <motion.div
             variants={cardVariants}
-            className="md:col-span-2 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6"
+            className="md:col-span-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md rounded-lg p-6"
           >
             <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
               Recent Activities
@@ -93,7 +93,7 @@ const Dashboard = () => {
           {/* Tall card for additional data */}
           <motion.div
             variants={cardVariants}
-            className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 flex flex-col justify-between"
+            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md rounded-lg p-6 flex flex-col justify-between"
           >
             <div>
               <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
@@ -112,7 +112,7 @@ const Dashboard = () => {
           {/* Another example card for placeholder content */}
           <motion.div
             variants={cardVariants}
-            className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6"
+            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md rounded-lg p-6"
           >
             <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
               Upcoming Events
@@ -127,7 +127,7 @@ const Dashboard = () => {
           {/* Add or remove more cards as needed */}
           <motion.div
             variants={cardVariants}
-            className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 flex flex-col justify-center items-start"
+            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md rounded-lg p-4 flex flex-col justify-center items-start"
           >
             <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
               Custom Metrics

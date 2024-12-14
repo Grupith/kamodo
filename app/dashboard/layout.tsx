@@ -26,7 +26,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [showNotifications, setShowNotifications] = useState(false);
   const [showAccountMenu, setShowAccountMenu] = useState(false);
 
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
@@ -49,14 +48,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const handleNotificationToggle = () => {
-    setShowNotifications((prev) => !prev);
-    setShowAccountMenu(false);
-  };
-
   const handleAccountMenuToggle = () => {
     setShowAccountMenu((prev) => !prev);
-    setShowNotifications(false);
   };
 
   useEffect(() => {
@@ -78,18 +71,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     };
     fetchCompany();
   }, [authLoading, user]);
-
-  const notifications = useMemo(
-    () => [
-      { id: 114212512, message: "New customer signed up", time: "2h ago" },
-      {
-        id: 2163426243632,
-        message: "Employee submitted a report",
-        time: "5h ago",
-      },
-    ],
-    []
-  );
 
   if (authLoading || loading) {
     return <LoadingSpinner />;
@@ -135,11 +116,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             <Navbar
               sidebarOpen={sidebarOpen}
               toggleSidebar={toggleSidebar}
-              handleNotificationToggle={handleNotificationToggle}
               handleAccountMenuToggle={handleAccountMenuToggle}
-              showNotifications={showNotifications}
               showAccountMenu={showAccountMenu}
-              notifications={notifications}
             />
             <motion.main
               initial={{ opacity: 0 }}

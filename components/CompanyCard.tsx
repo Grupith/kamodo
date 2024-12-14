@@ -16,7 +16,7 @@ const CompanyCard = ({ company }: { company: Company | null }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className="max-w-lg mx-auto bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6"
+      className="max-w-lg mx-auto bg-white border border-gray-200 dark:border-gray-700 dark:bg-gray-800 shadow-lg rounded-lg p-6"
     >
       {/* Header */}
       <div className="mb-4 border-b pb-4 border-gray-200 dark:border-gray-700">
