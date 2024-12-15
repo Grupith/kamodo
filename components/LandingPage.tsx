@@ -18,7 +18,6 @@ import DashboardMockupDark from "../public/images/dashboard-mockup-dark.svg";
 import DarkModeToggle from "../components/DarkModeToggle";
 import Checkmark from "../components/Checkmark";
 import { motion } from "framer-motion";
-import Check from "../public/images/check.png";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { handleGoogleLogin, signOutUser } from "@/lib/auth";
