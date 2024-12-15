@@ -23,6 +23,7 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { handleGoogleLogin, signOutUser } from "@/lib/auth";
 import { useRouter } from "next/navigation";
+import Kamodo from "../public/images/kamodo.png";
 
 const LandingPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -90,8 +91,17 @@ const LandingPage = () => {
             className="container mx-auto flex items-center justify-between md:justify-around py-3 px-6"
           >
             <Link href="#">
-              <div className="flex space-x-1 items-center">
-                <Image alt="Kamodo logo" src={Check} className="w-7 h-7" />
+              <div className="flex space-x-1 items-center cursor-pointer">
+                <div className="flex justify-center ">
+                  <Image
+                    src={Kamodo}
+                    alt="Kamodo Logo"
+                    width={150}
+                    height={150}
+                    priority
+                    className="dark:invert w-10 h-10 mr-1 rounded-lg" // Inverts colors in dark mode if needed
+                  />
+                </div>
                 <div className="text-2xl font-bold">Kamodo</div>
               </div>
             </Link>
@@ -263,7 +273,7 @@ const LandingPage = () => {
                   Overwhelmed by CRMs? Kamodo makes business management simple
                   and stress-free.
                 </p>
-                <ul className="max-w-xl space-y-4 text-gray-800 bg-gray-100 border border-gray-200 shadow-lg rounded-md p-6 text-lg list-inside dark:text-gray-300 dark:bg-gray-800">
+                <ul className="max-w-xl space-y-4 text-gray-800 bg-gray-100 border border-gray-200 dark:border-gray-700 shadow-lg rounded-md p-6 text-lg list-inside dark:text-gray-300 dark:bg-gray-800">
                   <li className="flex items-center">
                     <Checkmark />
                     Manage your customers
@@ -293,7 +303,7 @@ const LandingPage = () => {
 
               {/* Right Side */}
               <div className="w-full lg:w-1/3 lg:pl-8 mt-10 lg:mt-0">
-                <div className="bg-gray-100 dark:bg-gray-800 border border-gray-200 shadow-sm rounded-md px-6 py-10">
+                <div className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm rounded-md px-6 py-10">
                   <p className="text-gray-900 mb-4 font-semibold md:text-xl lg:text-xl dark:text-gray-200">
                     Why Choose Kamodo?
                   </p>
@@ -566,7 +576,7 @@ const FeatureItem: React.FC<FeatureItemProps> = ({ Icon, title, features }) => (
     whileInView={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.8, ease: "easeOut" }}
     viewport={{ once: true }}
-    className="bg-white border border-gray-200 p-6 rounded-md shadow-lg hover:shadow-xl transition-transform hover:scale-[1.02] dark:bg-gray-800 dark:text-white"
+    className="bg-white border border-gray-200 dark:border-gray-700 p-6 rounded-md shadow-lg hover:shadow-xl transition-transform hover:scale-[1.02] dark:bg-gray-800 dark:text-white"
   >
     <div className="mb-4">
       <Icon className="h-12 w-12 text-green-600" />
