@@ -59,7 +59,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      dir="ltr" // Specify text direction for accessibility
+      className="scroll-smooth" // Add smooth scrolling
+      suppressHydrationWarning
+    >
       <body className={`${figTree.className} dark:bg-gray-800`}>
         <NextThemesProvider
           attribute="class" // Uses class-based theming
