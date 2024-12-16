@@ -2,6 +2,10 @@
 import { ArrowDownOnSquareIcon } from "@heroicons/react/24/outline";
 import React, { useEffect, useState } from "react";
 
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => void;
+}
+
 export default function InstallAppButton() {
   const [isInstallable, setIsInstallable] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<Event | null>(null);
@@ -25,7 +29,7 @@ export default function InstallAppButton() {
 
   const handleInstallClick = () => {
     if (deferredPrompt) {
-      (deferredPrompt as any).prompt(); // Show the install prompt
+      (deferredPrompt as BeforeInstallPromptEvent).prompt(); // Show the install prompt
       setDeferredPrompt(null); // Clear the prompt
       setIsInstallable(false); // Hide the button
     }
