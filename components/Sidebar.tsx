@@ -8,6 +8,7 @@ import {
   UsersIcon,
   BuildingOffice2Icon,
 } from "@heroicons/react/24/outline";
+import InstallAppButton from "./InstallAppButton";
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -176,6 +177,7 @@ const Sidebar = ({
               </a>
             </motion.div>
           )}
+          <InstallAppButton />
         </motion.aside>
       )}
     </AnimatePresence>
