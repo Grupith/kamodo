@@ -1,19 +1,21 @@
 "use client";
-
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
-import Breadcrumbs from "@/components/Breadcrumbs";
 
 interface Customer {
   id: string;
   name: string;
   email?: string;
   company?: string;
+  highlightedFields?: {
+    name: string;
+    email: string;
+    company: string;
+  };
 }
 
-// Dummy customer data for demonstration
 const customers: Customer[] = [
   {
     id: "1",
@@ -45,235 +47,170 @@ const customers: Customer[] = [
     email: "michael@example.com",
     company: "Globex Co.",
   },
-  {
-    id: "6",
-    name: "David Green",
-    email: "david.green@example.com",
-    company: "ACME Inc.",
-  },
-  {
-    id: "7",
-    name: "Emma White",
-    email: "emma.white@example.com",
-    company: "Umbrella Corp.",
-  },
-  {
-    id: "8",
-    name: "Oliver Black",
-    email: "oliver.black@example.com",
-    company: "Soylent Corp.",
-  },
-  {
-    id: "9",
-    name: "Sophia Davis",
-    email: "sophia.davis@example.com",
-    company: "Wayne Enterprises",
-  },
-  {
-    id: "10",
-    name: "Lucas Gray",
-    email: "lucas.gray@example.com",
-    company: "Initech",
-  },
-  {
-    id: "11",
-    name: "Mia Scott",
-    email: "mia.scott@example.com",
-    company: "Globex Co.",
-  },
-  {
-    id: "12",
-    name: "Ethan Clark",
-    email: "ethan.clark@example.com",
-    company: "ACME Inc.",
-  },
-  {
-    id: "13",
-    name: "Isabella Hill",
-    email: "isabella.hill@example.com",
-    company: "Cyberdyne Systems",
-  },
-  {
-    id: "14",
-    name: "William Hall",
-    email: "william.hall@example.com",
-    company: "ACME Inc.",
-  },
-  {
-    id: "15",
-    name: "Charlotte King",
-    email: "charlotte.king@example.com",
-    company: "Umbrella Corp.",
-  },
 ];
 
-const containerVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: "easeOut", staggerChildren: 0.1 },
-  },
-};
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
-};
-
-interface HighlightSearchTerm {
-  (text: string, searchTerm: string): string;
-}
-
-const highlightSearchTerm: HighlightSearchTerm = (text, searchTerm) => {
+const highlightSearchTerm = (text: string, searchTerm: string): string => {
   if (!searchTerm) return text;
   const regex = new RegExp(`(${searchTerm})`, "gi");
-  return text.replace(regex, (match) => `<mark>${match}</mark>`);
-};
-
-interface CustomerListProps {
-  customers: Customer[];
-  searchTerm: string;
-}
-
-const CustomerList: React.FC<CustomerListProps> = ({
-  customers,
-  searchTerm,
-}) => {
-  const [filteredCustomers, setFilteredCustomers] = useState<
-    (Customer & { highlightedName: string })[]
-  >([]);
-
-  useEffect(() => {
-    const filtered = customers
-      .filter((customer) =>
-        customer.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-      .map((customer) => ({
-        ...customer,
-        highlightedName: highlightSearchTerm(customer.name, searchTerm),
-      }));
-    setFilteredCustomers(filtered);
-  }, [searchTerm, customers]);
-
-  return (
-    <div>
-      {filteredCustomers.map((customer) => (
-        <div
-          key={customer.id}
-          dangerouslySetInnerHTML={{ __html: customer.highlightedName }}
-        />
-      ))}
-    </div>
+  return text.replace(
+    regex,
+    (match) => `<mark class="bg-yellow-300">${match}</mark>`
   );
 };
 
-const CustomersPage: React.FC = () => {
+export default function CustomersPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  // State to manage filter and filtered customers
+  const [searchTerm, setSearchTerm] = useState(
+    searchParams.get("search") || ""
+  );
   const [filter, setFilter] = useState<string>("All");
   const [filteredCustomers, setFilteredCustomers] =
     useState<Customer[]>(customers);
 
-  // Handle Add Customer
-  const handleAddCustomer = () => {
-    console.log("Add Customer Clicked");
-  };
-
-  // Handle Filter Logic
-  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedFilter = e.target.value;
-    setFilter(selectedFilter);
-
-    if (selectedFilter === "All") {
-      setFilteredCustomers(customers); // Reset to all customers
-    } else {
-      const filtered = customers.filter(
-        (customer) => customer.company === selectedFilter
-      );
-      setFilteredCustomers(filtered);
+  // Filter logic
+  useEffect(() => {
+    let filtered = customers;
+    if (filter !== "All") {
+      filtered = filtered.filter((customer) => customer.company === filter);
     }
-  };
+    if (searchTerm) {
+      filtered = filtered
+        .filter((customer) =>
+          [customer.name, customer.email, customer.company]
+            .filter(Boolean)
+            .some((value) =>
+              value!.toLowerCase().includes(searchTerm.toLowerCase())
+            )
+        )
+        .map((customer) => ({
+          ...customer,
+          highlightedFields: {
+            name: highlightSearchTerm(customer.name, searchTerm),
+            email: highlightSearchTerm(customer.email || "", searchTerm),
+            company: highlightSearchTerm(customer.company || "", searchTerm),
+          },
+        }));
+    }
+    setFilteredCustomers(filtered);
+  }, [searchTerm, filter]);
 
   const handleViewProfile = (customerId: string) => {
     router.push(`/dashboard/customers/${customerId}`);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && filteredCustomers.length > 0) {
+      handleViewProfile(filteredCustomers[0].id);
+    }
+    if (e.key === "Escape") {
+      setSearchTerm(""); // Clear search term
+      inputRef.current?.blur();
+    }
+  };
+
+  useEffect(() => {
+    const handleGlobalKeydown = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        inputRef.current?.focus();
+      }
+    };
+
+    window.addEventListener("keydown", handleGlobalKeydown);
+    return () => window.removeEventListener("keydown", handleGlobalKeydown);
+  }, []);
+
   return (
     <div className="p-4 min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
-      {/* Header */}
-      <Breadcrumbs />
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
         <h2 className="text-3xl font-bold">Customers</h2>
         <div className="flex flex-col sm:flex-row sm:space-x-4 gap-2 sm:gap-0">
-          {/* Filter Dropdown */}
+          {/* Search Input */}
+          <div className="relative w-full sm:w-auto">
+            <input
+              ref={inputRef}
+              type="text"
+              placeholder="Search customers..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="pl-4 pr-20 py-2 rounded-md shadow-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 dark:text-gray-200 w-full"
+            />
+            <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
+              <span className="flex items-center space-x-1 text-gray-500 dark:text-gray-400">
+                <kbd className="px-1.5 py-0.5 text-xs font-semibold text-gray-800 bg-gray-200 border rounded-md dark:bg-gray-600 dark:text-gray-100">
+                  {navigator.platform.includes("Mac") ? "⌘" : "Ctrl"}
+                </kbd>
+                <span>+</span>
+                <kbd className="px-1.5 py-0.5 text-xs font-semibold text-gray-800 bg-gray-200 border rounded-md dark:bg-gray-600 dark:text-gray-100">
+                  K
+                </kbd>
+              </span>
+            </div>
+          </div>
+
+          {/* Filter */}
           <select
             value={filter}
-            onChange={handleFilterChange}
-            className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 w-full sm:w-auto"
+            onChange={(e) => setFilter(e.target.value)}
+            className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-md border w-full sm:w-auto"
           >
             <option value="All">All Companies</option>
             <option value="ACME Inc.">ACME Inc.</option>
             <option value="Globex Co.">Globex Co.</option>
-            <option value="Soylent Corp.">Soylent Corp.</option>
-            <option value="Initech">Initech</option>
           </select>
-
-          {/* Add Customer Button */}
-          <button
-            onClick={handleAddCustomer}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition w-full sm:w-auto"
-          >
-            Add Customer
-          </button>
         </div>
       </div>
 
-      {/* Grid of Customer Cards */}
+      {/* Customer Grid */}
       <motion.div
         className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-        variants={containerVariants}
         initial="hidden"
         animate="visible"
+        variants={{
+          hidden: { opacity: 0, y: 20 },
+          visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.1 } },
+        }}
       >
         {filteredCustomers.map((customer) => (
           <motion.div
             key={customer.id}
-            variants={cardVariants}
-            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-6 flex flex-col items-center transform transition-transform hover:scale-105"
+            variants={{
+              hidden: { opacity: 0, y: 20 },
+              visible: { opacity: 1, y: 0 },
+            }}
+            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-md hover:scale-105 transition-transform"
           >
-            {/* Profile Image Placeholder */}
             <div className="w-24 h-24 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mb-4">
-              <UserCircleIcon className="w-16 h-16 text-gray-400 dark:text-gray-500" />
+              <UserCircleIcon className="w-16 h-16 text-gray-400" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-1">
-              {customer.name}
-            </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-300">
-              {customer.email || "No Email"}
-            </p>
-            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-              {customer.company || "No Company"}
-            </p>
+            <h3
+              className="text-xl font-semibold mb-1"
+              dangerouslySetInnerHTML={{
+                __html: customer.highlightedFields?.name || customer.name,
+              }}
+            />
+            <p
+              className="text-sm text-gray-600"
+              dangerouslySetInnerHTML={{
+                __html:
+                  customer.highlightedFields?.email ||
+                  customer.email ||
+                  "No Email",
+              }}
+            />
             <button
               onClick={() => handleViewProfile(customer.id)}
-              className="mt-auto inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition"
+              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
             >
               View Profile
             </button>
           </motion.div>
         ))}
       </motion.div>
-
-      {/* No Customers Message */}
-      {filteredCustomers.length === 0 && (
-        <div className="text-center text-gray-600 dark:text-gray-300 mt-8">
-          No customers found for the selected filter.
-        </div>
-      )}
     </div>
   );
-};
-
-export default CustomersPage;
+}

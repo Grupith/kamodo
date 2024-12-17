@@ -21,7 +21,7 @@ export default function InstallAppButton() {
 
     window.addEventListener(
       "beforeinstallprompt",
-      handleBeforeInstallPrompt as any
+      handleBeforeInstallPrompt as EventListener
     );
 
     return () => {

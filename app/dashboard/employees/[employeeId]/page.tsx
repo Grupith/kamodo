@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
-import Breadcrumbs from "@/components/Breadcrumbs";
 
 // Mock function to simulate fetching employee data from an API or database
 async function fetchEmployeeData(employeeId: string) {
@@ -100,7 +99,6 @@ export default function EmployeeProfilePage() {
 
   return (
     <div className="p-4 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen flex flex-col justify-start">
-      <Breadcrumbs />
       <motion.div
         className="w-full max-w-6xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg rounded-md p-8"
         variants={containerVariants}

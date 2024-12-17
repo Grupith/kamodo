@@ -1,92 +1,88 @@
 "use client";
-
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { UserCircleIcon } from "@heroicons/react/24/outline";
+import { WrenchIcon } from "@heroicons/react/24/outline";
 
-// Mock function to simulate fetching customer data from an API or database
-async function fetchCustomerData(customerId: string) {
+// Mock function to simulate fetching equipment data from an API or database
+async function fetchEquipmentData(equipmentId: string) {
   return new Promise((resolve) => {
     setTimeout(() => {
-      const mockCustomers = [
+      const mockEquipment = [
         {
           id: "1",
-          name: "John Doe",
-          email: "john@example.com",
-          phone: "+1 (555) 123-4567",
-          address: "123 Elm St, Springfield, USA",
-          company: "ACME Inc.",
-          accountCreation: "2022-03-15",
-          notes: "Priority customer. Prefers email communication.",
+          name: "Excavator",
+          serialNumber: "EXC12345",
+          location: "Site A",
+          purchaseDate: "2020-01-15",
+          condition: "Good",
+          notes: "Regular maintenance required every 3 months.",
         },
         {
           id: "2",
-          name: "Jane Smith",
-          email: "jane@example.com",
-          phone: "+1 (555) 987-6543",
-          address: "456 Pine St, Metropolis, USA",
-          company: "Globex Co.",
-          accountCreation: "2021-11-10",
-          notes: "Interested in premium support packages.",
+          name: "Bulldozer",
+          serialNumber: "BULL5678",
+          location: "Site B",
+          purchaseDate: "2019-06-20",
+          condition: "Excellent",
+          notes: "Recently serviced and in peak condition.",
         },
       ];
-      const customer = mockCustomers.find((c) => c.id === customerId);
-      resolve(customer || null);
+      const equipment = mockEquipment.find((e) => e.id === equipmentId);
+      resolve(equipment || null);
     }, 250); // Simulate a short delay
   });
 }
 
-interface Customer {
+interface Equipment {
   id: string;
   name: string;
-  email?: string;
-  phone?: string;
-  address?: string;
-  company?: string;
-  accountCreation?: string;
+  serialNumber?: string;
+  location?: string;
+  purchaseDate?: string;
+  condition?: string;
   notes?: string;
 }
 
-export default function CustomerProfilePage() {
-  const { customerId } = useParams() as { customerId: string };
-  const [customer, setCustomer] = useState<Customer | null>(null);
+export default function EquipmentProfilePage() {
+  const { equipmentId } = useParams() as { equipmentId: string };
+  const [equipment, setEquipment] = useState<Equipment | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const getCustomer = async () => {
-      const data = await fetchCustomerData(customerId);
-      setCustomer(data as Customer | null);
+    const getEquipment = async () => {
+      const data = await fetchEquipmentData(equipmentId);
+      setEquipment(data as Equipment | null);
       setLoading(false);
     };
 
-    if (customerId) {
-      getCustomer();
+    if (equipmentId) {
+      getEquipment();
     }
-  }, [customerId]);
+  }, [equipmentId]);
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.1, ease: "easeOut" },
+      transition: { duration: 0.3, ease: "easeOut" },
     },
   };
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-200">
-        <p>Loading customer data...</p>
+        <p>Loading equipment data...</p>
       </div>
     );
   }
 
-  if (!customer) {
+  if (!equipment) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-200 p-4">
-        <h2 className="text-2xl font-bold mb-4">Customer Not Found</h2>
-        <p>We could not find a customer with the given ID.</p>
+        <h2 className="text-2xl font-bold mb-4">Equipment Not Found</h2>
+        <p>We could not find equipment with the given ID.</p>
       </div>
     );
   }
@@ -102,65 +98,58 @@ export default function CustomerProfilePage() {
         {/* Header Section */}
         <div className="flex items-center mb-8">
           <div className="w-32 h-32 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mr-6">
-            <UserCircleIcon className="w-24 h-24 text-gray-400 dark:text-gray-500" />
+            <WrenchIcon className="w-24 h-24 text-gray-400 dark:text-gray-500" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold mb-2">{customer.name}</h1>
+            <h1 className="text-2xl font-bold mb-2">{equipment.name}</h1>
             <p className="text-lg text-blue-600 dark:text-blue-400">
-              {customer.company || "No Company"}
+              {equipment.serialNumber || "No Serial Number"}
+            </p>
+            <p className="text-gray-500 dark:text-gray-400">
+              {equipment.location || "Location Unknown"}
             </p>
           </div>
         </div>
 
-        {/* Customer Details */}
+        {/* Equipment Details */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {customer.email && (
+          {equipment.purchaseDate && (
             <div className="p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 rounded-md shadow-md">
               <h3 className="font-semibold text-gray-600 dark:text-gray-300">
-                Email
+                Purchase Date
               </h3>
               <p className="text-gray-700 dark:text-gray-200">
-                {customer.email}
+                {equipment.purchaseDate}
               </p>
             </div>
           )}
-          {customer.phone && (
+          {equipment.condition && (
             <div className="p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 rounded-md shadow-md">
               <h3 className="font-semibold text-gray-600 dark:text-gray-300">
-                Phone
+                Condition
               </h3>
               <p className="text-gray-700 dark:text-gray-200">
-                {customer.phone}
+                {equipment.condition}
               </p>
             </div>
           )}
-          {customer.address && (
+          {equipment.location && (
             <div className="p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 rounded-md shadow-md">
               <h3 className="font-semibold text-gray-600 dark:text-gray-300">
-                Address
+                Location
               </h3>
               <p className="text-gray-700 dark:text-gray-200">
-                {customer.address}
+                {equipment.location}
               </p>
             </div>
           )}
-          {customer.accountCreation && (
-            <div className="p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 rounded-md shadow-md">
-              <h3 className="font-semibold text-gray-600 dark:text-gray-300">
-                Account Created
-              </h3>
-              <p className="text-gray-700 dark:text-gray-200">
-                {customer.accountCreation}
-              </p>
-            </div>
-          )}
-          {customer.notes && (
+          {equipment.notes && (
             <div className="col-span-1 md:col-span-2 p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 rounded-md shadow-md">
               <h3 className="font-semibold text-gray-600 dark:text-gray-300">
                 Notes
               </h3>
               <p className="text-gray-700 dark:text-gray-200">
-                {customer.notes}
+                {equipment.notes}
               </p>
             </div>
           )}

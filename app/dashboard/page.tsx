@@ -6,7 +6,6 @@ import CompanyCard from "@/components/CompanyCard";
 import { useCompany } from "@/contexts/CompanyContext";
 import { motion } from "framer-motion";
 import JobProgressChart from "@/components/JobProgressChart";
-import Breadcrumbs from "@/components/Breadcrumbs";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Dashboard = () => {
@@ -43,7 +42,6 @@ const Dashboard = () => {
   return (
     <ProtectedRoute>
       <div className="p-4">
-        <Breadcrumbs />
         <h2 className="text-3xl font-bold mb-4">Dashboard</h2>
 
         {/* Responsive grid for cards */}
@@ -78,7 +76,7 @@ const Dashboard = () => {
           {/* Example wide card */}
           <motion.div
             variants={cardVariants}
-            className="md:col-span-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md rounded-lg p-6"
+            className="md:col-span-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md rounded-lg p-6"
           >
             <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
               Recent Activities

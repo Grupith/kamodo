@@ -86,22 +86,20 @@ const CompanyCard = ({ company }: { company: Company | null }) => {
           <hr className="mb-4" />
           <div className="flex flex-col space-y-4">
             <div className="flex justify-between space-x-2">
+              <p className="text-gray-700 dark:text-gray-200">Notifications</p>
+              <Switcher />
+            </div>
+
+            <div className="flex justify-between space-x-2">
               <p className="text-gray-700 dark:text-gray-200">
-                Switch between companies to view their data.
+                Enable analytics.
               </p>
               <Switcher />
             </div>
 
             <div className="flex justify-between space-x-2">
               <p className="text-gray-700 dark:text-gray-200">
-                Learn more about the company's history and mission.
-              </p>
-              <Switcher />
-            </div>
-
-            <div className="flex justify-between space-x-2">
-              <p className="text-gray-700 dark:text-gray-200">
-                Switch between employees to view their profiles.
+                Beta user feature
               </p>
               <Switcher />
             </div>

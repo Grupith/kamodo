@@ -5,70 +5,25 @@ import { CompanyProvider } from "@/contexts/CompanyContext";
 import { fetchCompanyDataByOwnerId } from "@/firebase/firestore";
 import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import { motion } from "framer-motion";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { usePathname } from "next/navigation";
 
 interface Company {
   id: string;
   name: string;
-  numberOfEmployees?: number;
-  website?: string;
-  state?: string;
-  businessType?: string;
   ownerId: string;
-  createdAt?: string;
 }
 
-// Define props for child components
-interface DashboardChildProps {
-  searchTerm: string;
-  currentPage: string;
-}
-
-interface DashboardLayoutProps {
-  children: React.ReactElement<DashboardChildProps>;
-}
-
-const DashboardLayout = ({ children }: DashboardLayoutProps) => {
+const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const { user, loading: authLoading } = useAuth();
   const [company, setCompany] = useState<Company | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [showAccountMenu, setShowAccountMenu] = useState(false);
-
-  const [searchTerm, setSearchTerm] = useState(""); // Search term state
-  const pathname = usePathname();
 
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 1024) {
-        setSidebarOpen(false);
-      }
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  const toggleSidebar = (open?: boolean) => {
-    setSidebarOpen((prev) => {
-      const newState = typeof open === "boolean" ? open : !prev;
-      try {
-        localStorage.setItem("sidebarOpen", JSON.stringify(newState));
-      } catch (error) {
-        console.error("Error saving sidebar state to localStorage:", error);
-      }
-      return newState;
-    });
-  };
-
-  const handleAccountMenuToggle = () => setShowAccountMenu((prev) => !prev);
-
-  const handleSearch = (term: string) => setSearchTerm(term);
 
   useEffect(() => {
     const fetchCompany = async () => {
@@ -80,71 +35,81 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         setError(
           err instanceof Error ? err.message : "An unknown error occurred"
         );
+        console.error("Error fetching company data:", error);
       } finally {
         setLoading(false);
       }
     };
     fetchCompany();
-  }, [authLoading, user]);
+  }, [authLoading, user, error]);
 
-  if (authLoading || loading) return <LoadingSpinner />;
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 text-red-500">
-        {error}
-      </div>
-    );
+  if (authLoading || loading) {
+    return <LoadingSpinner />;
   }
-
-  const contentVariants = {
-    open: { x: 0, transition: { duration: 0.3, ease: "easeInOut" } },
-    closed: { x: 0, transition: { duration: 0.3, ease: "easeInOut" } },
-  };
-
-  const currentPage = pathname.includes("employees")
-    ? "employees"
-    : pathname.includes("customers")
-    ? "customers"
-    : "";
 
   return (
     <ProtectedRoute>
       <CompanyProvider company={company}>
-        <div className="flex h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden relative">
-          <Sidebar
-            sidebarOpen={sidebarOpen}
-            setSidebarOpen={setSidebarOpen}
-            handleLinkClick={() => isMobile && toggleSidebar(false)}
-            companyName={company?.name || "Your Company"}
-            isMobile={isMobile}
-          />
+        <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
+          {/* Sidebar */}
           <motion.div
-            className="flex flex-col flex-1 overflow-hidden"
-            variants={contentVariants}
-            animate={sidebarOpen ? "open" : "closed"}
-            initial="closed"
+            initial={false}
+            animate={{
+              marginLeft: sidebarOpen ? "0" : "-16rem", // Moves off-screen when closed
+            }}
+            transition={{ duration: 0.3 }}
+            className="hidden lg:block w-64 bg-white dark:bg-gray-800 h-full"
           >
+            <Sidebar
+              sidebarOpen={sidebarOpen}
+              setSidebarOpen={setSidebarOpen}
+              handleLinkClick={() => {
+                if (isMobile) setSidebarOpen(false);
+              }}
+              companyName={company?.name || "Your Company"}
+            />
+          </motion.div>
+
+          {/* Mobile Sidebar */}
+          {isMobile && sidebarOpen && (
+            <motion.div
+              initial={{ x: "-100%" }}
+              animate={{ x: sidebarOpen ? "0" : "-100%" }}
+              transition={{ duration: 0.3 }}
+              className="fixed top-0 left-0 z-50 w-64 h-full bg-white dark:bg-gray-800"
+            >
+              <Sidebar
+                sidebarOpen={sidebarOpen}
+                setSidebarOpen={setSidebarOpen}
+                handleLinkClick={() => setSidebarOpen(false)}
+                companyName={company?.name || "Your Company"}
+              />
+            </motion.div>
+          )}
+
+          {/* Main Content */}
+          <div
+            className={`flex flex-col flex-1 transition-all duration-300 ${
+              sidebarOpen && !isMobile ? "2xl:ml-64" : ""
+            }`}
+          >
+            {/* Navbar */}
             <Navbar
               sidebarOpen={sidebarOpen}
-              toggleSidebar={toggleSidebar}
-              handleAccountMenuToggle={handleAccountMenuToggle}
-              showAccountMenu={showAccountMenu}
-              onSearch={handleSearch}
-              currentPage={currentPage}
+              toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+              handleAccountMenuToggle={() => {}}
+              showAccountMenu={false}
+              onSearch={() => {}}
             />
-            <motion.main
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.1 }}
-              className="flex-1 p-2 overflow-auto"
-            >
-              {React.cloneElement(children, {
-                searchTerm,
-                currentPage,
-              })}
-            </motion.main>
-          </motion.div>
+
+            {/* Breadcrumbs */}
+            <div className="pl-4 py-1 bg-transparent dark:bg-gray-800 border-gray-300 dark:border-gray-700">
+              <Breadcrumbs />
+            </div>
+
+            {/* Main Content */}
+            <main className="flex-1 p-4 overflow-auto">{children}</main>
+          </div>
         </div>
       </CompanyProvider>
     </ProtectedRoute>

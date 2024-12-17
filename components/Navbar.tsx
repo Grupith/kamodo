@@ -28,7 +28,6 @@ const Navbar: React.FC<NavbarProps> = ({
   handleAccountMenuToggle,
   showAccountMenu,
   onSearch,
-  currentPage,
 }) => {
   const { user } = useAuth();
   const isMobile = window.innerWidth < 768;
@@ -65,10 +64,11 @@ const Navbar: React.FC<NavbarProps> = ({
           <div className="relative hidden md:block">
             <MagnifyingGlassIcon className="w-5 h-5 text-gray-500 dark:text-gray-300 absolute top-1/2 left-3 transform -translate-y-1/2" />
             <input
+              disabled
               type="text"
               placeholder="Search..."
               onChange={(e) => onSearch(e.target.value)}
-              className="pl-10 pr-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="pl-10 pr-24 py-2 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>

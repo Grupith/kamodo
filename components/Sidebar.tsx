@@ -7,6 +7,7 @@ import {
   HomeIcon,
   UsersIcon,
   BuildingOffice2Icon,
+  WrenchIcon,
 } from "@heroicons/react/24/outline";
 import InstallAppButton from "./InstallAppButton";
 
@@ -125,6 +126,13 @@ const Sidebar = ({
               icon={<BuildingOffice2Icon className="w-6 h-6" />}
               label="Employees"
               active={pathname === "/dashboard/employees"}
+              onClick={handleLinkClick}
+            />
+            <SidebarLink
+              href="/dashboard/equipment"
+              icon={<WrenchIcon className="w-6 h-6" />}
+              label="Equipment"
+              active={pathname === "/dashboard/equipment"}
               onClick={handleLinkClick}
             />
           </nav>
