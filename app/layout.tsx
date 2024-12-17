@@ -1,4 +1,5 @@
-import type { Metadata, Viewport } from "next";
+"use client";
+
 import "./globals.css";
 import { Figtree } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
@@ -6,77 +7,44 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { AlertProvider } from "@/contexts/AlertContext";
+import { useEffect } from "react";
 
 const figTree = Figtree({
   subsets: ["latin"],
   display: "swap",
 });
 
-export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#72A0C1" },
-    { media: "(prefers-color-scheme: dark)", color: "black" },
-  ],
-};
-
-const APP_NAME = "Kamodo";
-const APP_DEFAULT_TITLE = "Kamodo - Small Business Management";
-const APP_TITLE_TEMPLATE = "%s - Kamodo";
-const APP_DESCRIPTION =
-  "All-in-one small business management software to organize your jobs, employees, and tasks.";
-
-export const metadata: Metadata = {
-  applicationName: APP_NAME,
-  title: {
-    default: APP_DEFAULT_TITLE,
-    template: APP_TITLE_TEMPLATE,
-  },
-  description: APP_DESCRIPTION,
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: APP_DEFAULT_TITLE,
-  },
-  formatDetection: {
-    telephone: false, // Prevent auto-detection of phone numbers
-  },
-  openGraph: {
-    type: "website",
-    siteName: APP_NAME,
-    title: {
-      default: APP_DEFAULT_TITLE,
-      template: APP_TITLE_TEMPLATE,
-    },
-    description: APP_DESCRIPTION,
-  },
-  twitter: {
-    card: "summary",
-    title: {
-      default: APP_DEFAULT_TITLE,
-      template: APP_TITLE_TEMPLATE,
-    },
-    description: APP_DESCRIPTION,
-  },
-};
-
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
+  useEffect(() => {
+    // Register the minimal service worker
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/sw.js") // Note: sw.ts is compiled to sw.js
+        .then((registration) => {
+          console.log("Service Worker registered:", registration);
+        })
+        .catch((error) => {
+          console.error("Service Worker registration failed:", error);
+        });
+    }
+  }, []);
+
   return (
     <html
       lang="en"
-      dir="ltr" // Specify text direction for accessibility
-      className="scroll-smooth" // Add smooth scrolling
+      dir="ltr"
+      className="scroll-smooth"
       suppressHydrationWarning
     >
-      <head />
       <body className={`${figTree.className} dark:bg-gray-800`}>
         <NextThemesProvider
-          attribute="class" // Uses class-based theming
-          defaultTheme="system" // Defaults to system preference
-          enableSystem={true} // Enables automatic theme detection
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
         >
           <AlertProvider>
             <AuthProvider>{children}</AuthProvider>

@@ -1,10 +1,10 @@
 "use client";
 import React, { useEffect } from "react";
-import { handleGoogleLogin } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAlert } from "@/contexts/AlertContext";
 import { motion } from "framer-motion";
+import { handleGoogleLogin } from "@/lib/auth";
 
 const LoginPage: React.FC = () => {
   const router = useRouter();

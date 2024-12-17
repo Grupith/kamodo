@@ -41,22 +41,19 @@ const LandingPage = () => {
   }, [user, router]);
 
   const handleLoginClick = async () => {
-    try {
-      await handleGoogleLogin({
-        onLoginSuccess: (newUser, companyId) => {
-          if (newUser || !companyId) {
-            router.push("/setup"); // Redirect to setup page
-          } else {
-            router.push("/dashboard"); // Redirect to dashboard
-          }
-        },
-        onError: (message) => {
-          console.error("Login error:", message);
-        },
-      });
-    } catch (error) {
-      console.error("Error during login:", error);
-    }
+    await handleGoogleLogin({
+      onLoginSuccess: (newUser, companyId) => {
+        if (newUser || !companyId) {
+          router.push("/setup"); // Redirect to setup page for new users
+        } else {
+          router.push("/dashboard"); // Redirect to dashboard for existing users
+        }
+      },
+      onError: (message) => {
+        console.error("Login error:", message);
+        alert("Failed to log in: " + message); // Optional: Show error alert
+      },
+    });
   };
 
   const handleSignOut = async () => {
@@ -97,7 +94,7 @@ const LandingPage = () => {
                     alt="Kamodo Logo"
                     width={150}
                     height={150}
-                    priority
+                    priority={true}
                     className="dark:invert w-10 h-10 mr-1 rounded-lg" // Inverts colors in dark mode if needed
                   />
                 </div>
@@ -238,15 +235,23 @@ const LandingPage = () => {
                 Get Started for Free
               </button>
             </Link>
-            <div>
+            <div className="flex justify-center">
               <Image
                 src={DashboardMockup}
-                alt={"Dashboard mockup light"}
+                alt="Dashboard Preview"
+                width={550}
+                height={550}
+                priority={true}
+                fetchPriority="high"
                 className="my-10 shadow-md rounded-md dark:hidden"
               />
               <Image
                 src={DashboardMockupDark}
-                alt={"Dashboard mockup dark"}
+                alt="Dashboard Preview"
+                width={550}
+                height={550}
+                priority={true}
+                fetchPriority="high"
                 className="my-10 shadow-md rounded-md hidden dark:block"
               />
             </div>
