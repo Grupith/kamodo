@@ -6,65 +6,71 @@ import { motion } from "framer-motion";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
 import Breadcrumbs from "@/components/Breadcrumbs";
 
-// Mock function to simulate fetching customer data from an API or database
-async function fetchCustomerData(customerId: string) {
+// Mock function to simulate fetching employee data from an API or database
+async function fetchEmployeeData(employeeId: string) {
   return new Promise((resolve) => {
     setTimeout(() => {
-      const mockCustomers = [
+      const mockEmployees = [
         {
           id: "1",
-          name: "John Doe",
-          email: "john@example.com",
+          name: "Alice Johnson",
+          email: "alice@example.com",
+          position: "Project Manager",
           phone: "+1 (555) 123-4567",
-          address: "123 Elm St, Springfield, USA",
-          company: "ACME Inc.",
-          accountCreation: "2022-03-15",
-          notes: "Priority customer. Prefers email communication.",
+          address: "123 Maple St, Springfield, USA",
+          department: "Management",
+          notes: "Excellent team leader with 5+ years of experience.",
+          hireDate: "2020-05-15",
+          salary: "$95,000",
         },
         {
           id: "2",
-          name: "Jane Smith",
-          email: "jane@example.com",
+          name: "Bob Smith",
+          email: "bob@example.com",
+          position: "Software Engineer",
           phone: "+1 (555) 987-6543",
           address: "456 Pine St, Metropolis, USA",
-          company: "Globex Co.",
-          accountCreation: "2021-11-10",
-          notes: "Interested in premium support packages.",
+          department: "Engineering",
+          notes: "Specializes in full-stack development.",
+          hireDate: "2019-08-20",
+          salary: "$110,000",
         },
       ];
-      const customer = mockCustomers.find((c) => c.id === customerId);
-      resolve(customer || null);
+      const employee = mockEmployees.find((e) => e.id === employeeId);
+      resolve(employee || null);
     }, 250); // Simulate a short delay
   });
 }
 
-interface Customer {
+interface Employee {
   id: string;
   name: string;
   email?: string;
+  position?: string;
   phone?: string;
   address?: string;
-  company?: string;
-  accountCreation?: string;
+  department?: string;
   notes?: string;
+  hireDate?: string;
+  salary?: string;
 }
 
-export default function CustomerProfilePage() {
-  const { customerId } = useParams() as { customerId: string };
-  const [customer, setCustomer] = useState<Customer | null>(null);
+export default function EmployeeProfilePage() {
+  const { employeeId } = useParams() as { employeeId: string };
+  const [employee, setEmployee] = useState<Employee | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const getCustomer = async () => {
-      const data = await fetchCustomerData(customerId);
-      setCustomer(data as Customer | null);
+    const getEmployee = async () => {
+      const data = await fetchEmployeeData(employeeId);
+      setEmployee(data as Employee | null);
       setLoading(false);
     };
 
-    if (customerId) {
-      getCustomer();
+    if (employeeId) {
+      getEmployee();
     }
-  }, [customerId]);
+  }, [employeeId]);
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -78,16 +84,16 @@ export default function CustomerProfilePage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-200">
-        <p>Loading customer data...</p>
+        <p>Loading employee data...</p>
       </div>
     );
   }
 
-  if (!customer) {
+  if (!employee) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-200 p-4">
-        <h2 className="text-2xl font-bold mb-4">Customer Not Found</h2>
-        <p>We could not find a customer with the given ID.</p>
+        <h2 className="text-2xl font-bold mb-4">Employee Not Found</h2>
+        <p>We could not find an employee with the given ID.</p>
       </div>
     );
   }
@@ -107,62 +113,75 @@ export default function CustomerProfilePage() {
             <UserCircleIcon className="w-24 h-24 text-gray-400 dark:text-gray-500" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold mb-2">{customer.name}</h1>
+            <h1 className="text-2xl font-bold mb-2">{employee.name}</h1>
             <p className="text-lg text-blue-600 dark:text-blue-400">
-              {customer.company || "No Company"}
+              {employee.position || "No Position"}
+            </p>
+            <p className="text-gray-500 dark:text-gray-400">
+              {employee.department || "N/A"}
             </p>
           </div>
         </div>
 
-        {/* Customer Details */}
+        {/* Employee Details */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {customer.email && (
-            <div className="p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 rounded-md shadow-md">
+          {employee.email && (
+            <div className="p-4 bg-gray-50 border border-gray-200  dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-700 rounded-md shadow-md">
               <h3 className="font-semibold text-gray-600 dark:text-gray-300">
                 Email
               </h3>
               <p className="text-gray-700 dark:text-gray-200">
-                {customer.email}
+                {employee.email}
               </p>
             </div>
           )}
-          {customer.phone && (
-            <div className="p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 rounded-md shadow-md">
+          {employee.phone && (
+            <div className="p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-700 rounded-md shadow-md">
               <h3 className="font-semibold text-gray-600 dark:text-gray-300">
                 Phone
               </h3>
               <p className="text-gray-700 dark:text-gray-200">
-                {customer.phone}
+                {employee.phone}
               </p>
             </div>
           )}
-          {customer.address && (
-            <div className="p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 rounded-md shadow-md">
+          {employee.address && (
+            <div className="p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-700 rounded-md shadow-md">
               <h3 className="font-semibold text-gray-600 dark:text-gray-300">
                 Address
               </h3>
               <p className="text-gray-700 dark:text-gray-200">
-                {customer.address}
+                {employee.address}
               </p>
             </div>
           )}
-          {customer.accountCreation && (
-            <div className="p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 rounded-md shadow-md">
+          {employee.hireDate && (
+            <div className="p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-700 rounded-md shadow-md">
               <h3 className="font-semibold text-gray-600 dark:text-gray-300">
-                Account Created
+                Hire Date
               </h3>
               <p className="text-gray-700 dark:text-gray-200">
-                {customer.accountCreation}
+                {employee.hireDate}
               </p>
             </div>
           )}
-          {customer.notes && (
-            <div className="col-span-1 md:col-span-2 p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 rounded-md shadow-md">
+          {employee.salary && (
+            <div className="p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-700 rounded-md shadow-md">
+              <h3 className="font-semibold text-gray-600 dark:text-gray-300">
+                Salary
+              </h3>
+              <p className="text-gray-700 dark:text-gray-200">
+                {employee.salary}
+              </p>
+            </div>
+          )}
+          {employee.notes && (
+            <div className="col-span-1 md:col-span-2 p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-700 rounded-md shadow-md">
               <h3 className="font-semibold text-gray-600 dark:text-gray-300">
                 Notes
               </h3>
               <p className="text-gray-700 dark:text-gray-200">
-                {customer.notes}
+                {employee.notes}
               </p>
             </div>
           )}

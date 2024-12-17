@@ -20,10 +20,10 @@ const CompanyCard = ({ company }: { company: Company | null }) => {
     >
       {/* Header */}
       <div className="mb-4 border-b pb-4 border-gray-200 dark:border-gray-700">
-        <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
           {company?.name || "No Company Name Available"}
         </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+        <p className="text-sm mt-2 text-gray-500 dark:text-gray-400">
           {company?.businessType || "Business type not specified"}
         </p>
       </div>
@@ -78,7 +78,35 @@ const CompanyCard = ({ company }: { company: Company | null }) => {
               : "Unknown"}
           </span>
         </div>
-        <Switcher />
+        {/* control panel */}
+        <section className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md shadow-md p-4">
+          <h3 className="font-semibold text-xl mb-2 text-gray-600 dark:text-gray-50">
+            Control Panel
+          </h3>
+          <hr className="mb-4" />
+          <div className="flex flex-col space-y-4">
+            <div className="flex justify-between space-x-2">
+              <p className="text-gray-700 dark:text-gray-200">
+                Switch between companies to view their data.
+              </p>
+              <Switcher />
+            </div>
+
+            <div className="flex justify-between space-x-2">
+              <p className="text-gray-700 dark:text-gray-200">
+                Learn more about the company's history and mission.
+              </p>
+              <Switcher />
+            </div>
+
+            <div className="flex justify-between space-x-2">
+              <p className="text-gray-700 dark:text-gray-200">
+                Switch between employees to view their profiles.
+              </p>
+              <Switcher />
+            </div>
+          </div>
+        </section>
       </div>
     </motion.div>
   );

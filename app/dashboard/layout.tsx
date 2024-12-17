@@ -8,6 +8,7 @@ import Navbar from "@/components/Navbar";
 import { motion } from "framer-motion";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { usePathname } from "next/navigation";
 
 interface Company {
   id: string;
@@ -17,10 +18,20 @@ interface Company {
   state?: string;
   businessType?: string;
   ownerId: string;
-  createdAt?: string; // Use Firebase Timestamp if applicable
+  createdAt?: string;
 }
 
-const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
+// Define props for child components
+interface DashboardChildProps {
+  searchTerm: string;
+  currentPage: string;
+}
+
+interface DashboardLayoutProps {
+  children: React.ReactElement<DashboardChildProps>;
+}
+
+const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const { user, loading: authLoading } = useAuth();
   const [company, setCompany] = useState<Company | null>(null);
   const [loading, setLoading] = useState(true);
@@ -28,16 +39,17 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showAccountMenu, setShowAccountMenu] = useState(false);
 
+  const [searchTerm, setSearchTerm] = useState(""); // Search term state
+  const pathname = usePathname();
+
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
-  // Add resize handler
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 1024) {
         setSidebarOpen(false);
       }
     };
-
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -54,29 +66,20 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
-  const handleLinkClick = () => {
-    if (isMobile) {
-      toggleSidebar(false);
-    }
-  };
+  const handleAccountMenuToggle = () => setShowAccountMenu((prev) => !prev);
 
-  const handleAccountMenuToggle = () => {
-    setShowAccountMenu((prev) => !prev);
-  };
+  const handleSearch = (term: string) => setSearchTerm(term);
 
   useEffect(() => {
     const fetchCompany = async () => {
       if (authLoading || !user) return;
-      console.log("Fetching company data...");
       try {
         const companyData = await fetchCompanyDataByOwnerId(user.uid);
         setCompany(companyData);
       } catch (err) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError("An unknown error occurred");
-        }
+        setError(
+          err instanceof Error ? err.message : "An unknown error occurred"
+        );
       } finally {
         setLoading(false);
       }
@@ -84,9 +87,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     fetchCompany();
   }, [authLoading, user]);
 
-  if (authLoading || loading) {
-    return <LoadingSpinner />;
-  }
+  if (authLoading || loading) return <LoadingSpinner />;
 
   if (error) {
     return (
@@ -97,15 +98,15 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   }
 
   const contentVariants = {
-    open: {
-      x: !isMobile ? 0 : 0,
-      transition: { duration: 0.3, ease: "easeInOut" },
-    },
-    closed: {
-      x: 0,
-      transition: { duration: 0.3, ease: "easeInOut" },
-    },
+    open: { x: 0, transition: { duration: 0.3, ease: "easeInOut" } },
+    closed: { x: 0, transition: { duration: 0.3, ease: "easeInOut" } },
   };
+
+  const currentPage = pathname.includes("employees")
+    ? "employees"
+    : pathname.includes("customers")
+    ? "customers"
+    : "";
 
   return (
     <ProtectedRoute>
@@ -114,11 +115,10 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           <Sidebar
             sidebarOpen={sidebarOpen}
             setSidebarOpen={setSidebarOpen}
-            handleLinkClick={handleLinkClick}
+            handleLinkClick={() => isMobile && toggleSidebar(false)}
             companyName={company?.name || "Your Company"}
             isMobile={isMobile}
           />
-          {/* Navbar and main  */}
           <motion.div
             className="flex flex-col flex-1 overflow-hidden"
             variants={contentVariants}
@@ -130,15 +130,19 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
               toggleSidebar={toggleSidebar}
               handleAccountMenuToggle={handleAccountMenuToggle}
               showAccountMenu={showAccountMenu}
+              onSearch={handleSearch}
+              currentPage={currentPage}
             />
             <motion.main
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
               transition={{ duration: 0.1 }}
               className="flex-1 p-2 overflow-auto"
             >
-              {children}
+              {React.cloneElement(children, {
+                searchTerm,
+                currentPage,
+              })}
             </motion.main>
           </motion.div>
         </div>

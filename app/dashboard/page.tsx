@@ -6,9 +6,12 @@ import CompanyCard from "@/components/CompanyCard";
 import { useCompany } from "@/contexts/CompanyContext";
 import { motion } from "framer-motion";
 import JobProgressChart from "@/components/JobProgressChart";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Dashboard = () => {
   const company = useCompany();
+  const { user } = useAuth();
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -40,6 +43,7 @@ const Dashboard = () => {
   return (
     <ProtectedRoute>
       <div className="p-4">
+        <Breadcrumbs />
         <h2 className="text-3xl font-bold mb-4">Dashboard</h2>
 
         {/* Responsive grid for cards */}
@@ -49,28 +53,27 @@ const Dashboard = () => {
           initial="hidden"
           animate="visible"
         >
+          {/* Welcome back card */}
+          <motion.div
+            variants={cardVariants}
+            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md rounded-lg p-4 flex flex-col justify-center items-start"
+          >
+            <h3 className="text-3xl font-semibold text-green-600 dark:text-green-500 mb-2">
+              {user &&
+                user.displayName &&
+                `Hello ${user.displayName.split(" ")[0]}`}
+            </h3>
+            <p className="text-gray-600 text-lg font-light dark:text-gray-300">
+              Welcome back to your dashboard.
+            </p>
+          </motion.div>
+
           {/* Company Card (provided) */}
           <motion.div variants={cardVariants}>
             <CompanyCard company={company} />
           </motion.div>
 
           <JobProgressChart />
-
-          {/* Example of a smaller info card */}
-          <motion.div
-            variants={cardVariants}
-            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md rounded-lg p-4 flex flex-col justify-center items-start"
-          >
-            <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
-              Quick Stats
-            </h3>
-            <p className="text-gray-600 dark:text-gray-300">
-              Monthly Sales: $12,340
-            </p>
-            <p className="text-gray-600 dark:text-gray-300">
-              Active Users: 456
-            </p>
-          </motion.div>
 
           {/* Example wide card */}
           <motion.div

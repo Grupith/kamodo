@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 const JobProgressChart = () => {
   return (
     <>
-      <motion.div className="max-w-sm w-full  bg-white rounded-lg shadow-lg dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 md:p-6 transition-colors duration-300">
+      <motion.div className="md:col-span-2 w-full  bg-white rounded-lg shadow-lg dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 md:p-6 transition-colors duration-300">
         {/* Header */}
         <div className="flex justify-between mb-3">
           <div className="flex items-center">

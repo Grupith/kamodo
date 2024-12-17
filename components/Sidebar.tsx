@@ -63,12 +63,12 @@ const Sidebar = ({
     visible: {
       x: 0,
       opacity: 1,
-      transition: { duration: 0.3, ease: "easeInOut" },
+      transition: { duration: 0.15, ease: "easeInOut" },
     },
     exit: {
       x: -200,
       opacity: 0,
-      transition: { duration: 0.3, ease: "easeInOut" },
+      transition: { duration: 0.15, ease: "easeInOut" },
     },
   };
 

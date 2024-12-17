@@ -18,6 +18,8 @@ interface NavbarProps {
   toggleSidebar: () => void;
   handleAccountMenuToggle: () => void;
   showAccountMenu: boolean;
+  onSearch: (term: string) => void;
+  currentPage?: string;
 }
 
 const Navbar: React.FC<NavbarProps> = ({
@@ -25,6 +27,8 @@ const Navbar: React.FC<NavbarProps> = ({
   toggleSidebar,
   handleAccountMenuToggle,
   showAccountMenu,
+  onSearch,
+  currentPage,
 }) => {
   const { user } = useAuth();
   const isMobile = window.innerWidth < 768;
@@ -63,6 +67,7 @@ const Navbar: React.FC<NavbarProps> = ({
             <input
               type="text"
               placeholder="Search..."
+              onChange={(e) => onSearch(e.target.value)}
               className="pl-10 pr-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
