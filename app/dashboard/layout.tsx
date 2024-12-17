@@ -22,8 +22,12 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [showAccountMenu, setShowAccountMenu] = useState(false);
 
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+
+  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+  const handleAccountMenuToggle = () => setShowAccountMenu((prev) => !prev);
 
   useEffect(() => {
     const fetchCompany = async () => {
@@ -96,10 +100,10 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             {/* Navbar */}
             <Navbar
               sidebarOpen={sidebarOpen}
-              toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-              handleAccountMenuToggle={() => {}}
-              showAccountMenu={false}
-              onSearch={() => {}}
+              toggleSidebar={toggleSidebar}
+              handleAccountMenuToggle={handleAccountMenuToggle}
+              showAccountMenu={showAccountMenu}
+              onSearch={(term) => console.log(term)}
             />
 
             {/* Breadcrumbs */}
