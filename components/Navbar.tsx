@@ -72,6 +72,7 @@ const Navbar: React.FC<NavbarProps> = ({
           </button>
           <div className="relative">
             <input
+              disabled
               type="text"
               placeholder="Search..."
               className="p-2 pl-10 pr-4 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-300"

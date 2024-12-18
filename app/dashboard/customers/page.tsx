@@ -1,8 +1,11 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { UserCircleIcon } from "@heroicons/react/24/outline";
+import { UserCircleIcon, UserPlusIcon } from "@heroicons/react/24/outline";
+import { fetchCustomers } from "@/firebase/firestore"; // Adjust the path to your Firestore functions
+import { useCompany } from "@/contexts/CompanyContext";
+import Link from "next/link";
 
 interface Customer {
   id: string;
@@ -16,39 +19,6 @@ interface Customer {
   };
 }
 
-const customers: Customer[] = [
-  {
-    id: "1",
-    name: "John Doe",
-    email: "john@example.com",
-    company: "ACME Inc.",
-  },
-  {
-    id: "2",
-    name: "Jane Smith",
-    email: "jane@example.com",
-    company: "Globex Co.",
-  },
-  {
-    id: "3",
-    name: "Mark Johnson",
-    email: "mark@example.com",
-    company: "Soylent Corp.",
-  },
-  {
-    id: "4",
-    name: "Sarah Williams",
-    email: "sarah@example.com",
-    company: "Initech",
-  },
-  {
-    id: "5",
-    name: "Michael Brown",
-    email: "michael@example.com",
-    company: "Globex Co.",
-  },
-];
-
 const highlightSearchTerm = (text: string, searchTerm: string): string => {
   if (!searchTerm) return text;
   const regex = new RegExp(`(${searchTerm})`, "gi");
@@ -59,7 +29,6 @@ const highlightSearchTerm = (text: string, searchTerm: string): string => {
 };
 
 export default function CustomersPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -67,61 +36,73 @@ export default function CustomersPage() {
     searchParams.get("search") || ""
   );
   const [filter, setFilter] = useState<string>("All");
-  const [filteredCustomers, setFilteredCustomers] =
-    useState<Customer[]>(customers);
-
-  // Filter logic
-  useEffect(() => {
-    let filtered = customers;
-    if (filter !== "All") {
-      filtered = filtered.filter((customer) => customer.company === filter);
-    }
-    if (searchTerm) {
-      filtered = filtered
-        .filter((customer) =>
-          [customer.name, customer.email, customer.company]
-            .filter(Boolean)
-            .some((value) =>
-              value!.toLowerCase().includes(searchTerm.toLowerCase())
-            )
-        )
-        .map((customer) => ({
-          ...customer,
-          highlightedFields: {
-            name: highlightSearchTerm(customer.name, searchTerm),
-            email: highlightSearchTerm(customer.email || "", searchTerm),
-            company: highlightSearchTerm(customer.company || "", searchTerm),
-          },
-        }));
-    }
-    setFilteredCustomers(filtered);
-  }, [searchTerm, filter]);
-
-  const handleViewProfile = (customerId: string) => {
-    router.push(`/dashboard/customers/${customerId}`);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && filteredCustomers.length > 0) {
-      handleViewProfile(filteredCustomers[0].id);
-    }
-    if (e.key === "Escape") {
-      setSearchTerm(""); // Clear search term
-      inputRef.current?.blur();
-    }
-  };
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
+  const [loading, setLoading] = useState(true);
+  const company = useCompany(); // Access current company context
 
   useEffect(() => {
-    const handleGlobalKeydown = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        inputRef.current?.focus();
+    const fetchAndSetCustomers = async () => {
+      const companyId = company?.id || "";
+      const fetchedCustomers = await fetchCustomers(companyId);
+
+      if (fetchedCustomers.length === 0) {
+        // Add a sample customer only for UI display when there are no customers
+        const sampleCustomer: Customer = {
+          id: "sample-customer",
+          name: "Sarah Sample",
+          email: "sarah-sample532@gmail.com",
+          company: "Sample Company",
+        };
+        setCustomers([sampleCustomer]);
+      } else {
+        setCustomers(fetchedCustomers);
       }
+      setLoading(false);
     };
 
-    window.addEventListener("keydown", handleGlobalKeydown);
-    return () => window.removeEventListener("keydown", handleGlobalKeydown);
-  }, []);
+    fetchAndSetCustomers();
+  }, [company?.id]);
+
+  useEffect(() => {
+    // Apply filters and search to the list of customers
+    const applyFilters = () => {
+      let filtered = [...customers];
+
+      // Filter by company
+      if (filter !== "All") {
+        filtered = filtered.filter((customer) => customer.company === filter);
+      }
+
+      // Apply search term
+      if (searchTerm) {
+        filtered = filtered
+          .filter((customer) =>
+            [customer.name, customer.email, customer.company]
+              .filter(Boolean)
+              .some((value) =>
+                value!.toLowerCase().includes(searchTerm.toLowerCase())
+              )
+          )
+          .map((customer) => ({
+            ...customer,
+            highlightedFields: {
+              name: highlightSearchTerm(customer.name, searchTerm),
+              email: highlightSearchTerm(customer.email || "", searchTerm),
+              company: highlightSearchTerm(customer.company || "", searchTerm),
+            },
+          }));
+      }
+
+      setFilteredCustomers(filtered);
+    };
+
+    applyFilters();
+  }, [customers, searchTerm, filter]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="p-4 min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
@@ -136,20 +117,8 @@ export default function CustomersPage() {
               placeholder="Search customers..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={handleKeyDown}
               className="pl-4 pr-32 py-2 rounded-md shadow-md border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 dark:text-gray-200 w-full"
             />
-            <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
-              <span className="flex items-center space-x-1 text-gray-500 dark:text-gray-400">
-                <kbd className="px-1.5 py-0.5 text-xs font-semibold text-gray-800 bg-gray-200 border rounded-md dark:bg-gray-600 dark:text-gray-100">
-                  {navigator.platform.includes("Mac") ? "⌘" : "Ctrl"}
-                </kbd>
-                <span>+</span>
-                <kbd className="px-1.5 py-0.5 text-xs font-semibold text-gray-800 bg-gray-200 border rounded-md dark:bg-gray-600 dark:text-gray-100">
-                  K
-                </kbd>
-              </span>
-            </div>
           </div>
 
           {/* Filter */}
@@ -162,6 +131,13 @@ export default function CustomersPage() {
             <option value="ACME Inc.">ACME Inc.</option>
             <option value="Globex Co.">Globex Co.</option>
           </select>
+          {/* Add customer */}
+          <Link href="/dashboard/customers/new">
+            <button className=" bg-blue-600 text-white px-4 py-2 flex rounded-md hover:bg-blue-700">
+              <UserPlusIcon className="w-6 h-6 mr-2" />
+              Add Customer
+            </button>
+          </Link>
         </div>
       </div>
 
@@ -202,12 +178,11 @@ export default function CustomersPage() {
                   "No Email",
               }}
             />
-            <button
-              onClick={() => handleViewProfile(customer.id)}
-              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-            >
-              View Profile
-            </button>
+            <Link href={`/dashboard/customers/${customer.id}`}>
+              <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                View Profile
+              </button>
+            </Link>
           </motion.div>
         ))}
       </motion.div>

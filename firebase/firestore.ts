@@ -25,6 +25,15 @@ interface Company {
   createdAt?: any; // Use Firebase Timestamp if applicable
 }
 
+interface Customer {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  address?: string;
+  createdAt?: any; // Use Firebase Timestamp if applicable
+}
+
 // Fetch company data
 export const fetchCompanyDataByOwnerId = async (
   uid: string
@@ -60,6 +69,29 @@ export const fetchCompanyDataByOwnerId = async (
     createdAt: companyData.createdAt,
   };
 };
+
+// FetchCustomers
+export async function fetchCustomers(companyId: string): Promise<Customer[]> {
+  const customersRef = collection(db, "companies", companyId, "customers");
+  const querySnapshot = await getDocs(customersRef);
+  const customers: Customer[] = [];
+  querySnapshot.forEach((doc) => {
+    customers.push({ id: doc.id, ...doc.data() } as Customer);
+  });
+  return customers;
+}
+
+// FetchCustomerById
+export async function fetchCustomerById(companyId: string, customerId: string) {
+  const docRef = doc(db, `companies/${companyId}/customers`, customerId);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    return { id: docSnap.id, ...docSnap.data() };
+  } else {
+    throw new Error("Customer not found");
+  }
+}
 
 /**
  * Checks if a user document exists; if not, creates it.

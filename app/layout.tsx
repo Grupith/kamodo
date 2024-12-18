@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { AlertProvider } from "@/contexts/AlertContext";
 import { useEffect } from "react";
+import { ModalProvider } from "@/contexts/ModalContext";
 
 const figTree = Figtree({
   subsets: ["latin"],
@@ -47,7 +48,9 @@ export default function RootLayout({
           enableSystem
         >
           <AlertProvider>
-            <AuthProvider>{children}</AuthProvider>
+            <ModalProvider>
+              <AuthProvider>{children}</AuthProvider>
+            </ModalProvider>
           </AlertProvider>
         </NextThemesProvider>
         <Analytics />

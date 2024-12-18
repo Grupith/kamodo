@@ -1,41 +1,11 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { fetchCustomerById } from "@/firebase/firestore"; // Update the import as needed
+import { useCompany } from "@/contexts/CompanyContext";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
-
-// Mock function to simulate fetching customer data from an API or database
-async function fetchCustomerData(customerId: string) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const mockCustomers = [
-        {
-          id: "1",
-          name: "John Doe",
-          email: "john@example.com",
-          phone: "+1 (555) 123-4567",
-          address: "123 Elm St, Springfield, USA",
-          company: "ACME Inc.",
-          accountCreation: "2022-03-15",
-          notes: "Priority customer. Prefers email communication.",
-        },
-        {
-          id: "2",
-          name: "Jane Smith",
-          email: "jane@example.com",
-          phone: "+1 (555) 987-6543",
-          address: "456 Pine St, Metropolis, USA",
-          company: "Globex Co.",
-          accountCreation: "2021-11-10",
-          notes: "Interested in premium support packages.",
-        },
-      ];
-      const customer = mockCustomers.find((c) => c.id === customerId);
-      resolve(customer || null);
-    }, 250); // Simulate a short delay
-  });
-}
 
 interface Customer {
   id: string;
@@ -49,21 +19,31 @@ interface Customer {
 }
 
 export default function CustomerProfilePage() {
-  const { customerId } = useParams() as { customerId: string };
+  const { customerId: id } = useParams(); // Extract the dynamic route parameter
+  const company = useCompany(); // Access the current company context
+
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const getCustomer = async () => {
-      const data = await fetchCustomerData(customerId);
-      setCustomer(data as Customer | null);
-      setLoading(false);
+    const fetchCustomerData = async () => {
+      if (id && company?.id) {
+        try {
+          const customerData = (await fetchCustomerById(
+            company.id,
+            id as string
+          )) as Customer; // Pass companyId and customerId
+          setCustomer(customerData);
+        } catch (error) {
+          console.error("Failed to fetch customer:", error);
+        } finally {
+          setLoading(false);
+        }
+      }
     };
 
-    if (customerId) {
-      getCustomer();
-    }
-  }, [customerId]);
+    fetchCustomerData();
+  }, [id, company]);
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -92,30 +72,26 @@ export default function CustomerProfilePage() {
   }
 
   return (
-    <div className="p-4 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen flex flex-col justify-start">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 p-8">
       <motion.div
-        className="w-full max-w-6xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg rounded-md p-8"
+        className="max-w-4xl mx-auto bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        {/* Header Section */}
-        <div className="flex items-center mb-8">
-          <div className="w-32 h-32 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mr-6">
-            <UserCircleIcon className="w-24 h-24 text-gray-400 dark:text-gray-500" />
+        {/* Profile Header */}
+        <div className="flex flex-col items-center p-8 bg-blue-600 text-white">
+          <div className="w-32 h-32 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+            <UserCircleIcon className="w-20 h-20 text-gray-400 dark:text-gray-500" />
           </div>
-          <div>
-            <h1 className="text-2xl font-bold mb-2">{customer.name}</h1>
-            <p className="text-lg text-blue-600 dark:text-blue-400">
-              {customer.company || "No Company"}
-            </p>
-          </div>
+          <h1 className="text-2xl font-bold mt-4">{customer.name}</h1>
+          <p className="text-lg">{customer.company || "No Company"}</p>
         </div>
 
         {/* Customer Details */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
           {customer.email && (
-            <div className="p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 rounded-md shadow-md">
+            <div className="flex flex-col">
               <h3 className="font-semibold text-gray-600 dark:text-gray-300">
                 Email
               </h3>
@@ -125,7 +101,7 @@ export default function CustomerProfilePage() {
             </div>
           )}
           {customer.phone && (
-            <div className="p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 rounded-md shadow-md">
+            <div className="flex flex-col">
               <h3 className="font-semibold text-gray-600 dark:text-gray-300">
                 Phone
               </h3>
@@ -135,7 +111,7 @@ export default function CustomerProfilePage() {
             </div>
           )}
           {customer.address && (
-            <div className="p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 rounded-md shadow-md">
+            <div className="flex flex-col">
               <h3 className="font-semibold text-gray-600 dark:text-gray-300">
                 Address
               </h3>
@@ -145,7 +121,7 @@ export default function CustomerProfilePage() {
             </div>
           )}
           {customer.accountCreation && (
-            <div className="p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 rounded-md shadow-md">
+            <div className="flex flex-col">
               <h3 className="font-semibold text-gray-600 dark:text-gray-300">
                 Account Created
               </h3>
@@ -155,7 +131,7 @@ export default function CustomerProfilePage() {
             </div>
           )}
           {customer.notes && (
-            <div className="col-span-1 md:col-span-2 p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 rounded-md shadow-md">
+            <div className="col-span-1 md:col-span-2 flex flex-col">
               <h3 className="font-semibold text-gray-600 dark:text-gray-300">
                 Notes
               </h3>
