@@ -30,7 +30,11 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
+      const isMobileView = window.innerWidth < 1024; // lg breakpoint
+      setIsMobile(isMobileView);
+      if (isMobileView) {
+        setSidebarOpen(false); // Close sidebar on smaller screens
+      }
     };
 
     // Set initial value
@@ -72,7 +76,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           <motion.div
             initial={false}
             animate={{
-              marginLeft: sidebarOpen && !isMobile ? "0" : "-16rem", // Moves off-screen when closed
+              marginLeft: sidebarOpen ? "0" : "-16rem", // Moves off-screen when closed
             }}
             transition={{ duration: 0.3 }}
             className="hidden lg:block w-64 bg-white dark:bg-gray-800 h-full"
@@ -118,6 +122,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
               handleAccountMenuToggle={handleAccountMenuToggle}
               showAccountMenu={showAccountMenu}
               onSearch={(term) => console.log(term)}
+              isMobile={isMobile}
             />
 
             {/* Breadcrumbs */}
