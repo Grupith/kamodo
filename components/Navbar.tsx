@@ -79,7 +79,6 @@ const Navbar: React.FC<NavbarProps> = ({
           <div className="relative hidden md:block">
             <MagnifyingGlassIcon className="w-5 h-5 text-gray-500 dark:text-gray-300 absolute top-1/2 left-3 transform -translate-y-1/2" />
             <input
-              disabled
               type="text"
               placeholder="Search..."
               onChange={(e) => onSearch(e.target.value)}
@@ -121,10 +120,9 @@ const Navbar: React.FC<NavbarProps> = ({
                       <div className="font-semibold mb-1">
                         {user.displayName || "User"}
                       </div>
-                      <span className="bg-green-200 text-green-800  text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">
-                        {"Owner"}
+                      <span className="bg-green-200 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">
+                        Owner
                       </span>
-
                       <div className="font-medium truncate text-blue-500 mt-1">
                         {user.email}
                       </div>
