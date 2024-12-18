@@ -106,7 +106,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
               marginLeft: isMobile ? "0" : sidebarOpen ? "0rem" : "0",
             }}
             transition={{ duration: 0.2 }}
-            className="flex flex-col flex-1 w-full"
+            className="flex flex-col flex-1 w-full overflow-y-auto"
           >
             {/* Navbar */}
             <Navbar
@@ -122,7 +122,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             <Breadcrumbs />
 
             {/* Dashboard view */}
-            <main className="flex-1 overflow-auto">{children}</main>
+            <main className="flex-1 overflow-y-auto">{children}</main>
           </motion.div>
         </div>
       </CompanyProvider>

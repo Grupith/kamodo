@@ -7,6 +7,7 @@ import {
   Bars3Icon,
   BookmarkIcon,
   ArrowPathIcon,
+  MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 import DarkModeToggle from "@/components/DarkModeToggle";
 import { signOutUser } from "@/lib/auth";
@@ -69,6 +70,14 @@ const Navbar: React.FC<NavbarProps> = ({
           <button className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">
             <BookmarkIcon className="w-6 h-6" />
           </button>
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search..."
+              className="p-2 pl-10 pr-4 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-300"
+            />
+            <MagnifyingGlassIcon className="w-6 h-6 absolute left-3 top-1/2 pr-1 transform -translate-y-1/2 text-gray-500 dark:text-gray-400" />
+          </div>
           <button
             onClick={() => {
               window.location.reload();
