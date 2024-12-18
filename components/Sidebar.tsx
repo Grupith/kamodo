@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import {
@@ -64,12 +64,12 @@ const Sidebar = ({
     visible: {
       x: 0,
       opacity: 1,
-      transition: { duration: 0.15, ease: "easeInOut" },
+      transition: { duration: 0.2, ease: "easeInOut" },
     },
     exit: {
       x: -200,
       opacity: 0,
-      transition: { duration: 0.15, ease: "easeInOut" },
+      transition: { duration: 0.2, ease: "easeInOut" },
     },
   };
 
@@ -86,7 +86,7 @@ const Sidebar = ({
   }, [setSidebarOpen]);
 
   return (
-    <AnimatePresence>
+    <>
       {sidebarOpen && (
         <motion.aside
           ref={sidebarRef}
@@ -94,7 +94,7 @@ const Sidebar = ({
           initial="hidden"
           animate="visible"
           exit="exit"
-          className={`flex flex-col w-64 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 z-40 ${
+          className={`flex flex-col w-64 h-full border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 z-40 ${
             isMobile ? "fixed h-full" : ""
           }`}
         >
@@ -104,91 +104,92 @@ const Sidebar = ({
               {companyName}
             </h2>
           </div>
-
-          {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto mt-4">
-            <SidebarLink
-              href="/dashboard"
-              icon={<HomeIcon className="w-6 h-6" />}
-              label="Dashboard"
-              active={pathname === "/dashboard"}
-              onClick={handleLinkClick}
-            />
-            <SidebarLink
-              href="/dashboard/customers"
-              icon={<UsersIcon className="w-6 h-6" />}
-              label="Customers"
-              active={pathname === "/dashboard/customers"}
-              onClick={handleLinkClick}
-            />
-            <SidebarLink
-              href="/dashboard/employees"
-              icon={<BuildingOffice2Icon className="w-6 h-6" />}
-              label="Employees"
-              active={pathname === "/dashboard/employees"}
-              onClick={handleLinkClick}
-            />
-            <SidebarLink
-              href="/dashboard/equipment"
-              icon={<WrenchIcon className="w-6 h-6" />}
-              label="Equipment"
-              active={pathname === "/dashboard/equipment"}
-              onClick={handleLinkClick}
-            />
-          </nav>
-          {/* Sidebar CTA */}
-          {showCTA && (
-            <motion.div
-              id="sidebar-cta"
-              className="p-3 m-3 mb-12 rounded-lg bg-blue-50 dark:bg-blue-900"
-              role="alert"
-              initial={{ opacity: 1 }}
-              animate={{ opacity: showCTA ? 1 : 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="flex items-center mb-2">
-                <span className="bg-green-100 text-green-800 text-xs font-semibold me-2 px-2 py-0.5 rounded dark:bg-green-200 dark:text-green-900">
-                  Upgrade
-                </span>
-                <button
-                  type="button"
-                  className="ms-auto text-blue-900 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-200"
-                  data-dismiss-target="#sidebar-cta"
-                  aria-label="Close"
-                  onClick={() => setShowCTA(false)}
-                >
-                  <svg
-                    className="w-4 h-4"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 14 14"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M1 1l6 6m0 0l6 6M7 7L1 13M7 7L13 1"
-                    />
-                  </svg>
-                </button>
-              </div>
-              <p className="text-xs text-blue-800 dark:text-blue-400 py-3">
-                Unlock all the features of Kamodo with the Starter plan. Get
-                enhanced tools to manage your small business more effectively.
-              </p>
-              <a
-                href="/pricing"
-                className="text-xs text-blue-800 underline font-medium hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+          <div className="flex flex-col h-full justify-between">
+            {/* Navigation */}
+            <nav className="flex-1 overflow-y-auto mt-4">
+              <SidebarLink
+                href="/dashboard"
+                icon={<HomeIcon className="w-6 h-6" />}
+                label="Dashboard"
+                active={pathname === "/dashboard"}
+                onClick={handleLinkClick}
+              />
+              <SidebarLink
+                href="/dashboard/customers"
+                icon={<UsersIcon className="w-6 h-6" />}
+                label="Customers"
+                active={pathname === "/dashboard/customers"}
+                onClick={handleLinkClick}
+              />
+              <SidebarLink
+                href="/dashboard/employees"
+                icon={<BuildingOffice2Icon className="w-6 h-6" />}
+                label="Employees"
+                active={pathname === "/dashboard/employees"}
+                onClick={handleLinkClick}
+              />
+              <SidebarLink
+                href="/dashboard/equipment"
+                icon={<WrenchIcon className="w-6 h-6" />}
+                label="Equipment"
+                active={pathname === "/dashboard/equipment"}
+                onClick={handleLinkClick}
+              />
+            </nav>
+            {/* Sidebar CTA */}
+            {showCTA && (
+              <motion.div
+                id="sidebar-cta"
+                className="p-3 m-3 mb-4 rounded-lg bg-blue-50 dark:bg-blue-900"
+                role="alert"
+                initial={{ opacity: 1 }}
+                animate={{ opacity: showCTA ? 1 : 0 }}
+                transition={{ duration: 0.3 }}
               >
-                Upgrade to Starter
-              </a>
-            </motion.div>
-          )}
-          <InstallAppButton />
+                <div className="flex items-center mb-2">
+                  <span className="bg-green-100 text-green-800 text-xs font-semibold me-2 px-2 py-0.5 rounded dark:bg-green-200 dark:text-green-900">
+                    Upgrade
+                  </span>
+                  <button
+                    type="button"
+                    className="ms-auto text-blue-900 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-200"
+                    data-dismiss-target="#sidebar-cta"
+                    aria-label="Close"
+                    onClick={() => setShowCTA(false)}
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 14 14"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M1 1l6 6m0 0l6 6M7 7L1 13M7 7L13 1"
+                      />
+                    </svg>
+                  </button>
+                </div>
+                <p className="text-xs text-blue-800 dark:text-blue-400 py-3">
+                  Unlock all the features of Kamodo with the Starter plan. Get
+                  enhanced tools to manage your small business more effectively.
+                </p>
+                <a
+                  href="/pricing"
+                  className="text-xs text-blue-800 underline font-medium hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                >
+                  Upgrade to Starter
+                </a>
+              </motion.div>
+            )}
+            <InstallAppButton />
+          </div>
         </motion.aside>
       )}
-    </AnimatePresence>
+    </>
   );
 };
 

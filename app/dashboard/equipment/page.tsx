@@ -104,7 +104,7 @@ export default function EquipmentPage() {
   }, []);
 
   return (
-    <div className="p-4 min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+    <div className="px-6 min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
         <h2 className="text-3xl font-bold">Equipment</h2>
@@ -137,7 +137,7 @@ export default function EquipmentPage() {
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-md border w-full sm:w-auto"
+            className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 w-full sm:w-auto"
           >
             <option value="All">All Locations</option>
             <option value="Site A">Site A</option>

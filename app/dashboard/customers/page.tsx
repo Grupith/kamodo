@@ -137,7 +137,7 @@ export default function CustomersPage() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="pl-4 pr-20 py-2 rounded-md shadow-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 dark:text-gray-200 w-full"
+              className="pl-4 pr-32 py-2 rounded-md shadow-md border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 dark:text-gray-200 w-full"
             />
             <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
               <span className="flex items-center space-x-1 text-gray-500 dark:text-gray-400">
@@ -156,7 +156,7 @@ export default function CustomersPage() {
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-md border w-full sm:w-auto"
+            className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-md shadow-md border border-gray-300 dark:border-gray-600 w-full sm:w-auto"
           >
             <option value="All">All Companies</option>
             <option value="ACME Inc.">ACME Inc.</option>

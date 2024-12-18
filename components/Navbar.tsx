@@ -4,8 +4,9 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   UserCircleIcon,
-  MagnifyingGlassIcon,
   Bars3Icon,
+  BookmarkIcon,
+  ArrowPathIcon,
 } from "@heroicons/react/24/outline";
 import DarkModeToggle from "@/components/DarkModeToggle";
 import { signOutUser } from "@/lib/auth";
@@ -28,7 +29,6 @@ const Navbar: React.FC<NavbarProps> = ({
   toggleSidebar,
   handleAccountMenuToggle,
   showAccountMenu,
-  onSearch,
   isMobile,
 }) => {
   const { user } = useAuth();
@@ -58,21 +58,25 @@ const Navbar: React.FC<NavbarProps> = ({
       <header className="flex items-center justify-between px-4 py-2 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 z-40 relative">
         <div className="flex items-center space-x-2">
           <button
-            onClick={toggleSidebar}
+            onClick={() => {
+              toggleSidebar();
+              console.log("toggleSidebar");
+            }}
             className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
           >
             <Bars3Icon className="w-6 h-6" />
           </button>
-          <div className="relative hidden md:block">
-            <MagnifyingGlassIcon className="w-5 h-5 text-gray-500 dark:text-gray-300 absolute top-1/2 left-3 transform -translate-y-1/2" />
-            <input
-              type="text"
-              disabled
-              placeholder="Search..."
-              onChange={(e) => onSearch(e.target.value)}
-              className="pl-10 pr-24 py-2 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+          <button className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">
+            <BookmarkIcon className="w-6 h-6" />
+          </button>
+          <button
+            onClick={() => {
+              window.location.reload();
+            }}
+            className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
+          >
+            <ArrowPathIcon className="w-6 h-6 transition-transform duration-300 transform hover:rotate-180" />
+          </button>
         </div>
         <div className="flex items-center space-x-4">
           <DarkModeToggle />
