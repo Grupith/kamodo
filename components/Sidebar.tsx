@@ -94,7 +94,7 @@ const Sidebar = ({
           initial="hidden"
           animate="visible"
           exit="exit"
-          className={`flex flex-col w-64 h-full border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 z-40 ${
+          className={`flex flex-col w-64 h-full mt-14 lg:mt-0 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 z-40 ${
             isMobile ? "fixed h-full" : ""
           }`}
         >
