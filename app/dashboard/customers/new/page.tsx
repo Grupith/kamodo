@@ -59,7 +59,7 @@ export default function AddCustomerPage() {
 
   return (
     <div className="p-4 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen flex justify-center items-center">
-      <div className="w-full max-w-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg rounded-md p-6">
+      <div className="w-full max-w-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg rounded-md p-6">
         <h1 className="text-2xl font-bold mb-6 text-center">
           Add New Customer
         </h1>

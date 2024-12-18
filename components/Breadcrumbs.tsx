@@ -44,7 +44,7 @@ const Breadcrumbs: React.FC = () => {
 
   return (
     <nav
-      className="flex items-center text-sm font-medium text-gray-500 dark:text-gray-400 bg-transparent pl-6 py-4"
+      className="flex items-center text-sm font-medium text-gray-500 dark:text-gray-400 bg-transparent pl-6 py-2"
       aria-label="Breadcrumb"
     >
       <ol className="inline-flex items-center space-x-1 md:space-x-2">

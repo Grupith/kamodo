@@ -10,6 +10,8 @@ import {
   WrenchIcon,
 } from "@heroicons/react/24/outline";
 import InstallAppButton from "./InstallAppButton";
+import Image from "next/image";
+import logo from "@/public/images/kamodo.png";
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -99,7 +101,14 @@ const Sidebar = ({
           }`}
         >
           {/* Sidebar header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-around p-4 border-b border-gray-200 dark:border-gray-700">
+            <Image
+              src={logo}
+              alt="Kamodo Logo"
+              width={32}
+              height={32}
+              className="rounded-md dark:invert"
+            />
             <h2 className="text-xl font-bold text-gray-800 dark:text-white">
               {companyName}
             </h2>
