@@ -30,12 +30,15 @@ const Navbar: React.FC<NavbarProps> = ({
   onSearch,
 }) => {
   const { user } = useAuth();
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
     };
+
+    // Set initial value
+    handleResize();
 
     window.addEventListener("resize", handleResize);
     return () => {
