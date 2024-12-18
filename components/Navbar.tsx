@@ -49,7 +49,7 @@ const Navbar: React.FC<NavbarProps> = ({
   const isOverlayVisible = (isMobile && sidebarOpen) || showAccountMenu;
 
   const closeAllMenus = () => {
-    if (isMobile && sidebarOpen) toggleSidebar();
+    if (sidebarOpen) toggleSidebar();
     if (showAccountMenu) handleAccountMenuToggle();
   };
 

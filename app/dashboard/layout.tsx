@@ -21,13 +21,26 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [company, setCompany] = useState<Company | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showAccountMenu, setShowAccountMenu] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-
-  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+  const toggleSidebar = () => setSidebarOpen((prev) => !prev);
   const handleAccountMenuToggle = () => setShowAccountMenu((prev) => !prev);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    // Set initial value
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   useEffect(() => {
     const fetchCompany = async () => {
@@ -59,7 +72,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           <motion.div
             initial={false}
             animate={{
-              marginLeft: sidebarOpen ? "0" : "-16rem", // Moves off-screen when closed
+              marginLeft: sidebarOpen && !isMobile ? "0" : "-16rem", // Moves off-screen when closed
             }}
             transition={{ duration: 0.3 }}
             className="hidden lg:block w-64 bg-white dark:bg-gray-800 h-full"
@@ -87,6 +100,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                 setSidebarOpen={setSidebarOpen}
                 handleLinkClick={() => setSidebarOpen(false)}
                 companyName={company?.name || "Your Company"}
+                isMobile={isMobile}
               />
             </motion.div>
           )}
