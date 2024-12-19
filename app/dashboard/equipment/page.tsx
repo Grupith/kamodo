@@ -1,89 +1,103 @@
 "use client";
+
 import React, { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { WrenchIcon } from "@heroicons/react/24/outline";
+import {
+  AdjustmentsHorizontalIcon,
+  CubeIcon,
+  PlusCircleIcon,
+} from "@heroicons/react/24/outline";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Table from "@/components/Table";
+import { getEquipmentForCompany } from "@/firebase/firestore"; // Replace with actual function
+import { useCompany } from "@/contexts/CompanyContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Equipment {
   id: string;
   name: string;
+  type: string;
   serialNumber: string;
-  location: string;
-  highlightedFields?: {
-    name: string;
-    serialNumber: string;
-    location: string;
-  };
 }
 
-// Dummy equipment data for demonstration
-const equipmentList: Equipment[] = [
-  { id: "1", name: "Excavator", serialNumber: "EXC12345", location: "Site A" },
-  { id: "2", name: "Bulldozer", serialNumber: "BULL5678", location: "Site B" },
-  { id: "3", name: "Crane", serialNumber: "CRN91011", location: "Site C" },
-  { id: "4", name: "Forklift", serialNumber: "FLK1213", location: "Warehouse" },
-  { id: "5", name: "Generator", serialNumber: "GEN1415", location: "Site A" },
-];
-
-// Highlight search terms
-const highlightSearchTerm = (text: string, searchTerm: string): string => {
-  if (!searchTerm) return text;
-  const regex = new RegExp(`(${searchTerm})`, "gi");
-  return text.replace(
-    regex,
-    (match) => `<mark class="bg-yellow-300">${match}</mark>`
-  );
-};
-
 export default function EquipmentPage() {
+  const [view, setView] = useState<"cards" | "table">("cards");
+  const [equipment, setEquipment] = useState<Equipment[]>([]);
+  const [filteredEquipment, setFilteredEquipment] = useState<Equipment[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
+  const [loading, setLoading] = useState(true);
+  const company = useCompany();
+  const { user } = useAuth();
 
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const [filter, setFilter] = useState<string>("All");
-  const [filteredEquipment, setFilteredEquipment] =
-    useState<Equipment[]>(equipmentList);
-
-  // Filter and search logic
   useEffect(() => {
-    let filtered = equipmentList;
+    const fetchAndSetEquipment = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
 
-    if (filter !== "All") {
-      filtered = filtered.filter((equipment) => equipment.location === filter);
-    }
+      try {
+        // Fetch equipment for the logged-in user's company
+        const companyId = company?.id || "";
+        const fetchedEquipment = await getEquipmentForCompany(companyId);
+        const equipmentWithDefaults: Equipment[] = fetchedEquipment.map(
+          (item) => ({
+            id: item.id,
+            name: (item as Equipment).name || "Unknown",
+            type: (item as Equipment).type || "Unknown",
+            serialNumber: (item as Equipment).serialNumber || "N/A",
+          })
+        );
+        if (fetchedEquipment.length === 0) {
+          setEquipment([
+            {
+              id: "sample",
+              name: "Impact Drill",
+              type: "Construction",
+              serialNumber: "N/A",
+            },
+            {
+              id: "sample2",
+              name: "Job Site Radio",
+              type: "Construction",
+              serialNumber: "N/A",
+            },
+            {
+              id: "sample3",
+              name: "Paint Sprayer",
+              type: "Painting",
+              serialNumber: "N/A",
+            },
+          ]);
+        } else {
+          setEquipment(equipmentWithDefaults);
+        }
+        console.log("Equipment fetched", fetchedEquipment.length);
+      } catch (error) {
+        console.error("Error fetching equipment:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    if (searchTerm) {
-      filtered = filtered
-        .filter((equipment) =>
-          [equipment.name, equipment.serialNumber, equipment.location]
-            .filter(Boolean)
-            .some((value) =>
-              value.toLowerCase().includes(searchTerm.toLowerCase())
-            )
-        )
-        .map((equipment) => ({
-          ...equipment,
-          highlightedFields: {
-            name: highlightSearchTerm(equipment.name, searchTerm),
-            serialNumber: highlightSearchTerm(
-              equipment.serialNumber,
-              searchTerm
-            ),
-            location: highlightSearchTerm(equipment.location, searchTerm),
-          },
-        }));
-    }
+    fetchAndSetEquipment();
+  }, [user, company?.id]);
 
+  useEffect(() => {
+    const filtered = equipment.filter((item) =>
+      [item.name, item.type, item.serialNumber]
+        .filter(Boolean)
+        .some((value) => value.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
     setFilteredEquipment(filtered);
-  }, [searchTerm, filter]);
-
-  const handleViewProfile = (equipmentId: string) => {
-    router.push(`/dashboard/equipment/${equipmentId}`);
-  };
+  }, [equipment, searchTerm]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && filteredEquipment.length > 0) {
-      handleViewProfile(filteredEquipment[0].id);
+      router.push(`/dashboard/equipment/${filteredEquipment[0].id}`);
     }
     if (e.key === "Escape") {
       setSearchTerm("");
@@ -91,121 +105,96 @@ export default function EquipmentPage() {
     }
   };
 
-  // Cmd + K functionality
-  useEffect(() => {
-    const handleGlobalKeydown = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        inputRef.current?.focus();
-      }
-    };
-    window.addEventListener("keydown", handleGlobalKeydown);
-    return () => window.removeEventListener("keydown", handleGlobalKeydown);
-  }, []);
+  const toggleView = () =>
+    setView((prev) => (prev === "cards" ? "table" : "cards"));
+
+  if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="px-6 min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
-      {/* Header */}
+    <div className="p-4 min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
         <h2 className="text-3xl font-bold">Equipment</h2>
-        <div className="flex flex-col sm:flex-row sm:space-x-4 gap-2 sm:gap-0">
-          {/* Search Input */}
-          <div className="relative w-full sm:w-auto">
-            <input
-              ref={inputRef}
-              type="text"
-              placeholder="Search equipment..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="pl-4 pr-20 py-2 rounded-md shadow-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 dark:text-gray-200 w-full"
-            />
-            <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
-              <span className="flex items-center space-x-1 text-gray-500 dark:text-gray-400">
-                <kbd className="px-1.5 py-0.5 text-xs font-semibold text-gray-800 bg-gray-200 border rounded-md dark:bg-gray-600 dark:text-gray-100">
-                  {navigator.platform.includes("Mac") ? "⌘" : "Ctrl"}
-                </kbd>
-                <span>+</span>
-                <kbd className="px-1.5 py-0.5 text-xs font-semibold text-gray-800 bg-gray-200 border rounded-md dark:bg-gray-600 dark:text-gray-100">
-                  K
-                </kbd>
-              </span>
+        <div className="flex flex-col sm:flex-row sm:space-x-4 gap-4 sm:gap-0">
+          <input
+            ref={inputRef}
+            type="text"
+            placeholder="Search equipment..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="pl-4 pr-32 py-2 rounded-md shadow-md border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 dark:text-gray-200 w-full"
+          />
+          <div className="flex gap-4">
+            <div
+              onClick={toggleView}
+              className="h-fit bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700 p-2 cursor-pointer w-fit"
+            >
+              <AdjustmentsHorizontalIcon className="w-6 h-6" />
             </div>
+            <Link href="/dashboard/equipment/new" passHref>
+              <button className="flex items-center px-4 py-2 text-md text-white bg-green-600 rounded-md shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                <PlusCircleIcon className="w-6 h-6 mr-2" />
+                New
+              </button>
+            </Link>
           </div>
-
-          {/* Filter Dropdown */}
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 w-full sm:w-auto"
-          >
-            <option value="All">All Locations</option>
-            <option value="Site A">Site A</option>
-            <option value="Site B">Site B</option>
-            <option value="Site C">Site C</option>
-            <option value="Warehouse">Warehouse</option>
-          </select>
         </div>
       </div>
 
-      {/* Equipment Grid */}
-      <motion.div
-        className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-        initial="hidden"
-        animate="visible"
-        variants={{
-          hidden: { opacity: 0, y: 20 },
-          visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.1 } },
-        }}
-      >
-        {filteredEquipment.map((equipment) => (
-          <motion.div
-            key={equipment.id}
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0 },
-            }}
-            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-md hover:scale-105 transition-transform"
-          >
-            <div className="w-24 h-24 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mb-4">
-              <WrenchIcon className="w-16 h-16 text-gray-400" />
-            </div>
-            <h3
-              className="text-xl font-semibold mb-1"
-              dangerouslySetInnerHTML={{
-                __html: equipment.highlightedFields?.name || equipment.name,
+      {view === "cards" ? (
+        <motion.div
+          className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: { opacity: 0, y: 20 },
+            visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.1 } },
+          }}
+        >
+          {filteredEquipment.map((item) => (
+            <motion.div
+              key={item.id}
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { opacity: 1, y: 0 },
               }}
-            />
-            <p
-              className="text-sm text-gray-600"
-              dangerouslySetInnerHTML={{
-                __html:
-                  equipment.highlightedFields?.serialNumber ||
-                  equipment.serialNumber,
-              }}
-            />
-            <p
-              className="text-sm text-gray-600"
-              dangerouslySetInnerHTML={{
-                __html:
-                  equipment.highlightedFields?.location || equipment.location,
-              }}
-            />
-            <button
-              onClick={() => handleViewProfile(equipment.id)}
-              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+              className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-lg transform transition-all hover:scale-105 hover:shadow-xl"
             >
-              View Details
-            </button>
-          </motion.div>
-        ))}
-      </motion.div>
-
-      {/* No Equipment Message */}
-      {filteredEquipment.length === 0 && (
-        <div className="text-center text-gray-600 mt-8">
-          No equipment found.
-        </div>
+              <div className="flex flex-col items-center">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-green-500 to-emerald-500 flex items-center justify-center text-white shadow-md mb-4">
+                  <CubeIcon className="w-12 h-12" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-800 dark:text-gray-100 mb-2">
+                  {item.name}
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                  {item.type}
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Serial: {item.serialNumber}
+                </p>
+              </div>
+              <div className="mt-6 text-center">
+                <button
+                  onClick={() => router.push(`/dashboard/equipment/${item.id}`)}
+                  className="bg-blue-600 text-white px-5 py-2 text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+                >
+                  View Details
+                </button>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      ) : (
+        <Table
+          data={filteredEquipment}
+          columns={[
+            { key: "name", label: "Name" },
+            { key: "type", label: "Type" },
+            { key: "serialNumber", label: "Serial Number" },
+          ]}
+          onRowClick={(row) => router.push(`/dashboard/equipment/${row.id}`)}
+        />
       )}
     </div>
   );

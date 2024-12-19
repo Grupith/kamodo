@@ -25,10 +25,19 @@ interface Company {
   createdAt?: any; // Use Firebase Timestamp if applicable
 }
 
+interface Employee {
+  id: string;
+  name: string;
+  position?: string;
+  email?: string;
+  phone?: string;
+  createdAt?: any; // Use Firebase Timestamp if applicable
+}
+
 interface Customer {
   id: string;
   name: string;
-  email: string;
+  email?: string;
   phone?: string;
   address?: string;
   createdAt?: any; // Use Firebase Timestamp if applicable
@@ -92,6 +101,68 @@ export async function fetchCustomerById(companyId: string, customerId: string) {
     throw new Error("Customer not found");
   }
 }
+
+// Get employees for a company
+export const getEmployeesForCompany = async (companyId: string) => {
+  const employeesRef = collection(db, "companies", companyId, "employees");
+  const querySnapshot = await getDocs(employeesRef);
+  const employees: Employee[] = [];
+  querySnapshot.forEach((doc) => {
+    employees.push({ id: doc.id, ...doc.data() } as Employee);
+  });
+
+  return employees;
+};
+
+// Fetch employee by ID
+export async function fetchEmployeeById(companyId: string, employeeId: string) {
+  const docRef = doc(db, `companies/${companyId}/employees`, employeeId);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    return { id: docSnap.id, ...docSnap.data() };
+  } else {
+    throw new Error("Employee not found");
+  }
+}
+// Fetch equipment for a company
+export const getEquipmentForCompany = async (companyId: string) => {
+  const equipmentRef = collection(db, "companies", companyId, "equipment");
+  const querySnapshot = await getDocs(equipmentRef);
+  const equipment: { id: string; [key: string]: any }[] = [];
+  querySnapshot.forEach((doc) => {
+    equipment.push({ id: doc.id, ...doc.data() });
+  });
+
+  return equipment;
+};
+
+// Fetch equipment by ID
+export const fetchEquipmentById = async (
+  companyId: string,
+  equipmentId: string
+) => {
+  try {
+    console.log(
+      "Fetching equipment for Company ID:",
+      companyId,
+      "Equipment ID:",
+      equipmentId
+    );
+    const docRef = doc(db, `companies/${companyId}/equipment/${equipmentId}`);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      return { id: docSnap.id, ...docSnap.data() };
+    } else {
+      console.warn(`No equipment found for ID: ${equipmentId}`);
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching equipment:", error);
+    throw error;
+  }
+};
 
 /**
  * Checks if a user document exists; if not, creates it.

@@ -4,42 +4,8 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
-
-// Mock function to simulate fetching employee data from an API or database
-async function fetchEmployeeData(employeeId: string) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const mockEmployees = [
-        {
-          id: "1",
-          name: "Alice Johnson",
-          email: "alice@example.com",
-          position: "Project Manager",
-          phone: "+1 (555) 123-4567",
-          address: "123 Maple St, Springfield, USA",
-          department: "Management",
-          notes: "Excellent team leader with 5+ years of experience.",
-          hireDate: "2020-05-15",
-          salary: "$95,000",
-        },
-        {
-          id: "2",
-          name: "Bob Smith",
-          email: "bob@example.com",
-          position: "Software Engineer",
-          phone: "+1 (555) 987-6543",
-          address: "456 Pine St, Metropolis, USA",
-          department: "Engineering",
-          notes: "Specializes in full-stack development.",
-          hireDate: "2019-08-20",
-          salary: "$110,000",
-        },
-      ];
-      const employee = mockEmployees.find((e) => e.id === employeeId);
-      resolve(employee || null);
-    }, 250); // Simulate a short delay
-  });
-}
+import { fetchEmployeeById } from "@/firebase/firestore";
+import { useCompany } from "@/contexts/CompanyContext";
 
 interface Employee {
   id: string;
@@ -55,21 +21,33 @@ interface Employee {
 }
 
 export default function EmployeeProfilePage() {
-  const { employeeId } = useParams() as { employeeId: string };
+  const { employeeId } = useParams();
+  const company = useCompany();
+
   const [employee, setEmployee] = useState<Employee | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getEmployee = async () => {
-      const data = await fetchEmployeeData(employeeId);
-      setEmployee(data as Employee | null);
-      setLoading(false);
+      try {
+        if (employeeId && company?.id) {
+          const data = await fetchEmployeeById(
+            company.id,
+            Array.isArray(employeeId) ? employeeId[0] : employeeId
+          );
+          setEmployee(data as Employee | null);
+        }
+      } catch (error) {
+        console.error("Failed to fetch employee data:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    if (employeeId) {
+    if (employeeId && company) {
       getEmployee();
     }
-  }, [employeeId]);
+  }, [employeeId, company]);
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
