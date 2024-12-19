@@ -1,10 +1,11 @@
 "use client";
 
-import { useParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { fetchCustomerById } from "@/firebase/firestore"; // Update the import as needed
+import { fetchCustomerById, deleteCustomerById } from "@/firebase/firestore"; // Update paths
 import { useCompany } from "@/contexts/CompanyContext";
+import { useModal } from "@/contexts/ModalContext";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
 
 interface Customer {
@@ -21,11 +22,13 @@ interface Customer {
 export default function CustomerProfilePage() {
   const { customerId: id } = useParams(); // Extract the dynamic route parameter
   const company = useCompany(); // Access the current company context
-
+  const { openModal, closeModal } = useModal();
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
-  useEffect(() => {
+  // Fetch customer data
+  React.useEffect(() => {
     const fetchCustomerData = async () => {
       if (id && company?.id) {
         try {
@@ -44,6 +47,47 @@ export default function CustomerProfilePage() {
 
     fetchCustomerData();
   }, [id, company]);
+
+  const handleDelete = () => {
+    openModal(
+      <>
+        <p className="text-gray-700 dark:text-gray-200">
+          Are you sure you want to delete this customer? This action cannot be
+          undone.
+        </p>
+        <div className="mt-4 flex justify-end gap-2">
+          <button
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded hover:bg-gray-300"
+            onClick={closeModal}
+          >
+            Cancel
+          </button>
+          <button
+            className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700"
+            onClick={async () => {
+              try {
+                if (company?.id && id) {
+                  await deleteCustomerById(
+                    company.id,
+                    Array.isArray(id) ? id[0] : id
+                  );
+                  closeModal();
+                  // Optionally redirect or update state
+                  router.push("/dashboard/customers");
+                  console.log("Customer deleted successfully");
+                }
+              } catch (error) {
+                console.error("Failed to delete customer:", error);
+              }
+            }}
+          >
+            Delete
+          </button>
+        </div>
+      </>,
+      "Confirm Deletion"
+    );
+  };
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -140,6 +184,16 @@ export default function CustomerProfilePage() {
               </p>
             </div>
           )}
+        </div>
+
+        {/* Delete Button */}
+        <div className="flex justify-end p-4 border-t border-gray-200 dark:border-gray-700">
+          <button
+            className="px-6 py-2 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700"
+            onClick={handleDelete}
+          >
+            Delete Customer
+          </button>
         </div>
       </motion.div>
     </div>

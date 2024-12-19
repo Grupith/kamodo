@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { WrenchIcon } from "@heroicons/react/24/outline";
-import { fetchEquipmentById } from "@/firebase/firestore"; // Adjust as necessary
+import { fetchEquipmentById, deleteEquipmentById } from "@/firebase/firestore";
 import { useCompany } from "@/contexts/CompanyContext";
+import { useModal } from "@/contexts/ModalContext";
 
 interface Equipment {
   id: string;
@@ -18,91 +19,83 @@ interface Equipment {
   notes?: string;
 }
 
-const sampleEquipment: Equipment[] = [
-  {
-    id: "sample",
-    name: "Impact Drill",
-    type: "Construction",
-    serialNumber: "N/A",
-    manufacturer: "DrillMaster",
-    purchaseDate: "2023-01-01",
-    warrantyExpiration: "2025-01-01",
-    notes: "This is a sample item for demonstration purposes.",
-  },
-  {
-    id: "sample2",
-    name: "Job Site Radio",
-    type: "Construction",
-    serialNumber: "N/A",
-    manufacturer: "RadioTech",
-    purchaseDate: "2022-11-15",
-    warrantyExpiration: "2024-11-15",
-    notes: "Sample item to show equipment details.",
-  },
-  {
-    id: "sample3",
-    name: "Paint Sprayer",
-    type: "Painting",
-    serialNumber: "SPR12345",
-    manufacturer: "PaintCo",
-    purchaseDate: "2021-06-10",
-    warrantyExpiration: "2023-06-10",
-    notes: "Demonstration item for testing the equipment profile page.",
-  },
-];
-
 export default function EquipmentProfilePage() {
-  const { equipmentId } = useParams() as { equipmentId: string };
+  const { equipmentId } = useParams();
+  const router = useRouter();
+  const company = useCompany();
+  const { openModal, closeModal } = useModal();
+
   const [equipment, setEquipment] = useState<Equipment | null>(null);
   const [loading, setLoading] = useState(true);
-  const company = useCompany();
 
   useEffect(() => {
-    console.log("Equipment ID:", equipmentId);
-    console.log("Company Context:", company);
-
     const getEquipment = async () => {
       try {
-        if (!company || !company.id || !equipmentId) {
-          console.error("Missing required parameters: company or equipmentId");
-          setLoading(false);
-          return;
-        }
-
-        console.log("Checking for real equipment in Firestore...");
-        const realEquipment = await fetchEquipmentById(company.id, equipmentId);
-
-        if (realEquipment) {
-          console.log("Real Equipment Found:", realEquipment);
-          setEquipment(realEquipment as Equipment);
-        } else if (equipmentId.startsWith("sample")) {
-          console.log("No real equipment found, checking sample data...");
-          const sampleItem = sampleEquipment.find(
-            (item) => item.id === equipmentId
+        if (equipmentId && company?.id) {
+          const data = await fetchEquipmentById(
+            company.id,
+            Array.isArray(equipmentId) ? equipmentId[0] : equipmentId
           );
-          console.log("Sample Item Found:", sampleItem);
-          setEquipment(sampleItem || null);
-        } else {
-          console.warn("No equipment found with the given ID.");
-          setEquipment(null);
+          setEquipment(data as Equipment | null);
         }
       } catch (error) {
-        console.error("Error fetching equipment data:", error);
-        setEquipment(null);
+        console.error("Failed to fetch equipment data:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    getEquipment();
+    if (equipmentId && company) {
+      getEquipment();
+    }
   }, [equipmentId, company]);
+
+  const handleDelete = () => {
+    openModal(
+      <>
+        <p className="text-gray-700 dark:text-gray-200">
+          Are you sure you want to delete this equipment? This action cannot be
+          undone.
+        </p>
+        <div className="mt-4 flex justify-end gap-2">
+          <button
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded hover:bg-gray-300"
+            onClick={closeModal}
+          >
+            Cancel
+          </button>
+          <button
+            className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700"
+            onClick={async () => {
+              try {
+                if (company?.id && equipmentId) {
+                  await deleteEquipmentById(
+                    company.id,
+                    Array.isArray(equipmentId) ? equipmentId[0] : equipmentId
+                  );
+                  console.log("Equipment deleted successfully");
+                  closeModal();
+                  router.push("/dashboard/equipment");
+                }
+              } catch (error) {
+                console.error("Failed to delete equipment:", error);
+              }
+            }}
+          >
+            Delete
+          </button>
+        </div>
+      </>,
+      "Confirm Deletion"
+    );
+  };
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.3, ease: "easeOut" },
+      transition: { duration: 0.1, ease: "easeOut" },
     },
   };
 
@@ -124,26 +117,30 @@ export default function EquipmentProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 p-8">
+    <div className="p-4 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen flex flex-col justify-start">
       <motion.div
-        className="max-w-4xl mx-auto bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden"
+        className="w-full max-w-6xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg rounded-md p-8"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        {/* Profile Header */}
-        <div className="flex flex-col items-center p-8 bg-blue-600 text-white">
-          <div className="w-32 h-32 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-            <WrenchIcon className="w-20 h-20 text-gray-400 dark:text-gray-500" />
+        {/* Header Section */}
+        <div className="flex items-center mb-8">
+          <div className="w-32 h-32 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mr-6">
+            <WrenchIcon className="w-24 h-24 text-gray-400 dark:text-gray-500" />
           </div>
-          <h1 className="text-2xl font-bold mt-4">{equipment.name}</h1>
-          <p className="text-lg">{equipment.type || "No Type"}</p>
+          <div>
+            <h1 className="text-2xl font-bold mb-2">{equipment.name}</h1>
+            <p className="text-lg text-blue-600 dark:text-blue-400">
+              {equipment.type || "No Type"}
+            </p>
+          </div>
         </div>
 
         {/* Equipment Details */}
-        <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {equipment.serialNumber && (
-            <div className="flex flex-col">
+            <div className="p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-700 rounded-md shadow-md">
               <h3 className="font-semibold text-gray-600 dark:text-gray-300">
                 Serial Number
               </h3>
@@ -153,7 +150,7 @@ export default function EquipmentProfilePage() {
             </div>
           )}
           {equipment.manufacturer && (
-            <div className="flex flex-col">
+            <div className="p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-700 rounded-md shadow-md">
               <h3 className="font-semibold text-gray-600 dark:text-gray-300">
                 Manufacturer
               </h3>
@@ -163,7 +160,7 @@ export default function EquipmentProfilePage() {
             </div>
           )}
           {equipment.purchaseDate && (
-            <div className="flex flex-col">
+            <div className="p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-700 rounded-md shadow-md">
               <h3 className="font-semibold text-gray-600 dark:text-gray-300">
                 Purchase Date
               </h3>
@@ -173,7 +170,7 @@ export default function EquipmentProfilePage() {
             </div>
           )}
           {equipment.warrantyExpiration && (
-            <div className="flex flex-col">
+            <div className="p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-700 rounded-md shadow-md">
               <h3 className="font-semibold text-gray-600 dark:text-gray-300">
                 Warranty Expiration
               </h3>
@@ -183,7 +180,7 @@ export default function EquipmentProfilePage() {
             </div>
           )}
           {equipment.notes && (
-            <div className="col-span-1 md:col-span-2 flex flex-col">
+            <div className="col-span-1 md:col-span-2 p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-700 rounded-md shadow-md">
               <h3 className="font-semibold text-gray-600 dark:text-gray-300">
                 Notes
               </h3>
@@ -192,6 +189,16 @@ export default function EquipmentProfilePage() {
               </p>
             </div>
           )}
+        </div>
+
+        {/* Delete Button */}
+        <div className="mt-8 flex justify-end">
+          <button
+            onClick={handleDelete}
+            className="px-4 py-2 bg-red-600 text-white rounded-md shadow hover:bg-red-700"
+          >
+            Delete Equipment
+          </button>
         </div>
       </motion.div>
     </div>

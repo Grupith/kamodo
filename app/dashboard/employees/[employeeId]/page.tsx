@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
-import { fetchEmployeeById } from "@/firebase/firestore";
+import { fetchEmployeeById, deleteEmployeeById } from "@/firebase/firestore";
 import { useCompany } from "@/contexts/CompanyContext";
+import { useModal } from "@/contexts/ModalContext";
 
 interface Employee {
   id: string;
@@ -22,7 +23,9 @@ interface Employee {
 
 export default function EmployeeProfilePage() {
   const { employeeId } = useParams();
+  const router = useRouter();
   const company = useCompany();
+  const { openModal, closeModal } = useModal();
 
   const [employee, setEmployee] = useState<Employee | null>(null);
   const [loading, setLoading] = useState(true);
@@ -48,6 +51,46 @@ export default function EmployeeProfilePage() {
       getEmployee();
     }
   }, [employeeId, company]);
+
+  const handleDelete = () => {
+    openModal(
+      <>
+        <p className="text-gray-700 dark:text-gray-200">
+          Are you sure you want to delete this employee? This action cannot be
+          undone.
+        </p>
+        <div className="mt-4 flex justify-end gap-2">
+          <button
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded hover:bg-gray-300"
+            onClick={closeModal}
+          >
+            Cancel
+          </button>
+          <button
+            className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700"
+            onClick={async () => {
+              try {
+                if (company?.id && employeeId) {
+                  await deleteEmployeeById(
+                    company.id,
+                    Array.isArray(employeeId) ? employeeId[0] : employeeId
+                  );
+                  console.log("Employee deleted successfully");
+                  closeModal();
+                  router.push("/dashboard/employees");
+                }
+              } catch (error) {
+                console.error("Failed to delete employee:", error);
+              }
+            }}
+          >
+            Delete
+          </button>
+        </div>
+      </>,
+      "Confirm Deletion"
+    );
+  };
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -161,6 +204,16 @@ export default function EmployeeProfilePage() {
               </p>
             </div>
           )}
+        </div>
+
+        {/* Delete Button */}
+        <div className="mt-8 flex justify-end">
+          <button
+            onClick={handleDelete}
+            className="px-4 py-2 bg-red-600 text-white rounded-md shadow hover:bg-red-700"
+          >
+            Delete Employee
+          </button>
         </div>
       </motion.div>
     </div>

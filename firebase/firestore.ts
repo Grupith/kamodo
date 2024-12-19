@@ -12,6 +12,7 @@ import {
   query,
   where,
   getDocs,
+  deleteDoc,
 } from "firebase/firestore";
 
 interface Company {
@@ -102,6 +103,32 @@ export async function fetchCustomerById(companyId: string, customerId: string) {
   }
 }
 
+export async function deleteCustomerById(
+  companyId: string,
+  customerId: string
+): Promise<void> {
+  if (!companyId || !customerId) {
+    throw new Error(
+      "Both companyId and customerId are required to delete a customer."
+    );
+  }
+
+  try {
+    const customerDocRef = doc(
+      db,
+      "companies",
+      companyId,
+      "customers",
+      customerId
+    );
+    await deleteDoc(customerDocRef);
+    console.log(`Customer with ID: ${customerId} successfully deleted.`);
+  } catch (error) {
+    console.error("Error deleting customer:", error);
+    throw new Error("Failed to delete customer.");
+  }
+}
+
 // Get employees for a company
 export const getEmployeesForCompany = async (companyId: string) => {
   const employeesRef = collection(db, "companies", companyId, "employees");
@@ -125,6 +152,30 @@ export async function fetchEmployeeById(companyId: string, employeeId: string) {
     throw new Error("Employee not found");
   }
 }
+// Delete employee by ID
+export const deleteEmployeeById = async (
+  companyId: string,
+  employeeId: string
+): Promise<void> => {
+  if (!companyId || !employeeId) {
+    throw new Error("Both companyId and employeeId are required.");
+  }
+
+  try {
+    const employeeDocRef = doc(
+      db,
+      "companies",
+      companyId,
+      "employees",
+      employeeId
+    );
+    await deleteDoc(employeeDocRef);
+    console.log(`Employee with ID: ${employeeId} successfully deleted.`);
+  } catch (error) {
+    console.error("Error deleting employee:", error);
+    throw error; // Rethrow the error to handle it in the calling function
+  }
+};
 // Fetch equipment for a company
 export const getEquipmentForCompany = async (companyId: string) => {
   const equipmentRef = collection(db, "companies", companyId, "equipment");
@@ -163,6 +214,30 @@ export const fetchEquipmentById = async (
     throw error;
   }
 };
+// Delete equipment by ID
+export async function deleteEquipmentById(
+  companyId: string,
+  equipmentId: string
+): Promise<void> {
+  if (!companyId || !equipmentId) {
+    throw new Error("Both companyId and equipmentId are required");
+  }
+
+  try {
+    const equipmentRef = doc(
+      db,
+      "companies",
+      companyId,
+      "equipment",
+      equipmentId
+    );
+    await deleteDoc(equipmentRef);
+    console.log(`Equipment with ID: ${equipmentId} successfully deleted.`);
+  } catch (error) {
+    console.error("Error deleting equipment:", error);
+    throw new Error("Failed to delete equipment.");
+  }
+}
 
 /**
  * Checks if a user document exists; if not, creates it.
