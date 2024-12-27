@@ -5,10 +5,11 @@ import { Figtree } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { AlertProvider } from "@/contexts/AlertContext";
-import { useEffect } from "react";
 import { ModalProvider } from "@/contexts/ModalContext";
+import { CompanyProvider } from "@/contexts/CompanyContext";
+import { useEffect } from "react";
+import { ThemeProvider } from "../components/theme-provider";
 
 const figTree = Figtree({
   subsets: ["latin"],
@@ -24,7 +25,7 @@ export default function RootLayout({
     // Register the minimal service worker
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker
-        .register("/sw.js") // Note: sw.ts is compiled to sw.js
+        .register("/sw.js")
         .then((registration) => {
           console.log("Service Worker registered:", registration);
         })
@@ -41,18 +42,22 @@ export default function RootLayout({
       className="scroll-smooth"
       suppressHydrationWarning
     >
-      <body className={`${figTree.className} dark:bg-gray-800`}>
-        <NextThemesProvider
+      <head />
+      <body className={`${figTree.className}`}>
+        <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
+          disableTransitionOnChange
         >
           <AlertProvider>
             <ModalProvider>
-              <AuthProvider>{children}</AuthProvider>
+              <AuthProvider>
+                <CompanyProvider>{children}</CompanyProvider>
+              </AuthProvider>
             </ModalProvider>
           </AlertProvider>
-        </NextThemesProvider>
+        </ThemeProvider>
         <Analytics />
         <SpeedInsights />
       </body>

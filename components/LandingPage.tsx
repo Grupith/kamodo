@@ -15,14 +15,13 @@ import {
 import Image from "next/image";
 import DashboardMockup from "../public/images/dashboard-mockup.svg";
 import DashboardMockupDark from "../public/images/dashboard-mockup-dark.svg";
-import DarkModeToggle from "../components/DarkModeToggle";
 import Checkmark from "../components/Checkmark";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { handleGoogleLogin, signOutUser } from "@/lib/auth";
 import { useRouter } from "next/navigation";
-import Kamodo from "../public/images/kamodo.png";
+import Kamodo from "../public/images/default-avatar.png";
 
 const LandingPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -126,7 +125,6 @@ const LandingPage = () => {
             </div>
             <div className="flex items-center space-x-3">
               <div className="flex items-center space-x-4">
-                <DarkModeToggle />
                 {!user ? (
                   <button
                     onClick={handleLoginClick}

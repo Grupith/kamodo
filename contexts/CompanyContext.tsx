@@ -1,31 +1,76 @@
-"use client";
-import React, { createContext, useContext } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { fetchCompanyDataByOwnerId } from "@/firebase/firestore";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Company {
   id: string;
   name: string;
-  numberOfEmployees?: number;
-  website?: string;
-  state?: string;
-  businessType?: string;
   ownerId: string;
-  createdAt?: any; // Use Firebase Timestamp if applicable
 }
 
-const CompanyContext = createContext<Company | null>(null);
+interface CompanyContextType {
+  id: string;
+  name: string;
+  company: Company | null;
+  loading: boolean;
+  state?: string;
+  website?: string;
+  numberOfEmployees?: number;
+  businessType?: string;
+  createdAt?: string;
+}
+
+const CompanyContext = createContext<CompanyContextType | null>(null);
 
 export const CompanyProvider = ({
   children,
-  company,
 }: {
   children: React.ReactNode;
-  company: Company | null;
 }) => {
+  const { user } = useAuth();
+  const [company, setCompany] = useState<Company | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) {
+      setCompany(null);
+      setLoading(false);
+      return;
+    }
+
+    const fetchCompany = async () => {
+      try {
+        const companyData = await fetchCompanyDataByOwnerId(user.uid);
+        setCompany(companyData);
+      } catch (error) {
+        console.error("Error fetching company data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCompany();
+  }, [user]);
+
   return (
-    <CompanyContext.Provider value={company}>
+    <CompanyContext.Provider
+      value={{
+        id: company?.id || "",
+        name: company?.name || "",
+        company, // Explicitly include the 'company' object
+        loading,
+        ...company, // Spread all properties of the 'company' object
+      }}
+    >
       {children}
     </CompanyContext.Provider>
   );
 };
 
-export const useCompany = () => useContext(CompanyContext);
+export const useCompany = () => {
+  const context = useContext(CompanyContext);
+  if (!context) {
+    throw new Error("useCompany must be used within a CompanyProvider");
+  }
+  return context;
+};

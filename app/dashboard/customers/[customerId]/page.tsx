@@ -1,12 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { fetchCustomerById, deleteCustomerById } from "@/firebase/firestore"; // Update paths
 import { useCompany } from "@/contexts/CompanyContext";
 import { useModal } from "@/contexts/ModalContext";
-import { UserCircleIcon } from "@heroicons/react/24/outline";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface Customer {
   id: string;
@@ -17,26 +21,32 @@ interface Customer {
   company?: string;
   accountCreation?: string;
   notes?: string;
+  orders?: number;
+  totalSpent?: number;
 }
 
 export default function CustomerProfilePage() {
-  const { customerId: id } = useParams(); // Extract the dynamic route parameter
-  const company = useCompany(); // Access the current company context
+  const { customerId: id } = useParams();
+  const company = useCompany();
   const { openModal, closeModal } = useModal();
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  // Fetch customer data
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchCustomerData = async () => {
       if (id && company?.id) {
+        console.log("Fetching customer with:", {
+          companyId: company.id,
+          customerId: id,
+        });
         try {
-          const customerData = (await fetchCustomerById(
-            company.id,
+          const customerData = await fetchCustomerById(
+            company.id as string,
             id as string
-          )) as Customer; // Pass companyId and customerId
-          setCustomer(customerData);
+          );
+          console.log("Fetched customer data:", customerData);
+          setCustomer(customerData as Customer);
         } catch (error) {
           console.error("Failed to fetch customer:", error);
         } finally {
@@ -46,33 +56,26 @@ export default function CustomerProfilePage() {
     };
 
     fetchCustomerData();
-  }, [id, company]);
+  }, [id, company?.id]);
 
   const handleDelete = () => {
     openModal(
       <>
-        <p className="text-gray-700 dark:text-gray-200">
+        <p>
           Are you sure you want to delete this customer? This action cannot be
           undone.
         </p>
         <div className="mt-4 flex justify-end gap-2">
-          <button
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded hover:bg-gray-300"
-            onClick={closeModal}
-          >
+          <Button variant="outline" onClick={closeModal}>
             Cancel
-          </button>
-          <button
-            className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700"
+          </Button>
+          <Button
+            variant="destructive"
             onClick={async () => {
               try {
                 if (company?.id && id) {
-                  await deleteCustomerById(
-                    company.id,
-                    Array.isArray(id) ? id[0] : id
-                  );
+                  await deleteCustomerById(company.id, id as string);
                   closeModal();
-                  // Optionally redirect or update state
                   router.push("/dashboard/customers");
                   console.log("Customer deleted successfully");
                 }
@@ -82,25 +85,16 @@ export default function CustomerProfilePage() {
             }}
           >
             Delete
-          </button>
+          </Button>
         </div>
       </>,
       "Confirm Deletion"
     );
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.1, ease: "easeOut" },
-    },
-  };
-
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-200">
+      <div className="min-h-screen flex items-center justify-center">
         <p>Loading customer data...</p>
       </div>
     );
@@ -108,92 +102,90 @@ export default function CustomerProfilePage() {
 
   if (!customer) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-200 p-4">
-        <h2 className="text-2xl font-bold mb-4">Customer Not Found</h2>
-        <p>We could not find a customer with the given ID.</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Customer not found.</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 p-8">
+    <div className="min-h-screen bg-background text-foreground p-8">
       <motion.div
-        className="max-w-4xl mx-auto bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
+        className="max-w-6xl mx-auto space-y-6"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
       >
         {/* Profile Header */}
-        <div className="flex flex-col items-center p-8 bg-blue-600 text-white">
-          <div className="w-32 h-32 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-            <UserCircleIcon className="w-20 h-20 text-gray-400 dark:text-gray-500" />
-          </div>
-          <h1 className="text-2xl font-bold mt-4">{customer.name}</h1>
-          <p className="text-lg">{customer.company || "No Company"}</p>
+        <Card className="bg-zinc-100 dark:bg-zinc-900 border dark:border-zinc-800 shadow-md">
+          <CardContent className="flex justify-between items-center w-full py-2 sm:py-6">
+            {/* Avatar */}
+            <div className="flex items-center space-x-4">
+              <Avatar>
+                <AvatarImage
+                  src="/placeholder-avatar.png"
+                  alt={customer.name}
+                />
+                <AvatarFallback>{customer.name[0]}</AvatarFallback>
+              </Avatar>
+              <div>
+                <h1 className="text-2xl font-bold">{customer.name}</h1>
+                <p className="text-muted-foreground">
+                  {customer.company || "No Company"}
+                </p>
+              </div>
+            </div>
+
+            {/* Badge */}
+            <Badge variant="outline">Customer ID: {customer.id}</Badge>
+          </CardContent>
+        </Card>
+
+        <Separator />
+
+        {/* Customer Info Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Card className="bg-zinc-100 dark:bg-zinc-900 border dark:border-zinc-800 shadow-md">
+            <CardHeader>
+              <CardTitle>Contact Information</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>Email: {customer.email || "N/A"}</p>
+              <p>Phone: {customer.phone || "N/A"}</p>
+              <p>Address: {customer.address || "N/A"}</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-zinc-100 dark:bg-zinc-900 border dark:border-zinc-800 shadow-md">
+            <CardHeader>
+              <CardTitle>Account Details</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>Account Created: {customer.accountCreation || "N/A"}</p>
+              <p>Orders: {customer.orders || 0}</p>
+              <p>Total Spent: ${customer.totalSpent?.toFixed(2) || "0.00"}</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-zinc-100 dark:bg-zinc-900 border dark:border-zinc-800 shadow-md">
+            <CardHeader>
+              <CardTitle>Notes</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>{customer.notes || "No additional notes."}</p>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Customer Details */}
-        <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-          {customer.email && (
-            <div className="flex flex-col">
-              <h3 className="font-semibold text-gray-600 dark:text-gray-300">
-                Email
-              </h3>
-              <p className="text-gray-700 dark:text-gray-200">
-                {customer.email}
-              </p>
-            </div>
-          )}
-          {customer.phone && (
-            <div className="flex flex-col">
-              <h3 className="font-semibold text-gray-600 dark:text-gray-300">
-                Phone
-              </h3>
-              <p className="text-gray-700 dark:text-gray-200">
-                {customer.phone}
-              </p>
-            </div>
-          )}
-          {customer.address && (
-            <div className="flex flex-col">
-              <h3 className="font-semibold text-gray-600 dark:text-gray-300">
-                Address
-              </h3>
-              <p className="text-gray-700 dark:text-gray-200">
-                {customer.address}
-              </p>
-            </div>
-          )}
-          {customer.accountCreation && (
-            <div className="flex flex-col">
-              <h3 className="font-semibold text-gray-600 dark:text-gray-300">
-                Account Created
-              </h3>
-              <p className="text-gray-700 dark:text-gray-200">
-                {customer.accountCreation}
-              </p>
-            </div>
-          )}
-          {customer.notes && (
-            <div className="col-span-1 md:col-span-2 flex flex-col">
-              <h3 className="font-semibold text-gray-600 dark:text-gray-300">
-                Notes
-              </h3>
-              <p className="text-gray-700 dark:text-gray-200">
-                {customer.notes}
-              </p>
-            </div>
-          )}
-        </div>
+        <Separator />
 
-        {/* Delete Button */}
-        <div className="flex justify-end p-4 border-t border-gray-200 dark:border-gray-700">
-          <button
-            className="px-6 py-2 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700"
-            onClick={handleDelete}
-          >
+        {/* Actions */}
+        <div className="flex justify-end space-x-4">
+          <Button variant="secondary" onClick={() => router.back()}>
+            Go Back
+          </Button>
+          <Button variant="destructive" onClick={handleDelete}>
             Delete Customer
-          </button>
+          </Button>
         </div>
       </motion.div>
     </div>

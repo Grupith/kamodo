@@ -9,10 +9,15 @@ import {
 } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Table from "@/components/Table";
-import { getEquipmentForCompany } from "@/firebase/firestore"; // Replace with actual function
+import { getEquipmentForCompany } from "@/firebase/firestore";
 import { useCompany } from "@/contexts/CompanyContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import DataTable from "@/components/ui/data-table";
+import { ColumnDef } from "@tanstack/react-table";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 interface Equipment {
   id: string;
@@ -29,53 +34,28 @@ export default function EquipmentPage() {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(true);
-  const company = useCompany();
+  const { company, loading: companyLoading } = useCompany();
   const { user } = useAuth();
 
   useEffect(() => {
     const fetchAndSetEquipment = async () => {
-      if (!user) {
+      // Ensure user and company are loaded
+      if (!user || !company?.id) {
         setLoading(false);
         return;
       }
 
       try {
-        // Fetch equipment for the logged-in user's company
-        const companyId = company?.id || "";
-        const fetchedEquipment = await getEquipmentForCompany(companyId);
-        const equipmentWithDefaults: Equipment[] = fetchedEquipment.map(
-          (item) => ({
-            id: item.id,
-            name: (item as Equipment).name || "Unknown",
-            type: (item as Equipment).type || "Unknown",
-            serialNumber: (item as Equipment).serialNumber || "N/A",
-          })
-        );
-        if (fetchedEquipment.length === 0) {
-          setEquipment([
-            {
-              id: "sample",
-              name: "Impact Drill",
-              type: "Construction",
-              serialNumber: "N/A",
-            },
-            {
-              id: "sample2",
-              name: "Job Site Radio",
-              type: "Construction",
-              serialNumber: "N/A",
-            },
-            {
-              id: "sample3",
-              name: "Paint Sprayer",
-              type: "Painting",
-              serialNumber: "N/A",
-            },
-          ]);
-        } else {
-          setEquipment(equipmentWithDefaults);
-        }
-        console.log("Equipment fetched", fetchedEquipment.length);
+        console.log("Fetching equipment for company ID:", company.id);
+        const fetchedEquipment = await getEquipmentForCompany(company.id);
+        const equipmentWithDefaults = fetchedEquipment.map((item) => ({
+          id: item.id,
+          name: item.name || "Unknown",
+          type: item.type || "Unknown",
+          serialNumber: item.serialNumber || "N/A",
+        }));
+        setEquipment(equipmentWithDefaults);
+        console.log("Equipment fetched:", fetchedEquipment.length);
       } catch (error) {
         console.error("Error fetching equipment:", error);
       } finally {
@@ -83,8 +63,11 @@ export default function EquipmentPage() {
       }
     };
 
-    fetchAndSetEquipment();
-  }, [user, company?.id]);
+    // Only fetch equipment when company and user are fully loaded
+    if (!companyLoading && company?.id && user) {
+      fetchAndSetEquipment();
+    }
+  }, [user, company?.id, companyLoading]);
 
   useEffect(() => {
     const filtered = equipment.filter((item) =>
@@ -108,94 +91,123 @@ export default function EquipmentPage() {
   const toggleView = () =>
     setView((prev) => (prev === "cards" ? "table" : "cards"));
 
+  const columns: ColumnDef<Equipment>[] = [
+    {
+      id: "name",
+      accessorKey: "name",
+      header: "Name",
+    },
+    {
+      id: "type",
+      accessorKey: "type",
+      header: "Type",
+    },
+    {
+      id: "serialNumber",
+      accessorKey: "serialNumber",
+      header: "Serial Number",
+    },
+  ];
+
   if (loading) return <div>Loading...</div>;
 
+  if (!company?.id) {
+    return (
+      <div className="p-4 text-center">
+        <h2 className="text-xl font-bold">No Company Found</h2>
+        <p>Please ensure you are associated with a company.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-4 min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
-        <h2 className="text-3xl font-bold">Equipment</h2>
-        <div className="flex flex-col sm:flex-row sm:space-x-4 gap-4 sm:gap-0">
-          <input
-            ref={inputRef}
-            type="text"
-            placeholder="Search equipment..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="pl-4 pr-32 py-2 rounded-md shadow-md border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 dark:text-gray-200 w-full"
-          />
-          <div className="flex gap-4">
-            <div
-              onClick={toggleView}
-              className="h-fit bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700 p-2 cursor-pointer w-fit"
-            >
-              <AdjustmentsHorizontalIcon className="w-6 h-6" />
+    <ProtectedRoute>
+      <div className="p-4 min-h-screen bg-background text-foreground">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
+          <h2 className="text-3xl font-bold">Equipment</h2>
+          <div className="flex flex-col sm:flex-row sm:space-x-4 gap-4 sm:gap-0">
+            <Input
+              ref={inputRef}
+              type="text"
+              placeholder="Search equipment..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="w-full"
+            />
+            <div className="flex gap-4">
+              <Button variant="outline" size="icon" onClick={toggleView}>
+                <AdjustmentsHorizontalIcon className="w-4 h-4" />
+              </Button>
+              <Button asChild variant="outline">
+                <Link href="/dashboard/equipment/new">
+                  <PlusCircleIcon className="w-4 h-4 mr-2" />
+                  New
+                </Link>
+              </Button>
             </div>
-            <Link href="/dashboard/equipment/new" passHref>
-              <button className="flex items-center px-4 py-2 text-md text-white bg-green-600 rounded-md shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
-                <PlusCircleIcon className="w-6 h-6 mr-2" />
-                New
-              </button>
-            </Link>
           </div>
         </div>
-      </div>
 
-      {view === "cards" ? (
-        <motion.div
-          className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-          initial="hidden"
-          animate="visible"
-          variants={{
-            hidden: { opacity: 0, y: 20 },
-            visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.1 } },
-          }}
-        >
-          {filteredEquipment.map((item) => (
-            <motion.div
-              key={item.id}
-              variants={{
-                hidden: { opacity: 0, y: 20 },
-                visible: { opacity: 1, y: 0 },
-              }}
-              className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-lg transform transition-all hover:scale-105 hover:shadow-xl"
-            >
-              <div className="flex flex-col items-center">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-green-500 to-emerald-500 flex items-center justify-center text-white shadow-md mb-4">
-                  <CubeIcon className="w-12 h-12" />
-                </div>
-                <h3 className="text-lg font-medium text-gray-800 dark:text-gray-100 mb-2">
-                  {item.name}
-                </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                  {item.type}
-                </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Serial: {item.serialNumber}
-                </p>
-              </div>
-              <div className="mt-6 text-center">
-                <button
-                  onClick={() => router.push(`/dashboard/equipment/${item.id}`)}
-                  className="bg-blue-600 text-white px-5 py-2 text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
-                >
-                  View Details
-                </button>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
-      ) : (
-        <Table
-          data={filteredEquipment}
-          columns={[
-            { key: "name", label: "Name" },
-            { key: "type", label: "Type" },
-            { key: "serialNumber", label: "Serial Number" },
-          ]}
-          onRowClick={(row) => router.push(`/dashboard/equipment/${row.id}`)}
-        />
-      )}
-    </div>
+        {view === "cards" ? (
+          <motion.div
+            className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: { opacity: 0, y: 20 },
+              visible: {
+                opacity: 1,
+                y: 0,
+                transition: { staggerChildren: 0.1 },
+              },
+            }}
+          >
+            {filteredEquipment.map((item) => (
+              <motion.div
+                key={item.id}
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  visible: { opacity: 1, y: 0 },
+                }}
+              >
+                <Card className="transform transition-all hover:scale-105 border bg-zinc-100 dark:bg-zinc-900 text-card-foreground border-[var(--border)]">
+                  <CardContent className="p-6">
+                    <div className="flex flex-col items-center">
+                      <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-green-500 to-emerald-500 flex items-center justify-center text-white shadow-md mb-4">
+                        <CubeIcon className="w-12 h-12" />
+                      </div>
+                      <h3 className="text-lg font-medium mb-2">{item.name}</h3>
+                      <p className="text-sm text-muted-foreground mb-1">
+                        {item.type}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Serial: {item.serialNumber}
+                      </p>
+                    </div>
+                    <div className="mt-6 text-center">
+                      <Button
+                        variant={"default"}
+                        onClick={() =>
+                          router.push(`/dashboard/equipment/${item.id}`)
+                        }
+                      >
+                        View Details
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </motion.div>
+        ) : (
+          <DataTable
+            columns={columns}
+            data={filteredEquipment}
+            onRowClick={(row) => router.push(`/dashboard/equipment/${row.id}`)}
+          />
+        )}
+      </div>
+    </ProtectedRoute>
   );
 }

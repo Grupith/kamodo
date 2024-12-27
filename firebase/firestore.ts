@@ -93,7 +93,7 @@ export async function fetchCustomers(companyId: string): Promise<Customer[]> {
 
 // FetchCustomerById
 export async function fetchCustomerById(companyId: string, customerId: string) {
-  const docRef = doc(db, `companies/${companyId}/customers`, customerId);
+  const docRef = doc(db, `companies/${companyId}/customers/${customerId}`);
   const docSnap = await getDoc(docRef);
 
   if (docSnap.exists()) {
@@ -102,7 +102,7 @@ export async function fetchCustomerById(companyId: string, customerId: string) {
     throw new Error("Customer not found");
   }
 }
-
+// Delete customer by ID
 export async function deleteCustomerById(
   companyId: string,
   customerId: string
@@ -178,6 +178,12 @@ export const deleteEmployeeById = async (
 };
 // Fetch equipment for a company
 export const getEquipmentForCompany = async (companyId: string) => {
+  if (!companyId) {
+    throw new Error(
+      "Invalid companyId: companyId is required to fetch equipment."
+    );
+  }
+
   const equipmentRef = collection(db, "companies", companyId, "equipment");
   const querySnapshot = await getDocs(equipmentRef);
   const equipment: { id: string; [key: string]: any }[] = [];
@@ -239,14 +245,7 @@ export async function deleteEquipmentById(
   }
 }
 
-/**
- * Checks if a user document exists; if not, creates it.
- *
- * @param uid - The user's unique identifier.
- * @param displayName - The user's display name.
- * @param email - The user's email.
- * @returns An object indicating whether the user was newly created and their data.
- */
+// Checks if user exists in the 'users' collection, creates a new user document if not.
 export async function checkOrCreateUserDoc(
   uid: string,
   displayName: string,
@@ -269,17 +268,7 @@ export async function checkOrCreateUserDoc(
   return { newUser: false, userData: userSnap.data() };
 }
 
-/**
- * Creates a new company, assigns the user as Owner, and updates the user's companyId.
- *
- * @param uid - The user's unique identifier.
- * @param companyName - The name of the company.
- * @param numberOfEmployees - Number of employees in the company.
- * @param website - Company website URL.
- * @param state - State where the company is located.
- * @param businessType - Type of business.
- * @returns The newly created company's ID.
- */
+// Creates a new company, assigns the user as Owner, and updates the user's companyId.
 export async function createCompany(
   uid: string,
   companyName: string,

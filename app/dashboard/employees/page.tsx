@@ -9,16 +9,21 @@ import {
 } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Table from "@/components/Table";
 import { getEmployeesForCompany } from "@/firebase/firestore";
 import { useCompany } from "@/contexts/CompanyContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import DataTable from "@/components/ui/data-table";
+import { ColumnDef } from "@tanstack/react-table";
 
 interface Employee {
   id: string;
-  name: string;
-  email: string;
-  position: string;
+  name?: string;
+  title?: string;
+  email?: string;
+  phone?: string;
 }
 
 export default function EmployeesPage() {
@@ -29,56 +34,64 @@ export default function EmployeesPage() {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(true);
-  const company = useCompany();
+  const { company, loading: companyLoading } = useCompany();
   const { user } = useAuth();
 
   useEffect(() => {
     const fetchAndSetEmployees = async () => {
+      if (!company?.id) return; // Skip fetching if no company ID
       if (!user) {
         setLoading(false);
         return;
       }
 
       try {
-        // Fetch employees for the logged-in user's company
-        const companyId = company?.id || "";
-        const fetchedEmployees = await getEmployeesForCompany(companyId);
+        const fetchedEmployees = (await getEmployeesForCompany(
+          company.id
+        )) as Employee[];
         const employeesWithDefaults: Employee[] = fetchedEmployees.map(
-          (emp) => ({
-            id: emp.id,
-            name: (emp as Employee).name || "Unknown",
-            email: (emp as Employee).email || "Unknown",
-            position: (emp as Employee).position || "Unknown",
+          (employee) => ({
+            id: employee.id,
+            name: employee.name || "Unknown",
+            email: employee.email || "Unknown",
+            phone: employee.phone || "Unknown",
+            title: employee.title || "Unknown",
           })
         );
-        if (fetchedEmployees.length === 0) {
-          setEmployees([
-            {
-              id: "sample",
-              name: "Sample Employee",
-              email: "sample@example.com",
-              position: "employee",
-            },
-          ]);
-        } else {
-          setEmployees(employeesWithDefaults);
-        }
-        console.log("Employees fetched", fetchedEmployees.length);
+
+        setEmployees(
+          employeesWithDefaults.length > 0
+            ? employeesWithDefaults
+            : [
+                {
+                  id: "sample",
+                  name: "Sample Employee",
+                  title: "Sample Title",
+                  email: "sample@example.com",
+                  phone: "555-555-5555",
+                },
+              ]
+        );
+
+        console.log("Employees fetched:", fetchedEmployees.length);
       } catch (error) {
         console.error("Error fetching employees:", error);
       } finally {
         setLoading(false);
+        console.log("loading state, ", loading);
       }
     };
 
-    fetchAndSetEmployees();
-  }, [user, company?.id]);
+    if (!companyLoading && company?.id) fetchAndSetEmployees();
+  }, [user, company?.id, companyLoading, loading]);
 
   useEffect(() => {
     const filtered = employees.filter((employee) =>
-      [employee.name, employee.email, employee.position]
+      [employee.name, employee.title, employee.email, employee.phone]
         .filter(Boolean)
-        .some((value) => value.toLowerCase().includes(searchTerm.toLowerCase()))
+        .some((value) =>
+          value?.toLowerCase().includes(searchTerm.toLowerCase())
+        )
     );
     setFilteredEmployees(filtered);
   }, [employees, searchTerm]);
@@ -96,35 +109,37 @@ export default function EmployeesPage() {
   const toggleView = () =>
     setView((prev) => (prev === "cards" ? "table" : "cards"));
 
-  if (loading) return <div>Loading...</div>;
+  const columns: ColumnDef<Employee>[] = [
+    { id: "name", accessorKey: "name", header: "Name" },
+    { id: "title", accessorKey: "title", header: "Title" },
+    { id: "email", accessorKey: "email", header: "Email" },
+    { id: "phone", accessorKey: "phone", header: "Phone" },
+  ];
 
   return (
-    <div className="p-4 min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+    <div className="p-4 min-h-screen bg-background text-foreground">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
         <h2 className="text-3xl font-bold">Employees</h2>
         <div className="flex flex-col sm:flex-row sm:space-x-4 gap-4 sm:gap-0">
-          <input
+          <Input
             ref={inputRef}
             type="text"
             placeholder="Search employees..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="pl-4 pr-32 py-2 rounded-md shadow-md border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 dark:text-gray-200 w-full"
+            className="w-full"
           />
           <div className="flex gap-4">
-            <div
-              onClick={toggleView}
-              className="h-fit bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700 p-2 cursor-pointer w-fit"
-            >
-              <AdjustmentsHorizontalIcon className="w-6 h-6" />
-            </div>
-            <Link href="/dashboard/employees/new" passHref>
-              <button className="flex items-center px-4 py-2 text-md text-white bg-green-600 rounded-md shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
-                <UserPlusIcon className="w-6 h-6 mr-2" />
-                New
-              </button>
-            </Link>
+            <Button variant="outline" size="icon" onClick={toggleView}>
+              <AdjustmentsHorizontalIcon className="w-4 h-4" />
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="/dashboard/employees/new">
+                <UserPlusIcon className="w-4 h-4" />
+                Add
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
@@ -146,43 +161,56 @@ export default function EmployeesPage() {
                 hidden: { opacity: 0, y: 20 },
                 visible: { opacity: 1, y: 0 },
               }}
-              className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-lg transform transition-all hover:scale-105 hover:shadow-xl"
             >
-              <div className="flex flex-col items-center">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-blue-500 to-sky-500 flex items-center justify-center text-white shadow-md mb-4">
-                  <UserCircleIcon className="w-12 h-12" />
-                </div>
-                <h3 className="text-lg font-medium text-gray-800 dark:text-gray-100 mb-2">
-                  {employee.name}
-                </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                  {employee.email}
-                </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {employee.position}
-                </p>
-              </div>
-              <div className="mt-6 text-center">
-                <button
-                  onClick={() =>
-                    router.push(`/dashboard/employees/${employee.id}`)
-                  }
-                  className="bg-blue-600 text-white px-5 py-2 text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
-                >
-                  View Profile
-                </button>
-              </div>
+              <Card className="transform transition-all hover:scale-105 border bg-zinc-100 dark:bg-zinc-900 text-card-foreground border-[var(--border)]">
+                <CardContent className="p-6">
+                  <div className="flex flex-col items-center">
+                    {/* Avatar */}
+                    <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-blue-500 to-sky-500 flex items-center justify-center text-white shadow-md mb-4">
+                      <UserCircleIcon className="w-12 h-12" />
+                    </div>
+
+                    {/* Name */}
+                    <h3 className="text-lg font-medium mb-2">
+                      {employee.name}
+                    </h3>
+
+                    {/* Title */}
+                    <p className="text-sm text-muted-foreground mb-1">
+                      {employee.title || "No Title"}
+                    </p>
+
+                    {/* Email */}
+                    <p className="text-sm text-muted-foreground mb-1">
+                      {employee.email}
+                    </p>
+
+                    {/* Phone */}
+                    <p className="text-sm text-muted-foreground mb-1">
+                      {employee.phone}
+                    </p>
+                  </div>
+
+                  {/* View Profile Button */}
+                  <div className="mt-6 text-center">
+                    <Button
+                      variant={"default"}
+                      onClick={() =>
+                        router.push(`/dashboard/employees/${employee.id}`)
+                      }
+                    >
+                      View Profile
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             </motion.div>
           ))}
         </motion.div>
       ) : (
-        <Table
+        <DataTable
+          columns={columns}
           data={filteredEmployees}
-          columns={[
-            { key: "name", label: "Name" },
-            { key: "email", label: "Email" },
-            { key: "position", label: "Position" },
-          ]}
           onRowClick={(row) => router.push(`/dashboard/employees/${row.id}`)}
         />
       )}

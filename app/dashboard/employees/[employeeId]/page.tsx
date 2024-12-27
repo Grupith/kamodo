@@ -2,23 +2,31 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { UserCircleIcon } from "@heroicons/react/24/outline";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { fetchEmployeeById, deleteEmployeeById } from "@/firebase/firestore";
 import { useCompany } from "@/contexts/CompanyContext";
 import { useModal } from "@/contexts/ModalContext";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface Employee {
   id: string;
   name: string;
   email?: string;
-  position?: string;
   phone?: string;
-  address?: string;
-  department?: string;
-  notes?: string;
-  hireDate?: string;
-  salary?: string;
+  birthDate?: string;
+  title?: string;
+  employmentType?: string;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
 }
 
 export default function EmployeeProfilePage() {
@@ -55,19 +63,16 @@ export default function EmployeeProfilePage() {
   const handleDelete = () => {
     openModal(
       <>
-        <p className="text-gray-700 dark:text-gray-200">
+        <p>
           Are you sure you want to delete this employee? This action cannot be
           undone.
         </p>
         <div className="mt-4 flex justify-end gap-2">
-          <button
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded hover:bg-gray-300"
-            onClick={closeModal}
-          >
+          <Button variant="outline" onClick={closeModal}>
             Cancel
-          </button>
-          <button
-            className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700"
+          </Button>
+          <Button
+            variant="destructive"
             onClick={async () => {
               try {
                 if (company?.id && employeeId) {
@@ -85,25 +90,16 @@ export default function EmployeeProfilePage() {
             }}
           >
             Delete
-          </button>
+          </Button>
         </div>
       </>,
       "Confirm Deletion"
     );
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.1, ease: "easeOut" },
-    },
-  };
-
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-200">
+      <div className="min-h-screen flex items-center justify-center">
         <p>Loading employee data...</p>
       </div>
     );
@@ -111,111 +107,105 @@ export default function EmployeeProfilePage() {
 
   if (!employee) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-200 p-4">
-        <h2 className="text-2xl font-bold mb-4">Employee Not Found</h2>
-        <p>We could not find an employee with the given ID.</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Employee not found.</p>
       </div>
     );
   }
 
   return (
-    <div className="p-4 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen flex flex-col justify-start">
-      <motion.div
-        className="w-full max-w-6xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg rounded-md p-8"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
+    <div className="min-h-screen bg-zinc-50 dark:bg-black text-zinc-800 dark:text-zinc-200 p-8">
+      <div className="max-w-5xl mx-auto space-y-6">
         {/* Header Section */}
-        <div className="flex items-center mb-8">
-          <div className="w-32 h-32 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mr-6">
-            <UserCircleIcon className="w-24 h-24 text-gray-400 dark:text-gray-500" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold mb-2">{employee.name}</h1>
-            <p className="text-lg text-blue-600 dark:text-blue-400">
-              {employee.position || "No Position"}
-            </p>
-            <p className="text-gray-500 dark:text-gray-400">
-              {employee.department || "N/A"}
-            </p>
-          </div>
+        <Card className="border dark:border-zinc-800 dark:bg-zinc-900">
+          <CardContent className="flex flex-col md:flex-row items-center justify-between gap-6 p-6">
+            <div className="flex items-center gap-4">
+              <Avatar className="w-20 h-20">
+                <AvatarImage
+                  src="/placeholder-avatar.png"
+                  alt={employee.name}
+                />
+                <AvatarFallback>{employee.name[0]}</AvatarFallback>
+              </Avatar>
+              <div>
+                <h1 className="text-2xl font-bold">{employee.name}</h1>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                  {employee.title || "No Title"}
+                </p>
+              </div>
+            </div>
+            <Badge
+              variant="secondary"
+              className="text-blue-600 dark:text-blue-300 bg-blue-100 dark:bg-blue-800"
+            >
+              Employee ID: {employee.id}
+            </Badge>
+          </CardContent>
+        </Card>
+
+        <Separator />
+
+        {/* Information Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Contact Information */}
+          <Card className="border dark:border-zinc-800 dark:bg-zinc-900">
+            <CardHeader>
+              <CardTitle>Contact Information</CardTitle>
+              <CardDescription>
+                Personal details of the employee
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <p>Email: {employee.email || "Not Available"}</p>
+              <p>Phone: {employee.phone || "Not Available"}</p>
+              <p>Birth Date: {employee.birthDate || "Not Available"}</p>
+            </CardContent>
+          </Card>
+
+          {/* Job Information */}
+          <Card className="border dark:border-zinc-800 dark:bg-zinc-900">
+            <CardHeader>
+              <CardTitle>Position Details</CardTitle>
+              <CardDescription>Role and employment details</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <p>Title: {employee.title || "Not Available"}</p>
+              <p>
+                Employment Type: {employee.employmentType || "Not Available"}
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Emergency Contact */}
+          <Card className="border dark:border-zinc-800 dark:bg-zinc-900">
+            <CardHeader>
+              <CardTitle>Emergency Contact</CardTitle>
+              <CardDescription>Details for emergency purposes</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <p>
+                Contact Name: {employee.emergencyContactName || "Not Available"}
+              </p>
+              <p>
+                Contact Phone:{" "}
+                {employee.emergencyContactPhone || "Not Available"}
+              </p>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Employee Details */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {employee.email && (
-            <div className="p-4 bg-gray-50 border border-gray-200  dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-700 rounded-md shadow-md">
-              <h3 className="font-semibold text-gray-600 dark:text-gray-300">
-                Email
-              </h3>
-              <p className="text-gray-700 dark:text-gray-200">
-                {employee.email}
-              </p>
-            </div>
-          )}
-          {employee.phone && (
-            <div className="p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-700 rounded-md shadow-md">
-              <h3 className="font-semibold text-gray-600 dark:text-gray-300">
-                Phone
-              </h3>
-              <p className="text-gray-700 dark:text-gray-200">
-                {employee.phone}
-              </p>
-            </div>
-          )}
-          {employee.address && (
-            <div className="p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-700 rounded-md shadow-md">
-              <h3 className="font-semibold text-gray-600 dark:text-gray-300">
-                Address
-              </h3>
-              <p className="text-gray-700 dark:text-gray-200">
-                {employee.address}
-              </p>
-            </div>
-          )}
-          {employee.hireDate && (
-            <div className="p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-700 rounded-md shadow-md">
-              <h3 className="font-semibold text-gray-600 dark:text-gray-300">
-                Hire Date
-              </h3>
-              <p className="text-gray-700 dark:text-gray-200">
-                {employee.hireDate}
-              </p>
-            </div>
-          )}
-          {employee.salary && (
-            <div className="p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-700 rounded-md shadow-md">
-              <h3 className="font-semibold text-gray-600 dark:text-gray-300">
-                Salary
-              </h3>
-              <p className="text-gray-700 dark:text-gray-200">
-                {employee.salary}
-              </p>
-            </div>
-          )}
-          {employee.notes && (
-            <div className="col-span-1 md:col-span-2 p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-700 rounded-md shadow-md">
-              <h3 className="font-semibold text-gray-600 dark:text-gray-300">
-                Notes
-              </h3>
-              <p className="text-gray-700 dark:text-gray-200">
-                {employee.notes}
-              </p>
-            </div>
-          )}
-        </div>
+        <Separator />
 
-        {/* Delete Button */}
-        <div className="mt-8 flex justify-end">
-          <button
-            onClick={handleDelete}
-            className="px-4 py-2 bg-red-600 text-white rounded-md shadow hover:bg-red-700"
-          >
+        {/* Action Buttons */}
+        <div className="flex justify-between">
+          <Button variant="outline" onClick={() => router.back()}>
+            Back to Employees
+          </Button>
+          <Button variant="destructive" onClick={handleDelete}>
             Delete Employee
-          </button>
+          </Button>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

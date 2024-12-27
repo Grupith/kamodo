@@ -5,18 +5,31 @@ import { useForm } from "react-hook-form";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCompany } from "@/contexts/CompanyContext";
 import { addDoc, collection } from "firebase/firestore";
-import { db } from "@/firebase/firebase"; // Adjust path to your Firebase config
+import { db } from "@/firebase/firebase";
 import { useRouter } from "next/navigation";
-import { DocumentCheckIcon } from "@heroicons/react/24/outline";
+import { CheckSquare } from "lucide-react";
+
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface EmployeeFormData {
   name: string;
   email: string;
   phone: string;
-  address: string;
-  organization: string;
-  notes: string;
-  rating: number;
+  birthDate: string;
+  title: string;
+  employmentType: string;
+  emergencyContactName: string;
+  emergencyContactPhone: string;
 }
 
 export default function AddEmployeePage() {
@@ -26,159 +39,185 @@ export default function AddEmployeePage() {
     reset,
     formState: { errors },
   } = useForm<EmployeeFormData>();
-  const company = useCompany(); // Access current company context
+  const company = useCompany();
   const { user } = useAuth();
-
   const router = useRouter();
+
   const onSubmit = async (data: EmployeeFormData) => {
-    const companyRef = company?.id; // Access company id directly
+    const companyRef = company?.id;
     if (!companyRef || !user) {
       console.error("No company or user information available");
       return;
     }
 
+    const sanitizedData = {
+      ...data,
+      employmentType: data.employmentType || "Not Specified",
+      createdAt: new Date(),
+      createdBy: user.uid,
+    };
+
+    console.log("Submitting Employee Data:", sanitizedData);
+
     try {
       const employeesRef = collection(db, "companies", companyRef, "employees");
-      await addDoc(employeesRef, {
-        ...data,
-        createdAt: new Date(),
-        createdBy: user.uid,
-      });
+      await addDoc(employeesRef, sanitizedData);
       console.log("Employee added successfully");
       router.push("/dashboard/employees");
-      reset(); // Clear the form
+      reset();
     } catch (error) {
       console.error("Error adding Employee:", error);
     }
   };
 
   return (
-    <div className="p-4 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen flex justify-center items-center">
-      <div className="w-full max-w-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg rounded-md p-6">
-        <h1 className="text-2xl font-bold mb-6 text-center">
-          Add New Employee
-        </h1>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Name */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Name
-            </label>
-            <input
-              {...register("name", { required: "Name is required" })}
-              type="text"
-              className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200"
-              placeholder="Enter Employee name"
-            />
-            {errors.name && (
-              <p className="text-red-500 text-sm">{errors.name.message}</p>
-            )}
-          </div>
+    <div className="flex justify-center items-center min-h-screen bg-background text-foreground">
+      <Card className="w-full max-w-xl border-[var(--border)] bg-zinc-100 dark:bg-zinc-900">
+        <CardHeader>
+          <CardTitle className="text-center">Add New Employee</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {/* Name */}
+            <div>
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                placeholder="Enter employee name"
+                className="bg-white dark:bg-zinc-800 mt-1"
+                {...register("name", { required: "Name is required" })}
+              />
+              {errors.name && (
+                <p className="text-destructive text-sm mt-1">
+                  {errors.name.message}
+                </p>
+              )}
+            </div>
 
-          {/* Email */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Email
-            </label>
-            <input
-              {...register("email", {
-                required: "Email is required",
-                pattern: /^\S+@\S+$/i,
-              })}
-              type="email"
-              className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200"
-              placeholder="Enter Employee email"
-            />
-            {errors.email && (
-              <p className="text-red-500 text-sm">{errors.email.message}</p>
-            )}
-          </div>
+            {/* Email */}
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Enter employee email"
+                className="bg-white dark:bg-zinc-800 mt-1"
+                {...register("email", {
+                  required: "Email is required",
+                  pattern: {
+                    value: /^\S+@\S+$/i,
+                    message: "Invalid email address",
+                  },
+                })}
+              />
+              {errors.email && (
+                <p className="text-destructive text-sm mt-1">
+                  {errors.email.message}
+                </p>
+              )}
+            </div>
 
-          {/* Phone */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Phone
-            </label>
-            <input
-              {...register("phone", { required: "Phone number is required" })}
-              type="tel"
-              className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200"
-              placeholder="Enter Employee phone"
-            />
-            {errors.phone && (
-              <p className="text-red-500 text-sm">{errors.phone.message}</p>
-            )}
-          </div>
+            {/* Phone */}
+            <div>
+              <Label htmlFor="phone">Phone</Label>
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="Enter employee phone"
+                className="bg-white dark:bg-zinc-800 mt-1"
+                {...register("phone", { required: "Phone number is required" })}
+              />
+              {errors.phone && (
+                <p className="text-destructive text-sm mt-1">
+                  {errors.phone.message}
+                </p>
+              )}
+            </div>
 
-          {/* Address */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Address
-            </label>
-            <input
-              {...register("address")}
-              type="text"
-              className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200"
-              placeholder="Enter Employee address"
-            />
-          </div>
+            {/* Birth Date */}
+            <div>
+              <Label htmlFor="birthDate">Birth Date</Label>
+              <Input
+                id="birthDate"
+                type="date"
+                className="bg-white dark:bg-zinc-800 mt-1"
+                {...register("birthDate", {
+                  required: "Birth date is required",
+                })}
+              />
+              {errors.birthDate && (
+                <p className="text-destructive text-sm mt-1">
+                  {errors.birthDate.message}
+                </p>
+              )}
+            </div>
 
-          {/* Organization */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Organization
-            </label>
-            <input
-              {...register("organization")}
-              type="text"
-              className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200"
-              placeholder="Enter Employee company"
-            />
-          </div>
+            {/* Title */}
+            <div>
+              <Label htmlFor="title">Title</Label>
+              <Input
+                id="title"
+                placeholder="Enter employee title"
+                className="bg-white dark:bg-zinc-800 mt-1"
+                {...register("title")}
+              />
+            </div>
 
-          {/* Notes */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Notes
-            </label>
-            <textarea
-              {...register("notes")}
-              className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200"
-              placeholder="Enter any additional notes"
-              rows={3}
-            ></textarea>
-          </div>
+            {/* Employment Type */}
+            <div>
+              <Label htmlFor="employmentType">Employment Type</Label>
+              <Select
+                onValueChange={(value) =>
+                  register("employmentType").onChange({ target: { value } })
+                }
+              >
+                <SelectTrigger className="bg-white dark:bg-zinc-800 mt-1">
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Full-Time">Full-Time</SelectItem>
+                  <SelectItem value="Part-Time">Part-Time</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* Rating */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Rating
-            </label>
-            <select
-              {...register("rating", { valueAsNumber: true })}
-              className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200"
-            >
-              <option value={0}>No Rating</option>
-              <option value={1}>⭐</option>
-              <option value={2}>⭐⭐</option>
-              <option value={3}>⭐⭐⭐</option>
-              <option value={4}>⭐⭐⭐⭐</option>
-              <option value={5}>⭐⭐⭐⭐⭐</option>
-            </select>
-          </div>
+            {/* Emergency Contact Name */}
+            <div>
+              <Label htmlFor="emergencyContactName">
+                Emergency Contact Name
+              </Label>
+              <Input
+                id="emergencyContactName"
+                placeholder="Enter emergency contact name"
+                className="bg-white dark:bg-zinc-800 mt-1"
+                {...register("emergencyContactName")}
+              />
+            </div>
 
-          {/* Submit Button */}
-          <div className="flex justify-center">
-            <button
-              type="submit"
-              className="px-6 py-2 flex bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-            >
-              <DocumentCheckIcon className="w-6 h-6 mr-2" />
-              Save Employee
-            </button>
-          </div>
-        </form>
-      </div>
+            {/* Emergency Contact Phone */}
+            <div>
+              <Label htmlFor="emergencyContactPhone">
+                Emergency Contact Phone
+              </Label>
+              <Input
+                id="emergencyContactPhone"
+                type="tel"
+                placeholder="Enter emergency contact phone"
+                className="bg-white dark:bg-zinc-800 mt-1"
+                {...register("emergencyContactPhone")}
+              />
+            </div>
+
+            {/* Submit Button */}
+            <div className="flex justify-center">
+              <Button type="submit" className="w-full mt-6">
+                <CheckSquare className="mr-2 h-4 w-4" />
+                Save Employee
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }

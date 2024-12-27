@@ -1,70 +1,23 @@
-"use client";
-import React, { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
-import { useAlert } from "@/contexts/AlertContext";
-import { motion } from "framer-motion";
-import { handleGoogleLogin } from "@/lib/auth";
+import { GalleryVerticalEnd } from "lucide-react";
 
-const LoginPage: React.FC = () => {
-  const router = useRouter();
-  const { user, loading } = useAuth();
-  const { showAlert } = useAlert();
+import { LoginForm } from "@/components/login-form";
+import Link from "next/link";
 
-  const onLoginSuccess = (newUser: boolean, companyId?: string) => {
-    if (newUser || !companyId) {
-      router.push("/setup");
-    } else {
-      router.push("/dashboard");
-    }
-  };
-
-  const onError = (message: string) => {
-    showAlert("danger", message);
-  };
-
-  // Redirect authenticated users (for page refresh)
-  useEffect(() => {
-    if (!loading && user) {
-      router.push("/dashboard");
-    }
-  }, [user, loading, router]);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
-        <div className="text-gray-500 text-xl dark:text-gray-400">
-          Loading...
-        </div>
-      </div>
-    );
-  }
-
+export default function LoginPage() {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 max-w-md w-full"
-      >
-        <motion.h1 className="text-3xl font-bold text-center mb-4 text-gray-800 dark:text-white">
-          Welcome to Kamodo
-        </motion.h1>
-        <motion.button
-          onClick={() =>
-            handleGoogleLogin({
-              onLoginSuccess,
-              onError,
-            })
-          }
-          className="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg px-4 py-2"
+    <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">
+      <div className="flex w-full max-w-sm flex-col gap-6">
+        <Link
+          href="/"
+          className="flex items-center gap-2 self-center font-medium"
         >
-          Sign in with Google
-        </motion.button>
-      </motion.div>
+          <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
+            <GalleryVerticalEnd className="size-4" />
+          </div>
+          Kamodo
+        </Link>
+        <LoginForm />
+      </div>
     </div>
   );
-};
-
-export default LoginPage;
+}

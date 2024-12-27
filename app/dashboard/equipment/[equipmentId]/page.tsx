@@ -3,20 +3,33 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { WrenchIcon } from "@heroicons/react/24/outline";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Separator } from "@/components/ui/separator";
 import { fetchEquipmentById, deleteEquipmentById } from "@/firebase/firestore";
 import { useCompany } from "@/contexts/CompanyContext";
 import { useModal } from "@/contexts/ModalContext";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Equipment {
   id: string;
   name: string;
-  type: string;
+  type?: string;
   serialNumber?: string;
-  manufacturer?: string;
+  location?: string;
   purchaseDate?: string;
   warrantyExpiration?: string;
   notes?: string;
+  status?: string;
 }
 
 export default function EquipmentProfilePage() {
@@ -53,19 +66,16 @@ export default function EquipmentProfilePage() {
   const handleDelete = () => {
     openModal(
       <>
-        <p className="text-gray-700 dark:text-gray-200">
+        <p>
           Are you sure you want to delete this equipment? This action cannot be
           undone.
         </p>
         <div className="mt-4 flex justify-end gap-2">
-          <button
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded hover:bg-gray-300"
-            onClick={closeModal}
-          >
+          <Button variant="outline" onClick={closeModal}>
             Cancel
-          </button>
-          <button
-            className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700"
+          </Button>
+          <Button
+            variant="destructive"
             onClick={async () => {
               try {
                 if (company?.id && equipmentId) {
@@ -83,122 +93,111 @@ export default function EquipmentProfilePage() {
             }}
           >
             Delete
-          </button>
+          </Button>
         </div>
       </>,
       "Confirm Deletion"
     );
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.1, ease: "easeOut" },
-    },
-  };
-
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-200">
-        <p>Loading equipment data...</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <Skeleton className="w-1/2 h-10" />
       </div>
     );
   }
 
   if (!equipment) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-200 p-4">
-        <h2 className="text-2xl font-bold mb-4">Equipment Not Found</h2>
-        <p>We could not find equipment with the given ID.</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Equipment not found.</p>
       </div>
     );
   }
 
   return (
-    <div className="p-4 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen flex flex-col justify-start">
+    <div className="min-h-screen bg-background text-foreground p-6">
       <motion.div
-        className="w-full max-w-6xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg rounded-md p-8"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
+        className="max-w-4xl mx-auto space-y-6"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
       >
-        {/* Header Section */}
-        <div className="flex items-center mb-8">
-          <div className="w-32 h-32 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mr-6">
-            <WrenchIcon className="w-24 h-24 text-gray-400 dark:text-gray-500" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold mb-2">{equipment.name}</h1>
-            <p className="text-lg text-blue-600 dark:text-blue-400">
-              {equipment.type || "No Type"}
-            </p>
-          </div>
+        <Card className="shadow-md border bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold">
+              {equipment.name}
+            </CardTitle>
+            <CardDescription>{equipment.type || "N/A"}</CardDescription>
+          </CardHeader>
+          <CardContent className="flex justify-between items-center">
+            <Badge className="bg-secondary text-secondary-foreground">
+              Serial: {equipment.serialNumber || "N/A"}
+            </Badge>
+          </CardContent>
+        </Card>
+
+        <Separator />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Card className="bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 shadow-md">
+            <CardHeader>
+              <CardTitle>Details</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>
+                <strong>Location:</strong> {equipment.location || "N/A"}
+              </p>
+              <p>
+                <strong>Purchase Date:</strong>{" "}
+                {equipment.purchaseDate || "N/A"}
+              </p>
+              <p>
+                <strong>Warranty Expiration:</strong>{" "}
+                {equipment.warrantyExpiration || "N/A"}
+              </p>
+              <p>
+                <strong>Status:</strong> {equipment.status || "N/A"}
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 shadow-md">
+            <CardHeader>
+              <CardTitle>Edit Details</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Input placeholder="Location" defaultValue={equipment.location} />
+              <Input placeholder="Status" defaultValue={equipment.status} />
+              <Input
+                placeholder="Warranty Expiration"
+                defaultValue={equipment.warrantyExpiration}
+              />
+            </CardContent>
+          </Card>
+
+          <Card className="bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 shadow-md">
+            <CardHeader>
+              <CardTitle>Notes</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Textarea
+                placeholder="Add notes about this equipment..."
+                defaultValue={equipment.notes}
+              />
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Equipment Details */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {equipment.serialNumber && (
-            <div className="p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-700 rounded-md shadow-md">
-              <h3 className="font-semibold text-gray-600 dark:text-gray-300">
-                Serial Number
-              </h3>
-              <p className="text-gray-700 dark:text-gray-200">
-                {equipment.serialNumber}
-              </p>
-            </div>
-          )}
-          {equipment.manufacturer && (
-            <div className="p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-700 rounded-md shadow-md">
-              <h3 className="font-semibold text-gray-600 dark:text-gray-300">
-                Manufacturer
-              </h3>
-              <p className="text-gray-700 dark:text-gray-200">
-                {equipment.manufacturer}
-              </p>
-            </div>
-          )}
-          {equipment.purchaseDate && (
-            <div className="p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-700 rounded-md shadow-md">
-              <h3 className="font-semibold text-gray-600 dark:text-gray-300">
-                Purchase Date
-              </h3>
-              <p className="text-gray-700 dark:text-gray-200">
-                {equipment.purchaseDate}
-              </p>
-            </div>
-          )}
-          {equipment.warrantyExpiration && (
-            <div className="p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-700 rounded-md shadow-md">
-              <h3 className="font-semibold text-gray-600 dark:text-gray-300">
-                Warranty Expiration
-              </h3>
-              <p className="text-gray-700 dark:text-gray-200">
-                {equipment.warrantyExpiration}
-              </p>
-            </div>
-          )}
-          {equipment.notes && (
-            <div className="col-span-1 md:col-span-2 p-4 bg-gray-50 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-700 rounded-md shadow-md">
-              <h3 className="font-semibold text-gray-600 dark:text-gray-300">
-                Notes
-              </h3>
-              <p className="text-gray-700 dark:text-gray-200">
-                {equipment.notes}
-              </p>
-            </div>
-          )}
-        </div>
+        <Separator />
 
-        {/* Delete Button */}
-        <div className="mt-8 flex justify-end">
-          <button
-            onClick={handleDelete}
-            className="px-4 py-2 bg-red-600 text-white rounded-md shadow hover:bg-red-700"
-          >
+        <div className="flex justify-end space-x-4">
+          <Button variant="outline" onClick={() => router.back()}>
+            Go Back
+          </Button>
+          <Button variant="destructive" onClick={handleDelete}>
             Delete Equipment
-          </button>
+          </Button>
         </div>
       </motion.div>
     </div>

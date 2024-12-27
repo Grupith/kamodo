@@ -1,5 +1,14 @@
 import { motion } from "framer-motion";
-import Switcher from "./Switcher";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator";
 
 interface Company {
   name: string;
@@ -16,96 +25,85 @@ const CompanyCard = ({ company }: { company: Company | null }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className="max-w-lg mx-auto bg-white border border-gray-200 dark:border-gray-700 dark:bg-gray-800 shadow-lg rounded-lg p-6"
+      className="w-full"
     >
-      {/* Header */}
-      <div className="mb-4 border-b pb-4 border-gray-200 dark:border-gray-700">
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-          {company?.name || "No Company Name Available"}
-        </h2>
-        <p className="text-sm mt-2 text-gray-500 dark:text-gray-400">
-          {company?.businessType || "Business type not specified"}
-        </p>
-      </div>
+      <Card className="border border-[var(--border)] bg-card dark:bg-zinc-900 text-card-foreground">
+        {/* Header */}
+        <CardHeader>
+          <CardTitle className="text-xl font-bold">
+            {company?.name || "No Company Name Available"}
+          </CardTitle>
+          <CardDescription>
+            {company?.businessType || "Business type not specified"}
+          </CardDescription>
+        </CardHeader>
 
-      {/* Company Details */}
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <span className="font-medium text-gray-600 dark:text-gray-300">
-            Number of Employees:
-          </span>
-          <span className="text-gray-800 dark:text-white">
-            {company?.numberOfEmployees ?? "N/A"}
-          </span>
-        </div>
+        {/* Company Details */}
+        <CardContent className="space-y-4">
+          <div className="flex justify-between items-center">
+            <Label className="text-muted-foreground">
+              Number of Employees:
+            </Label>
+            <span>{company?.numberOfEmployees ?? "N/A"}</span>
+          </div>
 
-        <div className="flex justify-between items-center">
-          <span className="font-medium text-gray-600 dark:text-gray-300">
-            Website:
-          </span>
-          <a
-            href={
-              company?.website
-                ? company.website.startsWith("http")
-                  ? company.website
-                  : `https://${company.website}`
-                : "#"
-            }
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 dark:text-blue-400 hover:underline"
-          >
-            {company?.website || "Not Provided"}
-          </a>
-        </div>
+          <div className="flex justify-between items-center">
+            <Label className="text-muted-foreground">Website:</Label>
+            <a
+              href={
+                company?.website
+                  ? company.website.startsWith("http")
+                    ? company.website
+                    : `https://${company.website}`
+                  : "#"
+              }
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              {company?.website || "Not Provided"}
+            </a>
+          </div>
 
-        <div className="flex justify-between items-center">
-          <span className="font-medium text-gray-600 dark:text-gray-300">
-            State:
-          </span>
-          <span className="text-gray-800 dark:text-white">
-            {company?.state || "Not Specified"}
-          </span>
-        </div>
+          <div className="flex justify-between items-center">
+            <Label className="text-muted-foreground">State:</Label>
+            <span>{company?.state || "Not Specified"}</span>
+          </div>
 
-        <div className="flex justify-between items-center">
-          <span className="font-medium text-gray-600 dark:text-gray-300">
-            Created At:
-          </span>
-          <span className="text-gray-800 dark:text-white">
-            {company?.createdAt
-              ? new Date(company.createdAt).toLocaleDateString()
-              : "Unknown"}
-          </span>
-        </div>
-        {/* control panel */}
-        <section className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md shadow-md p-4">
-          <h3 className="font-semibold text-xl mb-2 text-gray-600 dark:text-gray-50">
-            Control Panel
-          </h3>
-          <hr className="mb-4" />
-          <div className="flex flex-col space-y-4">
-            <div className="flex justify-between space-x-2">
-              <p className="text-gray-700 dark:text-gray-200">Notifications</p>
-              <Switcher />
-            </div>
+          <div className="flex justify-between items-center">
+            <Label className="text-muted-foreground">Created At:</Label>
+            <span>
+              {company?.createdAt
+                ? new Date(company.createdAt).toLocaleDateString()
+                : "Unknown"}
+            </span>
+          </div>
 
-            <div className="flex justify-between space-x-2">
-              <p className="text-gray-700 dark:text-gray-200">
-                Enable analytics.
-              </p>
-              <Switcher />
-            </div>
-
-            <div className="flex justify-between space-x-2">
-              <p className="text-gray-700 dark:text-gray-200">
-                Beta user feature
-              </p>
-              <Switcher />
+          {/* Control Panel */}
+          <div className="bg-outline p-4 rounded-md border border-[var(--border)] dark:bg-zinc-800">
+            <h3 className="font-semibold text-lg mb-1">Control Panel</h3>
+            <Separator className="mb-4" />
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <Label className="text-muted-foreground">Notifications</Label>
+                <Switch />
+              </div>
+              <div className="flex justify-between items-center">
+                <Label className="text-muted-foreground">
+                  Enable analytics
+                </Label>
+                <Switch />
+              </div>
+              <div className="flex justify-between items-center">
+                <Label className="text-muted-foreground">
+                  Beta user feature
+                </Label>
+                <Switch />
+              </div>
             </div>
           </div>
-        </section>
-      </div>
+        </CardContent>
+      </Card>
     </motion.div>
   );
 };

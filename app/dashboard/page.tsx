@@ -1,39 +1,18 @@
 "use client";
 
-import React from "react";
-import ProtectedRoute from "@/components/ProtectedRoute";
 import CompanyCard from "@/components/CompanyCard";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import { useCompany } from "@/contexts/CompanyContext";
-import { motion } from "framer-motion";
-import JobProgressChart from "@/components/JobProgressChart";
-import { useAuth } from "@/contexts/AuthContext";
 
-const Dashboard = () => {
-  const company = useCompany();
-  const { user } = useAuth();
+export default function DashboardPage() {
+  const { company, loading } = useCompany();
 
-  const containerVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5, ease: "easeOut", staggerChildren: 0.1 },
-    },
-  };
-
-  const cardVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
-
-  if (!company) {
+  if (loading) {
     return (
       <ProtectedRoute>
         <div className="p-6">
-          <h2 className="text-3xl font-bold mb-4">Dashboard</h2>
-          <p className="text-gray-700 dark:text-gray-300">
-            Loading company data...
-          </p>
+          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <p>Loading company information...</p>
         </div>
       </ProtectedRoute>
     );
@@ -41,108 +20,34 @@ const Dashboard = () => {
 
   return (
     <ProtectedRoute>
-      <div className="px-6">
-        <h2 className="text-3xl font-bold mb-4">Dashboard</h2>
-        {/* Responsive grid for cards */}
-        <motion.div
-          className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          {/* Welcome back card */}
-          <motion.div
-            variants={cardVariants}
-            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md rounded-lg p-4 flex flex-col justify-center items-start"
-          >
-            <h3 className="text-3xl font-semibold text-green-600 dark:text-green-500 mb-2">
-              {user &&
-                user.displayName &&
-                `Hello ${user.displayName.split(" ")[0]}`}
-            </h3>
-            <p className="text-gray-600 text-lg font-light dark:text-gray-300">
-              Welcome back to your dashboard.
-            </p>
-          </motion.div>
+      <div className="p-6">
+        <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
+        <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-4">
+          {/* CompanyCard */}
+          <div className="col-span-1 lg:col-span-2">
+            {company ? (
+              <CompanyCard company={company} />
+            ) : (
+              <p>No company information available.</p>
+            )}
+          </div>
 
-          {/* Company Card (provided) */}
-          <motion.div variants={cardVariants}>
-            <CompanyCard company={company} />
-          </motion.div>
-
-          <JobProgressChart />
-
-          {/* Example wide card */}
-          <motion.div
-            variants={cardVariants}
-            className="md:col-span-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md rounded-lg p-6"
-          >
-            <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
-              Recent Activities
-            </h3>
-            <ul className="space-y-2">
-              <li className="text-gray-700 dark:text-gray-300">
-                - New client signed up
-              </li>
-              <li className="text-gray-700 dark:text-gray-300">
-                - Employee completed a task
-              </li>
-              <li className="text-gray-700 dark:text-gray-300">
-                - Invoice #1234 paid
-              </li>
-            </ul>
-          </motion.div>
-
-          {/* Tall card for additional data */}
-          <motion.div
-            variants={cardVariants}
-            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md rounded-lg p-6 flex flex-col justify-between"
-          >
-            <div>
-              <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
-                Performance
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">
-                Current Growth Rate: <span className="font-bold">+15%</span>
-              </p>
-              <p className="text-gray-600 dark:text-gray-300">
-                Keep track of your daily progress and adjust your strategy
-                accordingly.
-              </p>
+          {/* Add additional cards or components */}
+          <div className="col-span-1 border rounded-lg border-[var(--border)] bg-card dark:bg-zinc-900">
+            <div className="shadow-md rounded-lg p-6 h-full">
+              <h2 className="text-xl font-semibold">Additional Component</h2>
+              <p>Details about this component go here.</p>
             </div>
-          </motion.div>
+          </div>
 
-          {/* Another example card for placeholder content */}
-          <motion.div
-            variants={cardVariants}
-            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md rounded-lg p-6"
-          >
-            <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
-              Upcoming Events
-            </h3>
-            <ul className="space-y-2 text-gray-700 dark:text-gray-300">
-              <li>Meeting with Customer X</li>
-              <li>Team Building Activity</li>
-              <li>Product Launch Webinar</li>
-            </ul>
-          </motion.div>
-
-          {/* Add or remove more cards as needed */}
-          <motion.div
-            variants={cardVariants}
-            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md rounded-lg p-4 flex flex-col justify-center items-start"
-          >
-            <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
-              Custom Metrics
-            </h3>
-            <p className="text-gray-600 dark:text-gray-300">
-              You can add custom data here.
-            </p>
-          </motion.div>
-        </motion.div>
+          <div className="col-span-1 rounded-lg border border-[var(--border)] bg-card dark:bg-zinc-900">
+            <div className="shadow-md rounded-lg p-6 h-full">
+              <h2 className="text-xl font-semibold">Another Component</h2>
+              <p>Details about another component go here.</p>
+            </div>
+          </div>
+        </div>
       </div>
     </ProtectedRoute>
   );
-};
-
-export default Dashboard;
+}
