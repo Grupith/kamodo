@@ -9,12 +9,37 @@ import { AlertProvider } from "@/contexts/AlertContext";
 import { ModalProvider } from "@/contexts/ModalContext";
 import { CompanyProvider } from "@/contexts/CompanyContext";
 import { useEffect } from "react";
-import { ThemeProvider } from "../components/theme-provider";
+import { ThemeProvider, useTheme } from "next-themes";
 
 const figTree = Figtree({
   subsets: ["latin"],
   display: "swap",
 });
+
+function HotkeyListener() {
+  const { theme, setTheme } = useTheme();
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (
+        (event.metaKey || event.ctrlKey) && // Cmd (Mac) or Ctrl (Windows/Linux)
+        event.shiftKey && // Shift
+        event.key.toLowerCase() === "l" // 'L' key (case insensitive)
+      ) {
+        setTheme(theme === "dark" ? "light" : "dark");
+        console.log(`Theme toggled to: ${theme === "dark" ? "light" : "dark"}`);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [theme, setTheme]);
+
+  return null;
+}
 
 export default function RootLayout({
   children,
@@ -53,7 +78,10 @@ export default function RootLayout({
           <AlertProvider>
             <ModalProvider>
               <AuthProvider>
-                <CompanyProvider>{children}</CompanyProvider>
+                <CompanyProvider>
+                  <HotkeyListener />
+                  {children}
+                </CompanyProvider>
               </AuthProvider>
             </ModalProvider>
           </AlertProvider>

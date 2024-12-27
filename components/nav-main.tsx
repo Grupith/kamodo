@@ -1,19 +1,17 @@
-"use client";
-
 import Link from "next/link";
 import {
+  LayoutDashboard,
   Users,
   Briefcase,
-  PenToolIcon as Tool,
-  LayoutDashboard,
+  PenTool as Tool,
 } from "lucide-react";
-
 import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 
 const navItems = [
@@ -40,14 +38,22 @@ const navItems = [
 ];
 
 export function NavMain() {
+  const { isMobile, setOpenMobile } = useSidebar(); // Access sidebar context
+
+  const handleNavClick = () => {
+    if (isMobile) {
+      setOpenMobile(false); // Close sidebar on mobile
+    }
+  };
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
       <SidebarMenu>
         {navItems.map((item) => (
           <SidebarMenuItem key={item.title}>
-            <Link href={item.url} passHref legacyBehavior>
-              <SidebarMenuButton tooltip={item.title}>
+            <Link href={item.url} passHref>
+              <SidebarMenuButton tooltip={item.title} onClick={handleNavClick}>
                 {item.icon && <item.icon className="mr-2 h-4 w-4" />}
                 <span>{item.title}</span>
               </SidebarMenuButton>
