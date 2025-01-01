@@ -4,6 +4,7 @@ import {
   Users,
   Briefcase,
   PenTool as Tool,
+  ClipboardList,
 } from "lucide-react";
 import {
   SidebarGroup,
@@ -35,6 +36,11 @@ const navItems = [
     url: "/dashboard/equipment",
     icon: Tool,
   },
+  {
+    title: "Jobs",
+    url: "/dashboard/jobs",
+    icon: ClipboardList,
+  },
 ];
 
 export function NavMain() {
@@ -48,7 +54,7 @@ export function NavMain() {
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
+      <SidebarGroupLabel>Pages</SidebarGroupLabel>
       <SidebarMenu>
         {navItems.map((item) => (
           <SidebarMenuItem key={item.title}>

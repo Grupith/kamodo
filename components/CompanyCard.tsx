@@ -27,10 +27,10 @@ const CompanyCard = ({ company }: { company: Company | null }) => {
       transition={{ duration: 0.5, ease: "easeOut" }}
       className="w-full"
     >
-      <Card className="border border-[var(--border)] bg-card dark:bg-zinc-900 text-card-foreground">
+      <Card className="border border-[var(--border)] bg-card bg-zinc-100 dark:bg-zinc-900 text-card-foreground">
         {/* Header */}
         <CardHeader>
-          <CardTitle className="text-xl font-bold">
+          <CardTitle className="text-xl font-bold text-blue-600">
             {company?.name || "No Company Name Available"}
           </CardTitle>
           <CardDescription>

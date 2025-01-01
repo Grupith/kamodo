@@ -1,6 +1,9 @@
 "use client";
 
-import * as React from "react";
+import React, { useEffect, useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { useAuth } from "@/contexts/AuthContext"; // Import your custom AuthContext
+import { db } from "@/firebase/firebase"; // Import your Firestore instance
 import {
   AudioWaveform,
   Command,
@@ -26,13 +29,8 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 
-// This is sample data.
+// Placeholder data for teams and navigation links
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/images/default-avatar.png",
-  },
   teams: [
     {
       name: "Acme Inc",
@@ -71,6 +69,11 @@ const data = {
       url: "/dashboard/equipment",
       icon: PenTool,
     },
+    {
+      title: "Jobs",
+      url: "/dashboard/jobs",
+      icon: PenTool,
+    },
   ],
   projects: [
     {
@@ -92,6 +95,46 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user, loading } = useAuth(); // Access the user and loading state
+  const [userData, setUserData] = useState<{
+    name: string;
+    email: string;
+    avatar?: string;
+  } | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (user?.uid) {
+        try {
+          const userDocRef = doc(db, "users", user.uid);
+          const userDocSnap = await getDoc(userDocRef);
+
+          if (userDocSnap.exists()) {
+            const firestoreUser = userDocSnap.data();
+            setUserData({
+              name: firestoreUser.name || user.displayName || "Anonymous",
+              email: firestoreUser.email || user.email || "No email",
+              avatar:
+                firestoreUser.avatar || user.photoURL || "/default-avatar.png",
+            });
+          } else {
+            setUserData({
+              name: user.displayName || "Anonymous",
+              email: user.email || "No email",
+              avatar: user.photoURL || "/default-avatar.png",
+            });
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
+      }
+    };
+
+    if (!loading) {
+      fetchUser();
+    }
+  }, [user, loading]);
+
   return (
     <Sidebar
       collapsible="icon"
@@ -106,7 +149,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        {userData ? (
+          <NavUser
+            user={{
+              displayName: userData.name,
+              email: userData.email,
+              photoURL: userData.avatar || "",
+            }}
+          />
+        ) : (
+          <div>Loading user data...</div>
+        )}
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

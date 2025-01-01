@@ -245,6 +245,19 @@ export async function deleteEquipmentById(
   }
 }
 
+// Create job document
+export async function createJob(companyId: string, jobData: any) {
+  try {
+    const jobsRef = collection(db, "companies", companyId, "jobs");
+    const newJobRef = await addDoc(jobsRef, jobData);
+    console.log("Job created with ID:", newJobRef.id);
+    return newJobRef.id;
+  } catch (error) {
+    console.error("Error creating job:", error);
+    throw new Error("Failed to create job. Please try again.");
+  }
+}
+
 // Checks if user exists in the 'users' collection, creates a new user document if not.
 export async function checkOrCreateUserDoc(
   uid: string,

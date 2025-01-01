@@ -1,14 +1,25 @@
 "use client";
+
 import React from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import Image from "next/image";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
 
 const AccountSettings = () => {
   const { user } = useAuth();
 
   return (
-    <div className="py-10 sm:py-16 bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <div className="py-10 sm:py-16 bg-background min-h-screen">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -17,222 +28,163 @@ const AccountSettings = () => {
       >
         {/* Page Header */}
         <div className="mb-10">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
+          <h1 className="text-3xl font-bold tracking-tight">
             Account Settings
           </h1>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+          <p className="mt-2 text-sm text-muted-foreground">
             Manage your personal information, security, and preferences.
           </p>
         </div>
 
         {/* Profile Card */}
         <div className="mb-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            viewport={{ once: true }}
-            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow p-6"
-          >
-            <div className="flex items-center space-x-4">
-              <div className="flex-shrink-0">
-                {user && user.photoURL ? (
-                  <Image
-                    src={user.photoURL}
-                    alt="user"
-                    width={32}
-                    height={32}
-                    className="w-14 h-14 rounded-full"
-                    priority
-                  />
-                ) : (
-                  <div className="h-16 w-16 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                    <span className="text-gray-500 dark:text-gray-300 font-bold">
-                      {user?.displayName
-                        ? user.displayName.charAt(0).toUpperCase()
-                        : "U"}
-                    </span>
-                  </div>
-                )}
+          <Card className="bg-zinc-100 dark:bg-zinc-900 border dark:border-zinc-800">
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className="flex-shrink-0">
+                  {user?.photoURL ? (
+                    <Image
+                      src={user.photoURL}
+                      alt="user"
+                      width={56}
+                      height={56}
+                      className="w-14 h-14 rounded-full"
+                      priority
+                    />
+                  ) : (
+                    <div className="h-14 w-14 rounded-full bg-muted flex items-center justify-center">
+                      <span className="text-muted-foreground font-bold">
+                        {user?.displayName?.charAt(0).toUpperCase() || "U"}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold">
+                    {user?.displayName || "No User Name Available"}
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    {user?.email || "Email not specified"}
+                  </p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  {user?.displayName || "No User Name Available"}
-                </h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {user?.email || "Email not specified"}
-                </p>
-              </div>
-            </div>
-            <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="flex justify-between items-center">
-                <span className="font-medium text-gray-600 dark:text-gray-300">
-                  Phone Number
-                </span>
-                <span className="text-gray-800 dark:text-white">
-                  {user?.phoneNumber ?? "N/A"}
-                </span>
-              </div>
+              <Separator className="my-4" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium text-muted-foreground">
+                    Phone Number
+                  </span>
+                  <span>{user?.phoneNumber ?? "N/A"}</span>
+                </div>
 
-              <div className="flex justify-between items-center">
-                <span className="font-medium text-gray-600 dark:text-gray-300">
-                  Address
-                </span>
-                <span className="text-gray-800 dark:text-white">
-                  Not Provided
-                </span>
-              </div>
+                <div className="flex justify-between items-center">
+                  <span className="font-medium text-muted-foreground">
+                    Address
+                  </span>
+                  <span>Not Provided</span>
+                </div>
 
-              <div className="flex justify-between items-center">
-                <span className="font-medium text-gray-600 dark:text-gray-300">
-                  Joined At
-                </span>
-                <span className="text-gray-800 dark:text-white">Unknown</span>
+                <div className="flex justify-between items-center">
+                  <span className="font-medium text-muted-foreground">
+                    Joined At
+                  </span>
+                  <span>Unknown</span>
+                </div>
               </div>
-            </div>
-          </motion.div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Settings Cards Grid */}
         <div className="grid gap-8 md:grid-cols-2">
           {/* Security Settings Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            viewport={{ once: true }}
-            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow p-6"
-          >
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-              Security
-            </h3>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-              Manage your password and account security.
-            </p>
-            <div className="mt-4 space-y-2">
+          <Card className="bg-zinc-100 dark:bg-zinc-900 border dark:border-zinc-800">
+            <CardHeader>
+              <CardTitle>Security</CardTitle>
+              <CardDescription>
+                Manage your password and account security.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-gray-600 dark:text-gray-300">
-                  Password
-                </span>
-                <button className="text-indigo-600 dark:text-indigo-400 hover:underline text-sm">
+                <span>Password</span>
+                <Button variant="link" className="text-sm">
                   Change
-                </button>
+                </Button>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-600 dark:text-gray-300">
-                  Two-factor Auth
-                </span>
-                <button className="text-indigo-600 dark:text-indigo-400 hover:underline text-sm">
+                <span>Two-factor Auth</span>
+                <Button variant="link" className="text-sm">
                   Enable
-                </button>
+                </Button>
               </div>
-            </div>
-          </motion.div>
+            </CardContent>
+          </Card>
 
           {/* Notification Settings Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            viewport={{ once: true }}
-            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow p-6"
-          >
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-              Notifications
-            </h3>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-              Choose what notifications you want to receive.
-            </p>
-            <div className="mt-4 space-y-3">
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
-                  defaultChecked
-                />
-                <span className="text-gray-600 dark:text-gray-300">
-                  Email Notifications
-                </span>
-              </label>
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
-                />
-                <span className="text-gray-600 dark:text-gray-300">
-                  SMS Notifications
-                </span>
-              </label>
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
-                  defaultChecked
-                />
-                <span className="text-gray-600 dark:text-gray-300">
-                  Browser Push Notifications
-                </span>
-              </label>
-            </div>
-          </motion.div>
+          <Card className="bg-zinc-100 dark:bg-zinc-900 border dark:border-zinc-800">
+            <CardHeader>
+              <CardTitle>Notifications</CardTitle>
+              <CardDescription>
+                Choose what notifications you want to receive.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Checkbox
+                id="email-notifications"
+                defaultChecked
+                aria-label="Email Notifications"
+              />
+              <Checkbox id="sms-notifications" aria-label="SMS Notifications" />
+              <Checkbox
+                id="push-notifications"
+                defaultChecked
+                aria-label="Browser Push Notifications"
+              />
+            </CardContent>
+          </Card>
 
           {/* Privacy Settings Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            viewport={{ once: true }}
-            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow p-6"
-          >
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-              Privacy
-            </h3>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-              Review and adjust your privacy preferences.
-            </p>
-            <div className="mt-4 space-y-2">
+          <Card className="bg-zinc-100 dark:bg-zinc-900 border dark:border-zinc-800">
+            <CardHeader>
+              <CardTitle>Privacy</CardTitle>
+              <CardDescription>
+                Review and adjust your privacy preferences.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-gray-600 dark:text-gray-300">
-                  Profile Visibility
-                </span>
-                <button className="text-indigo-600 dark:text-indigo-400 hover:underline text-sm">
+                <span>Profile Visibility</span>
+                <Button variant="link" className="text-sm">
                   Edit
-                </button>
+                </Button>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-600 dark:text-gray-300">
-                  Search Visibility
-                </span>
-                <button className="text-indigo-600 dark:text-indigo-400 hover:underline text-sm">
+                <span>Search Visibility</span>
+                <Button variant="link" className="text-sm">
                   Edit
-                </button>
+                </Button>
               </div>
-            </div>
-          </motion.div>
+            </CardContent>
+          </Card>
 
           {/* Account Actions Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            viewport={{ once: true }}
-            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow p-6"
-          >
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-              Account Actions
-            </h3>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-              Access advanced account actions.
-            </p>
-            <div className="mt-4 space-y-2">
-              <button className="w-full inline-flex justify-center items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700">
+          <Card className="bg-zinc-100 dark:bg-zinc-900 border dark:border-zinc-800">
+            <CardHeader>
+              <CardTitle>Account Actions</CardTitle>
+              <CardDescription>
+                Access advanced account actions.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Button variant="destructive" className="w-full">
                 Deactivate Account
-              </button>
-              <button className="w-full inline-flex justify-center items-center px-3 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-white bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+              </Button>
+              <Button variant="outline" className="w-full">
                 Delete Account
-              </button>
-            </div>
-          </motion.div>
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </motion.div>
     </div>
