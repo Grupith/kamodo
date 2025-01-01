@@ -17,8 +17,6 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
-import ReactDatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 
 interface Customer {
   id: string;
@@ -144,20 +142,22 @@ const CreateJob = () => {
                 <label className="block text-sm font-medium text-muted-foreground">
                   Start Date <span className="text-red-500">*</span>
                 </label>
-                <ReactDatePicker
-                  selected={startDate}
-                  onChange={(date) => setStartDate(date)}
-                  className="w-full px-3 py-2 border rounded-md text-muted-foreground bg-background"
+                <Input
+                  type="date"
+                  value={startDate ? startDate.toISOString().split("T")[0] : ""}
+                  onChange={(e) => setStartDate(new Date(e.target.value))}
+                  required
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-muted-foreground">
                   End Date <span className="text-red-500">*</span>
                 </label>
-                <ReactDatePicker
-                  selected={endDate}
-                  onChange={(date) => setEndDate(date)}
-                  className="w-full px-3 py-2 border rounded-md text-muted-foreground bg-background"
+                <Input
+                  type="date"
+                  value={endDate ? endDate.toISOString().split("T")[0] : ""}
+                  onChange={(e) => setEndDate(new Date(e.target.value))}
+                  required
                 />
               </div>
             </div>

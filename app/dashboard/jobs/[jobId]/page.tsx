@@ -18,8 +18,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import ReactDatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 
 interface Job {
   id: string;
@@ -198,11 +196,14 @@ const JobDetails = () => {
             <div className="flex flex-col space-y-1">
               <Label className="text-sm font-medium">Start Date</Label>
               {isEditing ? (
-                <ReactDatePicker
-                  className="border border-input rounded-md p-2 text-sm"
-                  selected={new Date(job.startDate)}
-                  onChange={(date) =>
-                    setJob({ ...job, startDate: (date as Date).getTime() })
+                <Input
+                  type="date"
+                  value={new Date(job.startDate).toISOString().split("T")[0]}
+                  onChange={(e) =>
+                    setJob({
+                      ...job,
+                      startDate: new Date(e.target.value).getTime(),
+                    })
                   }
                 />
               ) : (
@@ -214,11 +215,14 @@ const JobDetails = () => {
             <div className="flex flex-col space-y-1">
               <Label className="text-sm font-medium">End Date</Label>
               {isEditing ? (
-                <ReactDatePicker
-                  className="border border-input rounded-md p-2 text-sm"
-                  selected={new Date(job.endDate)}
-                  onChange={(date) =>
-                    setJob({ ...job, endDate: (date as Date).getTime() })
+                <Input
+                  type="date"
+                  value={new Date(job.endDate).toISOString().split("T")[0]}
+                  onChange={(e) =>
+                    setJob({
+                      ...job,
+                      endDate: new Date(e.target.value).getTime(),
+                    })
                   }
                 />
               ) : (
