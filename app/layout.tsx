@@ -10,6 +10,7 @@ import { ModalProvider } from "@/contexts/ModalContext";
 import { CompanyProvider } from "@/contexts/CompanyContext";
 import { useEffect } from "react";
 import { ThemeProvider, useTheme } from "next-themes";
+import { Toaster } from "@/components/ui/toaster";
 
 const figTree = Figtree({
   subsets: ["latin"],
@@ -81,6 +82,7 @@ export default function RootLayout({
                 <CompanyProvider>
                   <HotkeyListener />
                   {children}
+                  <Toaster />
                 </CompanyProvider>
               </AuthProvider>
             </ModalProvider>

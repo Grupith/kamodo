@@ -17,6 +17,7 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 
 interface Customer {
   id: string;
@@ -41,6 +42,7 @@ const CreateJob = () => {
   const [taxes, setTaxes] = useState("");
   const [expenses, setExpenses] = useState("");
   const [status, setStatus] = useState("active");
+  const { toast } = useToast();
 
   // Fetch customers for the select
   useEffect(() => {
@@ -101,7 +103,12 @@ const CreateJob = () => {
 
     try {
       const jobId = await createJob(companyId, jobData);
-      alert(`Job created successfully with ID: ${jobId}`);
+      console.log("Job created with ID:", jobId);
+      toast({
+        title: "Job Created Successfully!",
+        description: "View your job on the jobs page",
+        variant: "default",
+      });
       router.push("/dashboard/jobs");
     } catch (error) {
       console.error("Error creating job:", error);

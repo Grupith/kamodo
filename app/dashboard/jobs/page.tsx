@@ -104,7 +104,7 @@ const JobsDashboard = () => {
             {activeJobs.length > 0 ? (
               activeJobs.map((job) => (
                 <Link key={job.id} href={`/dashboard/jobs/${job.id}`}>
-                  <Card className="bg-zinc-100 dark:bg-zinc-900 border dark:border-zinc-800 cursor-pointer hover:shadow-lg transition-shadow">
+                  <Card className="bg-zinc-100 dark:bg-zinc-900 border dark:border-zinc-800 cursor-pointer hover:shadow-lg hover:scale-105 transition-all">
                     <CardHeader>
                       <CardTitle>{job.jobName}</CardTitle>
                       <CardDescription>

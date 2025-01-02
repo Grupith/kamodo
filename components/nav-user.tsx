@@ -31,6 +31,7 @@ import { signOutUser } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes"; // Import the useTheme hook
 import Link from "next/link";
+import { useToast } from "@/hooks/use-toast";
 
 export function NavUser({
   user,
@@ -44,6 +45,7 @@ export function NavUser({
   const { isMobile } = useSidebar();
   const router = useRouter();
   const { theme, setTheme } = useTheme(); // Destructure theme and setTheme
+  const { toast } = useToast();
 
   const handleDarkModeToggle = (checked: boolean) => {
     setTheme(checked ? "dark" : "light"); // Update theme based on toggle state
@@ -51,6 +53,11 @@ export function NavUser({
 
   const handleSignOut = () => {
     console.log("Signing out...");
+    toast({
+      title: "Signed out",
+      description: "You have been signed out",
+      variant: "destructive",
+    });
     signOutUser();
     router.push("/");
   };
