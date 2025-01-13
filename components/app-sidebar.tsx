@@ -111,18 +111,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
           if (userDocSnap.exists()) {
             const firestoreUser = userDocSnap.data();
-            setUserData({
+            const newUserData = {
               name: firestoreUser.name || user.displayName || "Anonymous",
               email: firestoreUser.email || user.email || "No email",
               avatar:
                 firestoreUser.avatar || user.photoURL || "/default-avatar.png",
-            });
-          } else {
-            setUserData({
-              name: user.displayName || "Anonymous",
-              email: user.email || "No email",
-              avatar: user.photoURL || "/default-avatar.png",
-            });
+            };
+            if (
+              JSON.stringify(newUserData) !== JSON.stringify(userData) // Avoid unnecessary updates
+            ) {
+              setUserData(newUserData);
+            }
           }
         } catch (error) {
           console.error("Error fetching user data:", error);
@@ -154,7 +153,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             user={{
               displayName: userData.name,
               email: userData.email,
-              photoURL: userData.avatar || "",
+              avatar: userData.avatar || "",
             }}
           />
         ) : (
