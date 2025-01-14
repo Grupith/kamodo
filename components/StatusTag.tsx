@@ -1,9 +1,29 @@
-import React from "react";
+import React, { useState } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "@/firebase/firebase";
 
-export default function StatusTag({ status }: { status: string }) {
+export default function StatusTag({
+  status,
+  jobId,
+  companyId,
+  onStatusChange,
+}: {
+  status: string;
+  jobId: string;
+  companyId: string;
+  onStatusChange?: (newStatus: string) => void;
+}) {
+  const [currentStatus, setCurrentStatus] = useState(status);
+
   let colorClasses = "";
 
-  switch (status.toLowerCase()) {
+  switch (currentStatus.toLowerCase()) {
     case "active":
       colorClasses =
         "bg-green-200 text-green-800 dark:bg-green-800 dark:text-green-200";
@@ -22,11 +42,44 @@ export default function StatusTag({ status }: { status: string }) {
       break;
   }
 
+  const handleStatusChange = async (newStatus: string) => {
+    try {
+      setCurrentStatus(newStatus);
+      if (onStatusChange) {
+        onStatusChange(newStatus);
+      }
+
+      const jobDocRef = doc(db, "companies", companyId, "jobs", jobId);
+      await updateDoc(jobDocRef, { status: newStatus });
+
+      console.log(`Status updated to "${newStatus}" for job ${jobId}`);
+    } catch (error) {
+      console.error("Failed to update status:", error);
+    }
+  };
+
   return (
-    <span
-      className={`inline-block rounded-md px-2 py-1 text-xs font-medium transition-colors duration-200 ${colorClasses}`}
-    >
-      {status}
-    </span>
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        asChild
+        onClick={(e) => e.stopPropagation()} // Prevents navigation or click propagation
+      >
+        <button
+          className={`inline-block rounded-md px-2 py-1 text-xs font-medium transition-colors duration-200 ${colorClasses}`}
+        >
+          {currentStatus}
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        {["active", "pending", "complete", "inactive"].map((statusOption) => (
+          <DropdownMenuItem
+            key={statusOption}
+            onClick={() => handleStatusChange(statusOption)}
+          >
+            {statusOption.charAt(0).toUpperCase() + statusOption.slice(1)}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter, useParams } from "next/navigation";
 
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { db } from "@/firebase/firebase";
 import { useCompany } from "@/contexts/CompanyContext";
 
@@ -19,9 +19,19 @@ import {
   CardContent,
   CardDescription,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
+import { Pencil, Trash } from "lucide-react";
 
 interface Job {
   id: string;
@@ -50,6 +60,8 @@ const JobDetails = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const { toast } = useToast();
 
   // Extract the job ID from the route params
   const jobId = Array.isArray(params?.jobId) ? params.jobId[0] : params?.jobId;
@@ -91,27 +103,41 @@ const JobDetails = () => {
     setSaving(true);
     try {
       const jobDocRef = doc(db, "companies", companyId, "jobs", jobId);
-      await updateDoc(jobDocRef, {
-        jobName: job.jobName,
-        description: job.description,
-        startDate: job.startDate,
-        endDate: job.endDate,
-        assignedEmployees: job.assignedEmployees,
-        selectedCustomer: job.selectedCustomer,
-        selectedEquipment: job.selectedEquipment,
-        costs: job.costs,
-        charge: job.charge,
-        taxes: job.taxes,
-        expenses: job.expenses,
-        status: job.status,
-      });
+
+      // Remove undefined fields before updating
+      const sanitizedJobData = Object.fromEntries(
+        Object.entries({
+          jobName: job.jobName,
+          description: job.description,
+          startDate: job.startDate,
+          endDate: job.endDate,
+          assignedEmployees: job.assignedEmployees,
+          selectedCustomer: job.selectedCustomer,
+          selectedEquipment: job.selectedEquipment,
+          costs: job.costs,
+          charge: job.charge,
+          taxes: job.taxes,
+          expenses: job.expenses,
+          status: job.status,
+        }).filter(([, value]) => value !== undefined) // Skip unused key
+      );
+
+      await updateDoc(jobDocRef, sanitizedJobData);
+
       // Reflect saved changes in the original copy
       setOriginalJob(job);
       setIsEditing(false);
-      alert("Job updated successfully!");
+      toast({
+        title: "Job Updated",
+        description: "Job details have been successfully updated.",
+      });
     } catch (error) {
       console.error("Error updating job:", error);
-      alert("Failed to update job. Please try again.");
+      toast({
+        title: "Error",
+        description: "Failed to update job. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setSaving(false);
     }
@@ -123,6 +149,34 @@ const JobDetails = () => {
       setJob({ ...originalJob });
     }
     setIsEditing(false);
+  };
+
+  // Handle job deletion
+  const handleDeleteJob = async () => {
+    if (!companyId || !jobId) return;
+
+    try {
+      const jobDocRef = doc(db, "companies", companyId, "jobs", jobId);
+      await deleteDoc(jobDocRef);
+
+      toast({
+        title: "Job Deleted",
+        description: "The job has been successfully deleted.",
+        variant: "default",
+      });
+
+      // Redirect to the jobs list after deletion
+      router.push("/dashboard/jobs");
+    } catch (error) {
+      console.error("Error deleting job:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete the job. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setShowDeleteModal(false);
+    }
   };
 
   // Render a loading state
@@ -154,7 +208,6 @@ const JobDetails = () => {
         {/* Page Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
-            {/* If editing, show an input for the job name */}
             {isEditing ? (
               <Input
                 className="text-2xl font-semibold tracking-tight w-full md:w-auto"
@@ -198,14 +251,8 @@ const JobDetails = () => {
                 variant="default"
                 className="w-full sm:w-auto"
               >
+                <Pencil className="w-5 h-5 mr-0.5" />
                 Edit Job
-              </Button>
-              <Button
-                variant="outline"
-                className="w-full sm:w-auto"
-                onClick={() => router.push("/dashboard/jobs")}
-              >
-                Back to Jobs
               </Button>
             </div>
           )}
@@ -214,17 +261,15 @@ const JobDetails = () => {
         <Separator />
 
         {/* MAIN CARD */}
+        {/* Existing Cards and Details */}
         <Card className="bg-zinc-100 dark:bg-zinc-900 dark:border-zinc-800 border mt-4">
-          {/* Header with Status (TaskStatus) & Created On */}
           <CardHeader className="flex flex-row items-center justify-between space-x-4">
             <div>
               <CardTitle className="text-lg font-medium">Job Details</CardTitle>
-              <CardDescription className="text-xs">
+              <CardDescription>
                 Created on {new Date(job.createdAt).toLocaleDateString()}
               </CardDescription>
             </div>
-
-            {/* Status in header */}
             {isEditing ? (
               <Input
                 className="w-36"
@@ -232,183 +277,72 @@ const JobDetails = () => {
                 onChange={(e) => setJob({ ...job, status: e.target.value })}
               />
             ) : (
-              <StatusTag status={job.status} />
+              <StatusTag
+                status={job.status}
+                jobId={job.id}
+                companyId={companyId}
+                onStatusChange={(newStatus) =>
+                  setJob({ ...job, status: newStatus })
+                }
+              />
             )}
           </CardHeader>
 
           <CardContent className="space-y-6">
-            {/* DESCRIPTION, START DATE, END DATE */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* DESCRIPTION */}
-              <Card className="bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 border hover:shadow-lg hover:scale-[1.01] transition-transform">
-                <CardHeader>
-                  <CardTitle>Description</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {isEditing ? (
-                    <Input
-                      value={job.description || ""}
-                      onChange={(e) =>
-                        setJob({ ...job, description: e.target.value })
-                      }
-                    />
-                  ) : job.description ? (
-                    <p>{job.description}</p>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      No description provided.
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* START DATE */}
-              <Card className="bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 border hover:shadow-lg hover:scale-[1.01] transition-transform">
-                <CardHeader>
-                  <CardTitle>Start Date</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {isEditing ? (
-                    <Input
-                      type="date"
-                      value={
-                        new Date(job.startDate).toISOString().split("T")[0]
-                      }
-                      onChange={(e) =>
-                        setJob({
-                          ...job,
-                          startDate: new Date(e.target.value).getTime(),
-                        })
-                      }
-                    />
-                  ) : (
-                    <p>{new Date(job.startDate).toLocaleDateString()}</p>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* END DATE */}
-              <Card className="bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 border hover:shadow-lg hover:scale-[1.01] transition-transform">
-                <CardHeader>
-                  <CardTitle>End Date</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {isEditing ? (
-                    <Input
-                      type="date"
-                      value={new Date(job.endDate).toISOString().split("T")[0]}
-                      onChange={(e) =>
-                        setJob({
-                          ...job,
-                          endDate: new Date(e.target.value).getTime(),
-                        })
-                      }
-                    />
-                  ) : (
-                    <p>{new Date(job.endDate).toLocaleDateString()}</p>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* FINANCES SECTION */}
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Finances</h2>
-              <Separator />
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {/* COSTS */}
-                <Card className="bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 border hover:shadow-lg hover:scale-[1.01] transition-transform">
-                  <CardHeader>
-                    <CardTitle>Costs</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {isEditing ? (
-                      <Input
-                        type="number"
-                        value={job.costs.toString()}
-                        onChange={(e) =>
-                          setJob({ ...job, costs: parseFloat(e.target.value) })
-                        }
-                      />
-                    ) : (
-                      <p>{job.costs}</p>
-                    )}
-                  </CardContent>
-                </Card>
-
-                {/* CHARGE */}
-                <Card className="bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 border hover:shadow-lg hover:scale-[1.01] transition-transform">
-                  <CardHeader>
-                    <CardTitle>Charge</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {isEditing ? (
-                      <Input
-                        type="number"
-                        value={job.charge.toString()}
-                        onChange={(e) =>
-                          setJob({
-                            ...job,
-                            charge: parseFloat(e.target.value),
-                          })
-                        }
-                      />
-                    ) : (
-                      <p>{job.charge}</p>
-                    )}
-                  </CardContent>
-                </Card>
-
-                {/* TAXES */}
-                <Card className="bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 border hover:shadow-lg hover:scale-[1.01] transition-transform">
-                  <CardHeader>
-                    <CardTitle>Taxes</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {isEditing ? (
-                      <Input
-                        type="number"
-                        value={job.taxes.toString()}
-                        onChange={(e) =>
-                          setJob({
-                            ...job,
-                            taxes: parseFloat(e.target.value),
-                          })
-                        }
-                      />
-                    ) : (
-                      <p>{job.taxes}</p>
-                    )}
-                  </CardContent>
-                </Card>
-
-                {/* EXPENSES */}
-                <Card className="bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 border hover:shadow-lg hover:scale-[1.01] transition-transform">
-                  <CardHeader>
-                    <CardTitle>Expenses</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {isEditing ? (
-                      <Input
-                        type="number"
-                        value={job.expenses.toString()}
-                        onChange={(e) =>
-                          setJob({
-                            ...job,
-                            expenses: parseFloat(e.target.value),
-                          })
-                        }
-                      />
-                    ) : (
-                      <p>{job.expenses}</p>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
+            {/* Add your detailed content */}
           </CardContent>
         </Card>
+
+        {/* DELETE JOB CARD */}
+        <div className="mt-8">
+          <Card className="w-fit bg-zinc-100 dark:bg-zinc-900 border dark:border-zinc-800 hover:shadow-lg transition-transform">
+            <CardHeader>
+              <CardTitle className="text-black-600">Delete Job</CardTitle>
+              <CardDescription>
+                Deleting this job is permanent and cannot be undone.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button
+                variant="destructive"
+                className="w-full lg:w-1/2"
+                onClick={() => setShowDeleteModal(true)}
+              >
+                <Trash className="w-5 h-5 mr-0.5" />
+                Delete Job
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* DELETE MODAL */}
+        <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+          <DialogContent className="rounded-lg dark:bg-zinc-900 dark:border-zinc-800 border">
+            <DialogHeader>
+              <DialogTitle className="mb-4">Are you sure?</DialogTitle>
+              <DialogDescription>
+                This action cannot be undone. This will permanently delete the
+                job and its associated data.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="secondary"
+                onClick={() => setShowDeleteModal(false)}
+                className="my-2"
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleDeleteJob}
+                className="my-2"
+              >
+                Delete Job
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </motion.div>
     </div>
   );

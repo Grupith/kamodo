@@ -11,8 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Activity, File, Menu } from "lucide-react";
-import StatusTag from "./StatusTag";
+import { Activity, FileText, Menu } from "lucide-react";
 
 interface Job {
   id: string;
@@ -80,15 +79,13 @@ export function ActiveJobsCard({ jobs, onFilterChange }: ActiveJobsCardProps) {
                 <Card className="border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-200 hover:dark:bg-zinc-800 hover:scale-105 transition-all">
                   <CardHeader>
                     <div className="flex items-center space-x-2">
-                      <File className="h-5 w-5" />
+                      <FileText className="h-5 w-5" />
                       <CardTitle className="text-lg font-medium">
                         {job.jobName}
                       </CardTitle>
                     </div>
                   </CardHeader>
-                  <CardContent>
-                    <StatusTag status={job.status} />
-                  </CardContent>
+                  <CardContent></CardContent>
                 </Card>
               </Link>
             ))}
