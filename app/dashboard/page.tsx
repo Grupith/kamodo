@@ -7,13 +7,10 @@ import { db } from "@/firebase/firebase";
 import CompanyCard from "@/components/CompanyCard";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useCompany } from "@/contexts/CompanyContext";
-
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import Link from "next/link";
+import { ActiveJobsCard } from "@/components/ActiveJobsCard";
 
 export default function DashboardPage() {
   const { company, loading } = useCompany();
-
   // State to hold your top 3 active jobs
   interface Job {
     id: string;
@@ -58,6 +55,12 @@ export default function DashboardPage() {
     );
   }
 
+  function handleFilterChange(filter: string) {
+    // TODO: implement logic for re-sorting or re-fetching your jobs
+    // e.g., set sorting or pass filter query to Firestore, etc.
+    console.log("Filtering by:", filter);
+  }
+
   return (
     <ProtectedRoute>
       <div className="p-4">
@@ -72,53 +75,20 @@ export default function DashboardPage() {
             )}
           </div>
 
+          {/* Active Jobs Card */}
+          <div className="col-span-2 rounded-lg">
+            <ActiveJobsCard
+              jobs={topJobs}
+              onFilterChange={handleFilterChange}
+            />
+          </div>
+
           {/* Example placeholder card */}
           <div className="col-span-1 border rounded-lg border-[var(--border)] bg-card bg-zinc-100 dark:bg-zinc-900">
             <div className="shadow-md rounded-lg p-6 h-full">
               <h2 className="text-xl font-semibold">Additional Component</h2>
               <p>Details about this component go here.</p>
             </div>
-          </div>
-
-          {/* Top 3 Active Jobs Card */}
-          <div className="col-span-1 rounded-lg border border-[var(--border)] bg-card bg-zinc-100 dark:bg-zinc-900">
-            <Card className="h-full border dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900">
-              <CardHeader>
-                <CardTitle className="text-xl font-semibold">
-                  Top 3 Active Jobs
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {topJobs.length > 0 ? (
-                  <div className="space-y-4">
-                    {topJobs.map((job) => (
-                      <Link
-                        key={job.id}
-                        href={`/dashboard/jobs/${job.id}`}
-                        className="block"
-                      >
-                        <Card className="border dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 hover:dark:bg-zinc-800 transition-colors">
-                          <CardHeader>
-                            <CardTitle className="text-sm font-semibold">
-                              {job.jobName}
-                            </CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <p className="text-xs text-muted-foreground">
-                              Status: {job.status}
-                            </p>
-                          </CardContent>
-                        </Card>
-                      </Link>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    No active jobs found.
-                  </p>
-                )}
-              </CardContent>
-            </Card>
           </div>
         </div>
       </div>

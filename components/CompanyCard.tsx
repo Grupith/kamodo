@@ -7,8 +7,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
+import { Building2 } from "lucide-react";
 
 interface Company {
   name: string;
@@ -30,16 +29,19 @@ const CompanyCard = ({ company }: { company: Company | null }) => {
       <Card className="border border-[var(--border)] bg-card bg-zinc-100 dark:bg-zinc-900 text-card-foreground">
         {/* Header */}
         <CardHeader>
-          <CardTitle className="text-xl font-bold text-blue-600">
-            {company?.name || "No Company Name Available"}
-          </CardTitle>
-          <CardDescription>
+          <div className="flex items-center space-x-2">
+            <Building2 className="h-6 w-6" />
+            <CardTitle className="text-xl font-bold">
+              {company?.name || "No Company Name Available"}
+            </CardTitle>
+          </div>
+          <CardDescription className="text-blue-600 font-medium">
             {company?.businessType || "Business type not specified"}
           </CardDescription>
         </CardHeader>
-
+        <hr className="mx-6 mb-6" />
         {/* Company Details */}
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-3">
           <div className="flex justify-between items-center">
             <Label className="text-muted-foreground">
               Number of Employees:
@@ -77,30 +79,6 @@ const CompanyCard = ({ company }: { company: Company | null }) => {
                 ? new Date(company.createdAt).toLocaleDateString()
                 : "Unknown"}
             </span>
-          </div>
-
-          {/* Control Panel */}
-          <div className="bg-outline p-4 rounded-md border border-[var(--border)] dark:bg-zinc-800">
-            <h3 className="font-semibold text-lg mb-1">Control Panel</h3>
-            <Separator className="mb-4" />
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <Label className="text-muted-foreground">Notifications</Label>
-                <Switch />
-              </div>
-              <div className="flex justify-between items-center">
-                <Label className="text-muted-foreground">
-                  Enable analytics
-                </Label>
-                <Switch />
-              </div>
-              <div className="flex justify-between items-center">
-                <Label className="text-muted-foreground">
-                  Beta user feature
-                </Label>
-                <Switch />
-              </div>
-            </div>
           </div>
         </CardContent>
       </Card>
