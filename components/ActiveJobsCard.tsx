@@ -34,7 +34,9 @@ export function ActiveJobsCard({ jobs, onFilterChange }: ActiveJobsCardProps) {
         <div className="flex items-center justify-between">
           {/* Title */}
           <div className="flex items-center space-x-2">
-            <Activity className="h-6 w-6" />
+            <div className="bg-green-200 dark:bg-green-900 p-2 rounded-md">
+              <Activity className="h-5 w-5 text-green-500" />
+            </div>
             <CardTitle className="text-xl font-semibold">Active Jobs</CardTitle>
           </div>
 
@@ -73,7 +75,7 @@ export function ActiveJobsCard({ jobs, onFilterChange }: ActiveJobsCardProps) {
                 href={`/dashboard/jobs/${job.id}`}
                 className="block"
               >
-                <Card className="border border-zinc-300 dark:border-zinc-700 bg-zinc-200 dark:bg-zinc-800 hover:bg-zinc-200 hover:dark:bg-zinc-800 hover:scale-105 transition-all">
+                <Card className="border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-200 hover:dark:bg-zinc-800 hover:scale-105 transition-all">
                   <CardHeader>
                     <div className="flex items-center space-x-2">
                       <File className="h-5 w-5" />

@@ -28,7 +28,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Activity } from "lucide-react";
+import { Activity, Plus } from "lucide-react";
 
 const JobsDashboard = () => {
   const { id: companyId } = useCompany();
@@ -110,14 +110,12 @@ const JobsDashboard = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className="max-w-6xl mx-auto px-4 sm:px-4 lg:px-6"
+        className="max-w-6xl px-4 sm:px-4 lg:px-6"
       >
         {/* Page Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">
-              Jobs Dashboard
-            </h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Jobs</h1>
             <p className="mt-2 text-sm text-muted-foreground">
               Manage active jobs and job-related data.
             </p>
@@ -126,17 +124,21 @@ const JobsDashboard = () => {
             onClick={() => router.push("/dashboard/jobs/new")}
             variant="default"
           >
+            <Plus className="mr-0.5" size={16} />
             Create New Job
           </Button>
         </div>
 
-        <Separator className="my-2" />
+        <Separator className="my-3" />
 
         {/* Active Jobs Section */}
         <div className="mb-10">
           <div className="flex items-center space-x-2">
-            <Activity size={24} className="text-zinc-500 dark:text-zinc-400" />
-            <h2 className="text-xl font-semibold tracking-tight">
+            <Activity
+              size={24}
+              className="text-green-500 dark:text-green-400"
+            />
+            <h2 className="text-xl font-semibold tracking-tight dark:text-zinc-100">
               Active Jobs
             </h2>
           </div>
@@ -144,15 +146,15 @@ const JobsDashboard = () => {
             Here are the jobs currently in progress.
           </p>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 mt-6">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 mt-6">
             {activeJobs.length > 0 ? (
               activeJobs.map((job) => (
                 <Link key={job.id} href={`/dashboard/jobs/${job.id}`}>
-                  <Card className="bg-zinc-100 dark:bg-zinc-900 border dark:border-zinc-800 cursor-pointer hover:shadow-lg hover:scale-105 transition-transform">
+                  <Card className="bg-zinc-50 dark:bg-zinc-900 border dark:border-zinc-800 cursor-pointer hover:shadow-lg hover:scale-105 transition-transform">
                     <CardHeader className="flex flex-row items-center space-x-4">
                       <Avatar>
                         <AvatarImage src={job.image ?? ""} alt="Job Avatar" />
-                        <AvatarFallback className="bg-zinc-200 dark:bg-zinc-800">
+                        <AvatarFallback className="bg-zinc-200 dark:bg-zinc-700">
                           #
                         </AvatarFallback>
                       </Avatar>
@@ -198,7 +200,7 @@ const JobsDashboard = () => {
           </p>
 
           {/* 4) Display only the sliced jobs (`currentJobs`) instead of `jobs`: */}
-          <div className="grid gap-4 mt-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-6 mt-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
             {currentJobs.map((job) => (
               <Link key={job.id} href={`/dashboard/jobs/${job.id}`}>
                 <Card className="bg-zinc-100 dark:bg-zinc-900 dark:border-zinc-800 border cursor-pointer hover:shadow-lg hover:scale-105 transition-transform">

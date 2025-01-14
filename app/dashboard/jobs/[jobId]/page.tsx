@@ -1,22 +1,26 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { useRouter, useParams } from "next/navigation";
-import { useCompany } from "@/contexts/CompanyContext";
+
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase/firebase";
+import { useCompany } from "@/contexts/CompanyContext";
+
+// Custom components
+import StatusTag from "@/components/StatusTag";
 
 // shadcn/ui components
 import {
   Card,
   CardHeader,
   CardTitle,
-  CardDescription,
   CardContent,
+  CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 
 interface Job {
@@ -61,7 +65,10 @@ const JobDetails = () => {
         const jobSnapshot = await getDoc(jobDocRef);
 
         if (jobSnapshot.exists()) {
-          const jobData = { id: jobSnapshot.id, ...jobSnapshot.data() } as Job;
+          const jobData = {
+            id: jobSnapshot.id,
+            ...jobSnapshot.data(),
+          } as Job;
           setJob(jobData);
           setOriginalJob(jobData);
         } else {
@@ -137,225 +144,272 @@ const JobDetails = () => {
   }
 
   return (
-    <div className="py-10 sm:py-16 bg-background min-h-screen">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Card className="bg-card text-card-foreground border">
-          <CardHeader>
-            <CardTitle>
-              {isEditing ? (
-                <Input
-                  value={job.jobName}
-                  onChange={(e) => setJob({ ...job, jobName: e.target.value })}
-                  className="text-xl font-bold"
-                />
-              ) : (
-                <h1 className="text-2xl font-bold">{job.jobName}</h1>
-              )}
-            </CardTitle>
-            <CardDescription>
-              Created on: {new Date(job.createdAt).toLocaleDateString()}
-            </CardDescription>
+    <div className="py-4 sm:py-4 bg-background min-h-screen">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="max-w-6xl mx-auto px-4 sm:px-4 lg:px-6"
+      >
+        {/* Page Header */}
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            {/* If editing, show an input for the job name */}
+            {isEditing ? (
+              <Input
+                className="text-2xl font-semibold tracking-tight w-full md:w-auto"
+                value={job.jobName}
+                onChange={(e) => setJob({ ...job, jobName: e.target.value })}
+              />
+            ) : (
+              <h1 className="text-2xl font-semibold tracking-tight">
+                {job.jobName}
+              </h1>
+            )}
+            <p className="mt-2 text-sm text-muted-foreground">
+              Manage the details, status, and finances of this job.
+            </p>
+          </div>
+
+          {/* Edit / Save Buttons */}
+          {isEditing ? (
+            <div className="flex justify-between items-center space-x-4">
+              <Button
+                onClick={handleSave}
+                disabled={saving}
+                variant="default"
+                className="w-full sm:w-auto"
+              >
+                {saving ? "Saving..." : "Save Changes"}
+              </Button>
+              <Button
+                onClick={handleCancelEdit}
+                variant="outline"
+                className="w-full sm:w-auto"
+                disabled={saving}
+              >
+                Cancel
+              </Button>
+            </div>
+          ) : (
+            <div className="flex flex-col sm:flex-row justify-between items-center sm:space-x-2">
+              <Button
+                onClick={() => setIsEditing(true)}
+                variant="default"
+                className="w-full sm:w-auto"
+              >
+                Edit Job
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full sm:w-auto"
+                onClick={() => router.push("/dashboard/jobs")}
+              >
+                Back to Jobs
+              </Button>
+            </div>
+          )}
+        </div>
+
+        <Separator />
+
+        {/* MAIN CARD */}
+        <Card className="bg-zinc-100 dark:bg-zinc-900 dark:border-zinc-800 border mt-4">
+          {/* Header with Status (TaskStatus) & Created On */}
+          <CardHeader className="flex flex-row items-center justify-between space-x-4">
+            <div>
+              <CardTitle className="text-lg font-medium">Job Details</CardTitle>
+              <CardDescription className="text-xs">
+                Created on {new Date(job.createdAt).toLocaleDateString()}
+              </CardDescription>
+            </div>
+
+            {/* Status in header */}
+            {isEditing ? (
+              <Input
+                className="w-36"
+                value={job.status}
+                onChange={(e) => setJob({ ...job, status: e.target.value })}
+              />
+            ) : (
+              <StatusTag status={job.status} />
+            )}
           </CardHeader>
 
-          <CardContent className="space-y-4">
-            {/* STATUS */}
-            <div className="flex flex-col space-y-1">
-              <Label htmlFor="status" className="text-sm font-medium">
-                Status
-              </Label>
-              {isEditing ? (
-                <Input
-                  id="status"
-                  value={job.status}
-                  onChange={(e) => setJob({ ...job, status: e.target.value })}
-                />
-              ) : (
-                <p>{job.status}</p>
-              )}
-            </div>
-
-            {/* DESCRIPTION */}
-            <div className="flex flex-col space-y-1">
-              <Label htmlFor="description" className="text-sm font-medium">
-                Description
-              </Label>
-              {isEditing ? (
-                <Input
-                  id="description"
-                  value={job.description || ""}
-                  onChange={(e) =>
-                    setJob({ ...job, description: e.target.value })
-                  }
-                />
-              ) : (
-                <p>{job.description}</p>
-              )}
-            </div>
-
-            {/* START DATE */}
-            <div className="flex flex-col space-y-1">
-              <Label className="text-sm font-medium">Start Date</Label>
-              {isEditing ? (
-                <Input
-                  type="date"
-                  value={new Date(job.startDate).toISOString().split("T")[0]}
-                  onChange={(e) =>
-                    setJob({
-                      ...job,
-                      startDate: new Date(e.target.value).getTime(),
-                    })
-                  }
-                />
-              ) : (
-                <p>{new Date(job.startDate).toLocaleDateString()}</p>
-              )}
-            </div>
-
-            {/* END DATE */}
-            <div className="flex flex-col space-y-1">
-              <Label className="text-sm font-medium">End Date</Label>
-              {isEditing ? (
-                <Input
-                  type="date"
-                  value={new Date(job.endDate).toISOString().split("T")[0]}
-                  onChange={(e) =>
-                    setJob({
-                      ...job,
-                      endDate: new Date(e.target.value).getTime(),
-                    })
-                  }
-                />
-              ) : (
-                <p>{new Date(job.endDate).toLocaleDateString()}</p>
-              )}
-            </div>
-
-            <Separator className="my-6" />
-
-            {/* COSTS / CHARGE / TAXES / EXPENSES */}
+          <CardContent className="space-y-6">
+            {/* DESCRIPTION, START DATE, END DATE */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* COSTS */}
-              <div className="flex flex-col space-y-1">
-                <Label htmlFor="costs" className="text-sm font-medium">
-                  Costs
-                </Label>
-                {isEditing ? (
-                  <Input
-                    id="costs"
-                    type="number"
-                    value={job.costs.toString()}
-                    onChange={(e) =>
-                      setJob({ ...job, costs: parseFloat(e.target.value) })
-                    }
-                  />
-                ) : (
-                  <p>{job.costs}</p>
-                )}
-              </div>
+              {/* DESCRIPTION */}
+              <Card className="bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 border hover:shadow-lg hover:scale-[1.01] transition-transform">
+                <CardHeader>
+                  <CardTitle>Description</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {isEditing ? (
+                    <Input
+                      value={job.description || ""}
+                      onChange={(e) =>
+                        setJob({ ...job, description: e.target.value })
+                      }
+                    />
+                  ) : job.description ? (
+                    <p>{job.description}</p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      No description provided.
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
 
-              {/* CHARGE */}
-              <div className="flex flex-col space-y-1">
-                <Label htmlFor="charge" className="text-sm font-medium">
-                  Charge
-                </Label>
-                {isEditing ? (
-                  <Input
-                    id="charge"
-                    type="number"
-                    value={job.charge.toString()}
-                    onChange={(e) =>
-                      setJob({ ...job, charge: parseFloat(e.target.value) })
-                    }
-                  />
-                ) : (
-                  <p>{job.charge}</p>
-                )}
-              </div>
+              {/* START DATE */}
+              <Card className="bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 border hover:shadow-lg hover:scale-[1.01] transition-transform">
+                <CardHeader>
+                  <CardTitle>Start Date</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {isEditing ? (
+                    <Input
+                      type="date"
+                      value={
+                        new Date(job.startDate).toISOString().split("T")[0]
+                      }
+                      onChange={(e) =>
+                        setJob({
+                          ...job,
+                          startDate: new Date(e.target.value).getTime(),
+                        })
+                      }
+                    />
+                  ) : (
+                    <p>{new Date(job.startDate).toLocaleDateString()}</p>
+                  )}
+                </CardContent>
+              </Card>
 
-              {/* TAXES */}
-              <div className="flex flex-col space-y-1">
-                <Label htmlFor="taxes" className="text-sm font-medium">
-                  Taxes
-                </Label>
-                {isEditing ? (
-                  <Input
-                    id="taxes"
-                    type="number"
-                    value={job.taxes.toString()}
-                    onChange={(e) =>
-                      setJob({ ...job, taxes: parseFloat(e.target.value) })
-                    }
-                  />
-                ) : (
-                  <p>{job.taxes}</p>
-                )}
-              </div>
-
-              {/* EXPENSES */}
-              <div className="flex flex-col space-y-1">
-                <Label htmlFor="expenses" className="text-sm font-medium">
-                  Expenses
-                </Label>
-                {isEditing ? (
-                  <Input
-                    id="expenses"
-                    type="number"
-                    value={job.expenses.toString()}
-                    onChange={(e) =>
-                      setJob({ ...job, expenses: parseFloat(e.target.value) })
-                    }
-                  />
-                ) : (
-                  <p>{job.expenses}</p>
-                )}
-              </div>
+              {/* END DATE */}
+              <Card className="bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 border hover:shadow-lg hover:scale-[1.01] transition-transform">
+                <CardHeader>
+                  <CardTitle>End Date</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {isEditing ? (
+                    <Input
+                      type="date"
+                      value={new Date(job.endDate).toISOString().split("T")[0]}
+                      onChange={(e) =>
+                        setJob({
+                          ...job,
+                          endDate: new Date(e.target.value).getTime(),
+                        })
+                      }
+                    />
+                  ) : (
+                    <p>{new Date(job.endDate).toLocaleDateString()}</p>
+                  )}
+                </CardContent>
+              </Card>
             </div>
 
-            <Separator className="my-6" />
+            {/* FINANCES SECTION */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Finances</h2>
+              <Separator />
 
-            {/* ACTION BUTTONS */}
-            <div className="flex flex-col sm:flex-row gap-2 w-full">
-              {isEditing ? (
-                <>
-                  <Button
-                    onClick={handleSave}
-                    disabled={saving}
-                    variant="default"
-                    className="w-full sm:w-auto"
-                  >
-                    {saving ? "Saving..." : "Save Changes"}
-                  </Button>
-                  <Button
-                    onClick={handleCancelEdit}
-                    variant="outline"
-                    className="w-full sm:w-auto"
-                    disabled={saving}
-                  >
-                    Cancel
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button
-                    onClick={() => setIsEditing(true)}
-                    variant="default"
-                    className="w-full sm:w-auto"
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    onClick={() => router.push("/dashboard/jobs")}
-                    variant="outline"
-                    className="w-full sm:w-auto"
-                  >
-                    Back to Jobs
-                  </Button>
-                </>
-              )}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* COSTS */}
+                <Card className="bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 border hover:shadow-lg hover:scale-[1.01] transition-transform">
+                  <CardHeader>
+                    <CardTitle>Costs</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {isEditing ? (
+                      <Input
+                        type="number"
+                        value={job.costs.toString()}
+                        onChange={(e) =>
+                          setJob({ ...job, costs: parseFloat(e.target.value) })
+                        }
+                      />
+                    ) : (
+                      <p>{job.costs}</p>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* CHARGE */}
+                <Card className="bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 border hover:shadow-lg hover:scale-[1.01] transition-transform">
+                  <CardHeader>
+                    <CardTitle>Charge</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {isEditing ? (
+                      <Input
+                        type="number"
+                        value={job.charge.toString()}
+                        onChange={(e) =>
+                          setJob({
+                            ...job,
+                            charge: parseFloat(e.target.value),
+                          })
+                        }
+                      />
+                    ) : (
+                      <p>{job.charge}</p>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* TAXES */}
+                <Card className="bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 border hover:shadow-lg hover:scale-[1.01] transition-transform">
+                  <CardHeader>
+                    <CardTitle>Taxes</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {isEditing ? (
+                      <Input
+                        type="number"
+                        value={job.taxes.toString()}
+                        onChange={(e) =>
+                          setJob({
+                            ...job,
+                            taxes: parseFloat(e.target.value),
+                          })
+                        }
+                      />
+                    ) : (
+                      <p>{job.taxes}</p>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* EXPENSES */}
+                <Card className="bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 border hover:shadow-lg hover:scale-[1.01] transition-transform">
+                  <CardHeader>
+                    <CardTitle>Expenses</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {isEditing ? (
+                      <Input
+                        type="number"
+                        value={job.expenses.toString()}
+                        onChange={(e) =>
+                          setJob({
+                            ...job,
+                            expenses: parseFloat(e.target.value),
+                          })
+                        }
+                      />
+                    ) : (
+                      <p>{job.expenses}</p>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </CardContent>
         </Card>
-      </div>
+      </motion.div>
     </div>
   );
 };

@@ -7,7 +7,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Building2 } from "lucide-react";
+import { HardHat } from "lucide-react";
 import { Separator } from "./ui/separator";
 
 interface Company {
@@ -31,12 +31,14 @@ const CompanyCard = ({ company }: { company: Company | null }) => {
         {/* Header */}
         <CardHeader>
           <div className="flex items-center space-x-2">
-            <Building2 className="h-6 w-6" />
-            <CardTitle className="text-xl font-bold">
+            <div className="bg-orange-200 dark:bg-orange-700 p-2 rounded-md">
+              <HardHat className="w-5 h-5 text-orange-500 dark:text-orange-300" />
+            </div>
+            <CardTitle className="text-lg font-semibold dark:text-zinc-300">
               {company?.name || "No Company Name Available"}
             </CardTitle>
           </div>
-          <CardDescription className="text-blue-600 font-medium">
+          <CardDescription className="text-zinc-500 font-medium">
             {company?.businessType || "Business type not specified"}
           </CardDescription>
         </CardHeader>

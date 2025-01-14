@@ -22,6 +22,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"; // Import Tooltip
+import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -62,6 +67,10 @@ export function NavUser({
       variant: "destructive",
     });
   };
+
+  const shortcutKey = navigator.userAgent.toLowerCase().includes("mac")
+    ? "⌘ + ⇧ + L"
+    : "Ctrl + ⇧ + L";
 
   return (
     <SidebarMenu>
@@ -138,12 +147,23 @@ export function NavUser({
                 <Bell />
                 Notifications
               </DropdownMenuItem>
-              {/* Dark Mode Toggle */}
+              {/* Dark Mode Toggle with Tooltip */}
               <DropdownMenuItem className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <Moon />
-                  Dark Mode
-                </div>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-2">
+                      <Moon />
+                      Dark Mode
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    side="top"
+                    align="center"
+                    className="hidden md:block"
+                  >
+                    <p className="text-xs">{shortcutKey}</p>
+                  </TooltipContent>
+                </Tooltip>
                 <Switch
                   checked={theme === "dark"} // Check if the theme is dark
                   onCheckedChange={handleDarkModeToggle} // Toggle theme

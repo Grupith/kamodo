@@ -8,6 +8,7 @@ import CompanyCard from "@/components/CompanyCard";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useCompany } from "@/contexts/CompanyContext";
 import { ActiveJobsCard } from "@/components/ActiveJobsCard";
+import { JobStatsCard } from "@/components/JobStatsCard";
 
 export default function DashboardPage() {
   const { company, loading } = useCompany();
@@ -74,6 +75,13 @@ export default function DashboardPage() {
               <p>No company information available.</p>
             )}
           </div>
+
+          {/* NEW: Job Stats Card */}
+          {company && (
+            <div className="col-span-1">
+              <JobStatsCard companyId={company.id} />
+            </div>
+          )}
 
           {/* Active Jobs Card */}
           <div className="col-span-2 rounded-lg">
