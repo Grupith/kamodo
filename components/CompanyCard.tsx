@@ -27,7 +27,7 @@ const CompanyCard = ({ company }: { company: Company | null }) => {
       transition={{ duration: 0.5, ease: "easeOut" }}
       className="w-full"
     >
-      <Card className="border border-[var(--border)] bg-card bg-zinc-100 dark:bg-zinc-900 text-card-foreground">
+      <Card className="w-full border border-[var(--border)] bg-card bg-zinc-100 dark:bg-zinc-900 text-card-foreground">
         {/* Header */}
         <CardHeader>
           <div className="flex items-center space-x-2">

@@ -37,7 +37,9 @@ export function ActiveJobsCard({ jobs, onFilterChange }: ActiveJobsCardProps) {
             <div className="bg-green-200 dark:bg-green-900 p-2 rounded-md">
               <Activity className="h-5 w-5 text-green-500" />
             </div>
-            <CardTitle className="text-xl font-semibold">Active Jobs</CardTitle>
+            <CardTitle className="text-lg font-semibold dark:text-zinc-200">
+              Active Jobs
+            </CardTitle>
           </div>
 
           {/* Filter Dropdown Menu */}

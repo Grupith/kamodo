@@ -66,9 +66,9 @@ export default function DashboardPage() {
     <ProtectedRoute>
       <div className="p-4">
         <h1 className="text-2xl font-semibold mb-6">Dashboard</h1>
-        <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="grid sm:grid-cols-1 lg:grid-cols-3 gap-4">
           {/* CompanyCard */}
-          <div className="col-span-1 lg:col-span-2">
+          <div className="sm:col-span-1 lg:col-span-1">
             {company ? (
               <CompanyCard company={company} />
             ) : (
@@ -78,13 +78,13 @@ export default function DashboardPage() {
 
           {/* NEW: Job Stats Card */}
           {company && (
-            <div className="col-span-1">
+            <div className="sm:col-span-1">
               <JobStatsCard companyId={company.id} />
             </div>
           )}
 
           {/* Active Jobs Card */}
-          <div className="col-span-2 rounded-lg">
+          <div className="sm:col-span-2 rounded-lg">
             <ActiveJobsCard
               jobs={topJobs}
               onFilterChange={handleFilterChange}

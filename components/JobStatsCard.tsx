@@ -55,7 +55,7 @@ export function JobStatsCard({ companyId }: JobStatsCardProps) {
   }, [companyId]);
 
   return (
-    <Card className="bg-zinc-100 dark:bg-zinc-900 dark:border-zinc-800 border cursor-pointer hover:shadow-lg hover:scale-[1.01] transition-transform">
+    <Card className="h-full bg-zinc-100 dark:bg-zinc-900 dark:border-zinc-800 border cursor-pointer hover:shadow-lg hover:scale-[1.01] transition-transform">
       <CardHeader>
         <div className="flex items-center space-x-2">
           <div className="bg-blue-200 dark:bg-blue-900 p-2 rounded-md">
