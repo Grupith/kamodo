@@ -10,7 +10,7 @@ import {
   Moon,
 } from "lucide-react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,6 +32,7 @@ import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes"; // Import the useTheme hook
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
+import Image from "next/image";
 
 export function NavUser({
   user,
@@ -71,8 +72,13 @@ export function NavUser({
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-8 w-8 rounded-full">
-                <AvatarImage src={user.avatar} alt={"avatar image"} />
+              <Avatar className="h-8 w-8 rounded-lg">
+                <Image
+                  src={user.avatar}
+                  alt={"avatar image"}
+                  width={100}
+                  height={100}
+                />
                 <AvatarFallback className="rounded-lg">CN</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
@@ -93,7 +99,12 @@ export function NavUser({
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={"avatar image"} />
+                  <Image
+                    src={user.avatar}
+                    alt={"avatar image"}
+                    width={100}
+                    height={100}
+                  />
                   <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
@@ -106,7 +117,7 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem className="hover:cursor-pointer">
                 <Sparkles />
                 Upgrade to Pro
               </DropdownMenuItem>
@@ -114,16 +125,16 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <Link href="/dashboard/settings">
-                <DropdownMenuItem>
+                <DropdownMenuItem className="hover:cursor-pointer">
                   <BadgeCheck />
                   Account
                 </DropdownMenuItem>
               </Link>
-              <DropdownMenuItem>
+              <DropdownMenuItem className="hover:cursor-pointer">
                 <CreditCard />
                 Billing
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem className="hover:cursor-pointer">
                 <Bell />
                 Notifications
               </DropdownMenuItem>

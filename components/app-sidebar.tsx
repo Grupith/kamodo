@@ -132,7 +132,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     if (!loading) {
       fetchUser();
     }
-  }, [user, loading]);
+  }, [user, loading, userData]);
 
   return (
     <Sidebar
@@ -157,7 +157,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             }}
           />
         ) : (
-          <div>Loading user data...</div>
+          <div className="flex justify-center items-center animate-pulse">
+            <p>Loading user data...</p>
+          </div>
         )}
       </SidebarFooter>
       <SidebarRail />

@@ -124,7 +124,7 @@ export default function EquipmentPage() {
     <ProtectedRoute>
       <div className="p-4 min-h-screen bg-background text-foreground">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
-          <h2 className="text-3xl font-bold">Equipment</h2>
+          <h2 className="text-2xl font-semibold">Equipment</h2>
           <div className="flex flex-col sm:flex-row sm:space-x-4 gap-4 sm:gap-0">
             <Input
               ref={inputRef}

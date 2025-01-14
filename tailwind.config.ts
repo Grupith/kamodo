@@ -9,10 +9,15 @@ export default {
   darkMode: "class", // Ensure this matches next-themes configuration
   safelist: [
     {
-      pattern: /bg-(green|red|yellow|blue)-(100|900)/, // Safelist dynamic backgrounds
+      // Matches any of these colors plus gray, and any shade from 100 to 900
+      // e.g. bg-green-100, bg-green-200, ... up to bg-green-900
+      pattern:
+        /bg-(green|red|yellow|blue|gray)-(100|200|300|400|500|600|700|800|900)/,
     },
     {
-      pattern: /text-(green|red|yellow|blue)-(300|800)/, // Safelist dynamic text colors
+      // Same for text- classes
+      pattern:
+        /text-(green|red|yellow|blue|gray)-(100|200|300|400|500|600|700|800|900)/,
     },
   ],
   theme: {
