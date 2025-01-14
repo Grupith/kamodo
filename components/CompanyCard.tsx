@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Building2 } from "lucide-react";
+import { Separator } from "./ui/separator";
 
 interface Company {
   name: string;
@@ -39,7 +40,7 @@ const CompanyCard = ({ company }: { company: Company | null }) => {
             {company?.businessType || "Business type not specified"}
           </CardDescription>
         </CardHeader>
-        <hr className="mx-6 mb-6" />
+        <Separator />
         {/* Company Details */}
         <CardContent className="space-y-3">
           <div className="flex justify-between items-center">
