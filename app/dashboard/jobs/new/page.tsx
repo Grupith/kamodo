@@ -18,6 +18,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import {
+  BookPlus,
+  CircleDollarSign,
+  Clock,
+  Hammer,
+  UserPlus,
+} from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 
 interface Customer {
   id: string;
@@ -117,36 +125,54 @@ const CreateJob = () => {
   };
 
   return (
-    <div className="py-10 sm:py-16 bg-background min-h-screen">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-10">
-          <h1 className="text-3xl font-bold tracking-tight">Create New Job</h1>
+    <div className="sm:py-4 bg-background min-h-screen">
+      <div className="max-w-4xl mx-auto px-4 lg:px-4">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold tracking-tight">Add a new Job</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Fill in the details below to create a new job.
           </p>
         </div>
 
-        <Card className="bg-zinc-100 dark:bg-zinc-900 border dark:border-zinc-800">
-          <CardHeader>
-            <CardTitle>Job Information</CardTitle>
+        <Card className="bg-zinc-100 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 rounded-md shadow-sm p-4 sm:p-4">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex py-2 marker:placeholder:*:flex items-center text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+              <BookPlus className="w-5 h-5 mr-2 text-zinc-700 dark:text-zinc-300" />
+              Basic Information
+            </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+
+          <CardContent className="space-y-6 mt-4">
             {/* Job Name */}
             <div>
-              <label className="block text-sm font-medium text-muted-foreground">
+              <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
                 Job Name <span className="text-red-500">*</span>
               </label>
               <Input
                 value={jobName}
                 onChange={(e) => setJobName(e.target.value)}
                 required
+                className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700"
               />
             </div>
+
+            {/* Description */}
+            <div>
+              <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                Description
+              </label>
+              <Textarea className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700" />
+            </div>
+
+            <CardTitle className="py-2 flex items-center text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+              <Clock className="w-5 h-5 mr-2 text-zinc-700 dark:text-zinc-300" />
+              Date & Time
+            </CardTitle>
 
             {/* Start Date and End Date */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-muted-foreground">
+                <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   Start Date <span className="text-red-500">*</span>
                 </label>
                 <Input
@@ -154,10 +180,11 @@ const CreateJob = () => {
                   value={startDate ? startDate.toISOString().split("T")[0] : ""}
                   onChange={(e) => setStartDate(new Date(e.target.value))}
                   required
+                  className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 w-1/3"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-muted-foreground">
+                <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   End Date <span className="text-red-500">*</span>
                 </label>
                 <Input
@@ -165,35 +192,69 @@ const CreateJob = () => {
                   value={endDate ? endDate.toISOString().split("T")[0] : ""}
                   onChange={(e) => setEndDate(new Date(e.target.value))}
                   required
+                  className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 w-1/3"
                 />
               </div>
             </div>
 
-            {/* Repeats */}
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground">
-                Repeats
-              </label>
-              <Select value={repeats} onValueChange={setRepeats}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select repeat frequency" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="no">No</SelectItem>
-                  <SelectItem value="daily">Daily</SelectItem>
-                  <SelectItem value="weekly">Weekly</SelectItem>
-                  <SelectItem value="monthly">Monthly</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="flex justify-start space-x-10">
+              {/* Repeats */}
+              <div className="w-1/3">
+                <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                  Frequency
+                </label>
+                <Select value={repeats} onValueChange={setRepeats}>
+                  <SelectTrigger className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700">
+                    <SelectValue placeholder="Select repeat frequency" />
+                  </SelectTrigger>
+                  <SelectContent className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700">
+                    <SelectItem value="no">No</SelectItem>
+                    <SelectItem value="daily">Daily</SelectItem>
+                    <SelectItem value="weekly">Weekly</SelectItem>
+                    <SelectItem value="monthly">Monthly</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Status */}
+              <div className="w-1/3">
+                <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                  Status
+                </label>
+                <Select value={status} onValueChange={setStatus}>
+                  <SelectTrigger className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700">
+                    <SelectValue placeholder="Select job status" />
+                  </SelectTrigger>
+                  <SelectContent className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700">
+                    <SelectItem value="active" className="cursor-pointer">
+                      Active
+                    </SelectItem>
+                    <SelectItem value="pending" className="cursor-pointer">
+                      Pending
+                    </SelectItem>
+                    <SelectItem value="completed" className="cursor-pointer">
+                      Completed
+                    </SelectItem>
+                    <SelectItem value="inactive" className="cursor-pointer">
+                      Inactive
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
-            {/* Assigned Employees (comma-separated) */}
+            <CardTitle className="py-2 flex items-center text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+              <UserPlus className="w-5 h-5 mr-2 text-zinc-700 dark:text-zinc-300" />
+              Assign Employees
+            </CardTitle>
+            {/* Assigned Employees */}
             <div>
-              <label className="block text-sm font-medium text-muted-foreground">
-                Assigned Employees (comma-separated)
+              <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                Select your employees for this job
               </label>
               <Input
                 placeholder="e.g. Alice, Bob, Charlie"
+                className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 w-1/2"
                 value={assignedEmployees.join(", ")}
                 onChange={(e) =>
                   setAssignedEmployees(
@@ -206,21 +267,29 @@ const CreateJob = () => {
               />
             </div>
 
+            <CardTitle className="py-2 flex items-center text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+              <UserPlus className="w-5 h-5 mr-2 text-zinc-700 dark:text-zinc-300" />
+              Assign a Customer
+            </CardTitle>
             {/* Customer Selection */}
             <div>
-              <label className="block text-sm font-medium text-muted-foreground">
+              <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
                 Customer <span className="text-red-500">*</span>
               </label>
               <Select
-                onValueChange={(value) => setSelectedCustomer(value)}
+                onValueChange={setSelectedCustomer}
                 value={selectedCustomer}
               >
-                <SelectTrigger>
+                <SelectTrigger className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 w-1/2">
                   <SelectValue placeholder="Select a Customer" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700">
                   {customers.map((customer) => (
-                    <SelectItem key={customer.id} value={customer.id}>
+                    <SelectItem
+                      key={customer.id}
+                      value={customer.id}
+                      className="cursor-pointer"
+                    >
                       {customer.name}
                     </SelectItem>
                   ))}
@@ -228,14 +297,20 @@ const CreateJob = () => {
               </Select>
             </div>
 
-            {/* Selected Equipment (comma-separated) */}
+            <CardTitle className="py-2 flex items-center text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+              <Hammer className="w-5 h-5 mr-2 text-zinc-700 dark:text-zinc-300" />
+              Choose Equipment
+            </CardTitle>
+
+            {/* Selected Equipment */}
             <div>
-              <label className="block text-sm font-medium text-muted-foreground">
+              <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
                 Selected Equipment (comma-separated)
               </label>
               <Input
                 placeholder="e.g. Backhoe, Crane"
                 value={selectedEquipment.join(", ")}
+                className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 w-1/2"
                 onChange={(e) =>
                   setSelectedEquipment(
                     e.target.value
@@ -248,10 +323,15 @@ const CreateJob = () => {
             </div>
 
             {/* Costs, Charge, Taxes, Expenses */}
+
+            <CardTitle className="py-2 flex items-center text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+              <CircleDollarSign className="w-5 h-5 mr-2 text-zinc-700 dark:text-zinc-300" />
+              Financial
+            </CardTitle>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Costs */}
               <div>
-                <label className="block text-sm font-medium text-muted-foreground">
+                <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   Costs
                 </label>
                 <Input
@@ -260,12 +340,11 @@ const CreateJob = () => {
                   placeholder="e.g. 100.00"
                   value={costs}
                   onChange={(e) => setCosts(e.target.value)}
+                  className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700"
                 />
               </div>
-
-              {/* Charge */}
               <div>
-                <label className="block text-sm font-medium text-muted-foreground">
+                <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   Charge
                 </label>
                 <Input
@@ -274,12 +353,11 @@ const CreateJob = () => {
                   placeholder="e.g. 150.00"
                   value={charge}
                   onChange={(e) => setCharge(e.target.value)}
+                  className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700"
                 />
               </div>
-
-              {/* Taxes */}
               <div>
-                <label className="block text-sm font-medium text-muted-foreground">
+                <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   Taxes
                 </label>
                 <Input
@@ -288,12 +366,11 @@ const CreateJob = () => {
                   placeholder="e.g. 15.00"
                   value={taxes}
                   onChange={(e) => setTaxes(e.target.value)}
+                  className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700"
                 />
               </div>
-
-              {/* Expenses */}
               <div>
-                <label className="block text-sm font-medium text-muted-foreground">
+                <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   Expenses
                 </label>
                 <Input
@@ -302,32 +379,21 @@ const CreateJob = () => {
                   placeholder="e.g. 25.00"
                   value={expenses}
                   onChange={(e) => setExpenses(e.target.value)}
+                  className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700"
                 />
               </div>
             </div>
 
-            {/* Status */}
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground">
-                Status
-              </label>
-              <Select value={status} onValueChange={setStatus}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select job status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
             {/* Save Job */}
-            <Button onClick={handleSaveJob} className="w-full">
-              Save Job
-            </Button>
+            <div className="flex justify-center pt-4">
+              <Button
+                onClick={handleSaveJob}
+                className="w-full sm:w-1/3"
+                variant="default"
+              >
+                Save Job
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

@@ -130,6 +130,7 @@ const JobsDashboard = () => {
               variant="default"
             >
               <Plus size={16} />
+              New
             </Button>
           </div>
         </div>
