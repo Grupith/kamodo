@@ -130,6 +130,7 @@ const JobDetails = () => {
       toast({
         title: "Job Updated",
         description: "Job details have been successfully updated.",
+        variant: "default",
       });
     } catch (error) {
       console.error("Error updating job:", error);
@@ -198,15 +199,15 @@ const JobDetails = () => {
   }
 
   return (
-    <div className="py-4 sm:py-4 bg-background min-h-screen">
+    <div className="py-4 sm:py-4 bg-background min-h-screen mx-auto w-full">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className="max-w-6xl mx-auto px-4 sm:px-4 lg:px-6"
+        className="max-w-6xl px-4 sm:px-4 lg:px-6"
       >
         {/* Page Header */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-8 flex items-center justify-between border-b border-zinc-500 dark:border-zinc-300 pb-4">
           <div>
             {isEditing ? (
               <Input

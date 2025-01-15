@@ -19,13 +19,16 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import {
-  BookPlus,
   CircleDollarSign,
+  ClipboardPen,
   Clock,
   Hammer,
   UserPlus,
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
+import { DatePickerWithRange } from "@/components/DatePickerWithRange";
+import type { DateRange } from "react-day-picker";
+import { differenceInDays } from "date-fns";
 
 interface Customer {
   id: string;
@@ -38,8 +41,6 @@ const CreateJob = () => {
   const router = useRouter();
 
   const [jobName, setJobName] = useState("");
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
   const [repeats, setRepeats] = useState("no");
   const [assignedEmployees, setAssignedEmployees] = useState<string[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState("");
@@ -51,6 +52,17 @@ const CreateJob = () => {
   const [expenses, setExpenses] = useState("");
   const [status, setStatus] = useState("active");
   const { toast } = useToast();
+
+  // Set date range state for the job
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: new Date(),
+    to: new Date(),
+  });
+  const [totalDays, setTotalDays] = useState<number>(0);
+
+  // Extract start/end from dateRange
+  const startDate = dateRange?.from;
+  const endDate = dateRange?.to;
 
   // Fetch customers for the select
   useEffect(() => {
@@ -78,6 +90,17 @@ const CreateJob = () => {
     fetchCustomers();
   }, [companyId]);
 
+  useEffect(() => {
+    if (dateRange?.from && dateRange?.to) {
+      // Inclusive count of days
+      const days = differenceInDays(dateRange.to, dateRange.from) + 1;
+
+      setTotalDays(days);
+    } else {
+      setTotalDays(0);
+    }
+  }, [dateRange]);
+
   // Handle form submission
   const handleSaveJob = async () => {
     if (!jobName || !selectedCustomer || !startDate || !endDate) {
@@ -94,8 +117,6 @@ const CreateJob = () => {
 
     const jobData = {
       jobName,
-      startDate: startDate.toISOString(),
-      endDate: endDate.toISOString(),
       repeats,
       assignedEmployees,
       selectedCustomer,
@@ -107,11 +128,14 @@ const CreateJob = () => {
       status,
       createdBy: user?.uid,
       createdAt: new Date().toISOString(),
+      startDate: dateRange?.from ? dateRange.from.toISOString() : null,
+      endDate: dateRange?.to ? dateRange.to.toISOString() : null,
+      totalDays,
     };
 
     try {
       const jobId = await createJob(companyId, jobData);
-      console.log("Job created with ID:", jobId);
+      console.log(jobId, "Job created in database", jobData);
       toast({
         title: "Job Created Successfully!",
         description: "View your job on the jobs page",
@@ -127,17 +151,19 @@ const CreateJob = () => {
   return (
     <div className="sm:py-4 bg-background min-h-screen">
       <div className="max-w-4xl mx-auto px-4 lg:px-4">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold tracking-tight">Add a new Job</h1>
+        <div className="my-4">
+          <h1 className="text-2xl font-bold tracking-tight">Create Job</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Fill in the details below to create a new job.
           </p>
         </div>
 
-        <Card className="bg-zinc-100 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 rounded-md shadow-sm p-4 sm:p-4">
+        {/* Basic Information Section */}
+
+        <Card className="mt-8 bg-zinc-100 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 rounded-md shadow-sm p-2">
           <CardHeader className="pb-2">
-            <CardTitle className="flex py-2 marker:placeholder:*:flex items-center text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-              <BookPlus className="w-5 h-5 mr-2 text-zinc-700 dark:text-zinc-300" />
+            <CardTitle className="flex pb-2 marker:placeholder:*:flex items-center text-lg font-semibold text-zinc-900 dark:text-zinc-100 border-b border-zinc-400 dark:border-zinc-700">
+              <ClipboardPen className="w-5 h-5 mr-2 text-zinc-700 dark:text-zinc-300" />
               Basic Information
             </CardTitle>
           </CardHeader>
@@ -164,44 +190,33 @@ const CreateJob = () => {
               <Textarea className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700" />
             </div>
 
-            <CardTitle className="py-2 flex items-center text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+            {/* Date & Time Section */}
+
+            <CardTitle className="py-2 flex items-center text-lg font-semibold text-zinc-900 dark:text-zinc-100 border-b border-zinc-400 dark:border-zinc-700">
               <Clock className="w-5 h-5 mr-2 text-zinc-700 dark:text-zinc-300" />
               Date & Time
+              <span className="text-sm text-muted-foreground dark:text-muted-foreground ml-2">
+                ({totalDays} {totalDays === 1 ? "day" : "days"})
+              </span>
             </CardTitle>
 
-            {/* Start Date and End Date */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Start Date <span className="text-red-500">*</span>
-                </label>
-                <Input
-                  type="date"
-                  value={startDate ? startDate.toISOString().split("T")[0] : ""}
-                  onChange={(e) => setStartDate(new Date(e.target.value))}
-                  required
-                  className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 w-1/3"
-                />
-              </div>
-              <div>
-                <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  End Date <span className="text-red-500">*</span>
-                </label>
-                <Input
-                  type="date"
-                  value={endDate ? endDate.toISOString().split("T")[0] : ""}
-                  onChange={(e) => setEndDate(new Date(e.target.value))}
-                  required
-                  className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 w-1/3"
-                />
-              </div>
+            {/* Date Range Picker */}
+            <div className="mb-4">
+              <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                Date Range <span className="text-red-500">*</span>
+              </label>
+              <DatePickerWithRange
+                dateRange={dateRange}
+                onDateChange={setDateRange}
+                className="mt-2"
+              />
             </div>
 
             <div className="flex justify-start space-x-10">
               {/* Repeats */}
-              <div className="w-1/3">
+              <div className="w-2/5">
                 <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Frequency
+                  Repeat
                 </label>
                 <Select value={repeats} onValueChange={setRepeats}>
                   <SelectTrigger className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700">
@@ -217,7 +232,7 @@ const CreateJob = () => {
               </div>
 
               {/* Status */}
-              <div className="w-1/3">
+              <div className="w-2/5">
                 <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   Status
                 </label>
@@ -226,16 +241,28 @@ const CreateJob = () => {
                     <SelectValue placeholder="Select job status" />
                   </SelectTrigger>
                   <SelectContent className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700">
-                    <SelectItem value="active" className="cursor-pointer">
+                    <SelectItem
+                      value="active"
+                      className="cursor-pointer bg-green-200 text-green-800 border-green-300 hover:bg-green-300"
+                    >
                       Active
                     </SelectItem>
-                    <SelectItem value="pending" className="cursor-pointer">
+                    <SelectItem
+                      value="pending"
+                      className="cursor-pointer bg-yellow-100 text-yellow-800 border-yellow-300 hover:bg-yellow-200"
+                    >
                       Pending
                     </SelectItem>
-                    <SelectItem value="completed" className="cursor-pointer">
+                    <SelectItem
+                      value="completed"
+                      className="cursor-pointer bg-blue-100 text-blue-800 border-blue-300 hover:bg-blue-200"
+                    >
                       Completed
                     </SelectItem>
-                    <SelectItem value="inactive" className="cursor-pointer">
+                    <SelectItem
+                      value="inactive"
+                      className="cursor-pointer bg-gray-100 text-gray-800 border-gray-300 hover:bg-gray-200"
+                    >
                       Inactive
                     </SelectItem>
                   </SelectContent>
@@ -243,11 +270,13 @@ const CreateJob = () => {
               </div>
             </div>
 
-            <CardTitle className="py-2 flex items-center text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+            {/* Assigned Employees Section */}
+
+            <CardTitle className="py-2 flex items-center text-lg font-semibold text-zinc-900 dark:text-zinc-100 border-b border-zinc-400 dark:border-zinc-700">
               <UserPlus className="w-5 h-5 mr-2 text-zinc-700 dark:text-zinc-300" />
               Assign Employees
             </CardTitle>
-            {/* Assigned Employees */}
+            {/* Select Employees */}
             <div>
               <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
                 Select your employees for this job
@@ -267,11 +296,13 @@ const CreateJob = () => {
               />
             </div>
 
-            <CardTitle className="py-2 flex items-center text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+            {/* Customer Section */}
+
+            <CardTitle className="py-2 flex items-center text-lg font-semibold text-zinc-900 dark:text-zinc-100 border-b border-zinc-400 dark:border-zinc-700">
               <UserPlus className="w-5 h-5 mr-2 text-zinc-700 dark:text-zinc-300" />
               Assign a Customer
             </CardTitle>
-            {/* Customer Selection */}
+            {/* Select customer for job */}
             <div>
               <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
                 Customer <span className="text-red-500">*</span>
@@ -297,12 +328,14 @@ const CreateJob = () => {
               </Select>
             </div>
 
-            <CardTitle className="py-2 flex items-center text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+            {/* Equipment Section */}
+
+            <CardTitle className="py-2 flex items-center text-lg font-semibold text-zinc-900 dark:text-zinc-100 border-b border-zinc-400 dark:border-zinc-700">
               <Hammer className="w-5 h-5 mr-2 text-zinc-700 dark:text-zinc-300" />
               Choose Equipment
             </CardTitle>
 
-            {/* Selected Equipment */}
+            {/* Select equipment for job */}
             <div>
               <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
                 Selected Equipment (comma-separated)

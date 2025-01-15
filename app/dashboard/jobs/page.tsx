@@ -10,7 +10,6 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { useCompany } from "@/contexts/CompanyContext";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/firebase/firebase";
@@ -24,7 +23,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Activity, Plus, RefreshCcw } from "lucide-react";
+import { Activity, FileStack, Plus, RefreshCcw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -104,18 +103,18 @@ const JobsDashboard = () => {
   const activeJobs = jobs.filter((job) => job.status === "active");
 
   return (
-    <div className="py-4 sm:py-4 bg-background min-h-screen">
+    <div className="py-4 sm:py-4 bg-background min-h-screen mx-auto">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
         className="max-w-6xl px-4 sm:px-4 lg:px-6"
       >
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-8 flex items-center justify-between border-b pb-6">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Jobs</h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Manage active jobs and job-related data.
+            <p className="mt-2 text-sm text-muted-foreground mr-10">
+              View, Create, and Manage all your Jobs.
             </p>
           </div>
           <div className="flex items-center justify-between space-x-4">
@@ -135,8 +134,6 @@ const JobsDashboard = () => {
           </div>
         </div>
 
-        <Separator className="my-3" />
-
         <div className="mb-10">
           <div className="flex items-center space-x-2">
             <Activity
@@ -147,7 +144,7 @@ const JobsDashboard = () => {
               Active Jobs
             </h2>
           </div>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="my-3 text-sm text-muted-foreground">
             Here are the jobs currently in progress.
           </p>
 
@@ -208,8 +205,13 @@ const JobsDashboard = () => {
         </div>
 
         <div>
-          <h2 className="text-2xl font-semibold tracking-tight">All Jobs</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <div className="flex items-center space-x-2">
+            <FileStack size={24} className="text-blue-500" />
+            <h2 className="text-xl font-semibold tracking-tight flex">
+              Total Jobs
+            </h2>
+          </div>
+          <p className="my-3 text-sm text-muted-foreground">
             View the history and details of all jobs.
           </p>
 
