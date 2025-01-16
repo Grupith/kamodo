@@ -102,6 +102,7 @@ export async function fetchCustomerById(companyId: string, customerId: string) {
     throw new Error("Customer not found");
   }
 }
+
 // Delete customer by ID
 export async function deleteCustomerById(
   companyId: string,
@@ -152,6 +153,7 @@ export async function fetchEmployeeById(companyId: string, employeeId: string) {
     throw new Error("Employee not found");
   }
 }
+
 // Delete employee by ID
 export const deleteEmployeeById = async (
   companyId: string,
@@ -176,6 +178,7 @@ export const deleteEmployeeById = async (
     throw error; // Rethrow the error to handle it in the calling function
   }
 };
+
 // Fetch equipment for a company
 export const getEquipmentForCompany = async (companyId: string) => {
   if (!companyId) {
@@ -220,6 +223,7 @@ export const fetchEquipmentById = async (
     throw error;
   }
 };
+
 // Delete equipment by ID
 export async function deleteEquipmentById(
   companyId: string,

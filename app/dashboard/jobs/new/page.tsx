@@ -29,6 +29,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { DatePickerWithRange } from "@/components/DatePickerWithRange";
 import type { DateRange } from "react-day-picker";
 import { differenceInDays } from "date-fns";
+import StatusSelector from "@/components/StatusSelector";
 
 interface Customer {
   id: string;
@@ -233,40 +234,13 @@ const CreateJob = () => {
 
               {/* Status */}
               <div className="w-2/5">
-                <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="block mb-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   Status
                 </label>
-                <Select value={status} onValueChange={setStatus}>
-                  <SelectTrigger className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700">
-                    <SelectValue placeholder="Select job status" />
-                  </SelectTrigger>
-                  <SelectContent className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700">
-                    <SelectItem
-                      value="active"
-                      className="cursor-pointer bg-green-200 text-green-800 border-green-300 hover:bg-green-300"
-                    >
-                      Active
-                    </SelectItem>
-                    <SelectItem
-                      value="pending"
-                      className="cursor-pointer bg-yellow-100 text-yellow-800 border-yellow-300 hover:bg-yellow-200"
-                    >
-                      Pending
-                    </SelectItem>
-                    <SelectItem
-                      value="completed"
-                      className="cursor-pointer bg-blue-100 text-blue-800 border-blue-300 hover:bg-blue-200"
-                    >
-                      Completed
-                    </SelectItem>
-                    <SelectItem
-                      value="inactive"
-                      className="cursor-pointer bg-gray-100 text-gray-800 border-gray-300 hover:bg-gray-200"
-                    >
-                      Inactive
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+                <StatusSelector
+                  value={status}
+                  onChange={(newStatus) => setStatus(newStatus)}
+                />
               </div>
             </div>
 

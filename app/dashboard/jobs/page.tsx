@@ -1,8 +1,14 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/firebase/firebase";
+
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
@@ -10,47 +16,46 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { useCompany } from "@/contexts/CompanyContext";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "@/firebase/firebase";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import StatusTag from "@/components/StatusTag";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-import { Activity, FileStack, Plus, RefreshCcw } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { Skeleton } from "@/components/ui/skeleton";
+import DataTable from "@/components/ui/data-table";
+import { ColumnDef } from "@tanstack/react-table";
 
-const JobsDashboard = () => {
+import {
+  AdjustmentsHorizontalIcon,
+  FolderPlusIcon,
+  FolderIcon,
+} from "@heroicons/react/24/outline";
+import { useCompany } from "@/contexts/CompanyContext";
+import { Skeleton } from "@/components/ui/skeleton";
+import { RotateCcw } from "lucide-react";
+
+interface Job {
+  id: string;
+  jobName: string;
+  description?: string;
+  status: string;
+  createdAt: number;
+  image?: string;
+}
+
+export default function JobsDashboard() {
+  const router = useRouter();
   const { id: companyId } = useCompany();
 
-  interface Job {
-    id: string;
-    jobName: string;
-    description?: string;
-    status: string;
-    createdAt: number;
-    image?: string;
-  }
-
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [view, setView] = useState<"cards" | "table">("cards");
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const jobsPerPage = 6;
-  const totalPages = Math.ceil(jobs.length / jobsPerPage);
-  const router = useRouter();
+
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const fetchJobs = useCallback(async () => {
     if (!companyId) return;
+    setLoading(true);
 
     try {
-      setLoading(true);
       const jobsRef = collection(db, "companies", companyId, "jobs");
       const snapshot = await getDocs(jobsRef);
 
@@ -65,24 +70,80 @@ const JobsDashboard = () => {
     } finally {
       setLoading(false);
     }
-  }, [companyId]); // Memoize with `companyId` as a dependency
+  }, [companyId]);
 
   useEffect(() => {
     fetchJobs();
   }, [fetchJobs]);
 
-  // Pagination functions
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
+  // Filter jobs whenever `jobs` or `searchTerm` changes
+  useEffect(() => {
+    const term = searchTerm.toLowerCase();
+
+    const filtered = jobs.filter((job) => {
+      const { jobName = "", description = "", status = "" } = job;
+      // Add more fields if needed (e.g., assignedEmployees, etc.)
+      return (
+        jobName.toLowerCase().includes(term) ||
+        description.toLowerCase().includes(term) ||
+        status.toLowerCase().includes(term)
+      );
+    });
+
+    setFilteredJobs(filtered);
+  }, [jobs, searchTerm]);
+
+  // Toggle cards ↔ table
+  const toggleView = () => {
+    setView((prev) => (prev === "cards" ? "table" : "cards"));
+  };
+
+  // Handle "Enter" to jump to first match, or "Escape" to clear
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && filteredJobs.length > 0) {
+      router.push(`/dashboard/jobs/${filteredJobs[0].id}`);
+    }
+    if (e.key === "Escape") {
+      setSearchTerm("");
+      inputRef.current?.blur();
     }
   };
 
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
+  // DataTable columns
+  const columns: ColumnDef<Job>[] = [
+    {
+      id: "jobName",
+      accessorKey: "jobName",
+      header: "Job Name",
+      cell: ({ row }) => row.original.jobName || "No Name",
+    },
+    {
+      id: "status",
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => (
+        <StatusTag
+          status={row.original.status}
+          jobId={row.original.id}
+          companyId={companyId}
+          onStatusChange={(newStatus) =>
+            setJobs((prevJobs) =>
+              prevJobs.map((j) =>
+                j.id === row.original.id ? { ...j, status: newStatus } : j
+              )
+            )
+          }
+        />
+      ),
+    },
+    {
+      id: "createdAt",
+      accessorKey: "createdAt",
+      header: "Created",
+      cell: ({ row }) =>
+        new Date(row.original.createdAt).toLocaleDateString() || "",
+    },
+  ];
 
   if (loading) {
     return (
@@ -96,223 +157,158 @@ const JobsDashboard = () => {
     );
   }
 
-  const indexOfLastJob = currentPage * jobsPerPage;
-  const indexOfFirstJob = indexOfLastJob - jobsPerPage;
-  const currentJobs = jobs.slice(indexOfFirstJob, indexOfLastJob);
-
-  const activeJobs = jobs.filter((job) => job.status === "active");
-
   return (
-    <div className="py-4 sm:py-4 bg-background min-h-screen mx-auto">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        className="max-w-6xl px-4 sm:px-4 lg:px-6"
-      >
-        <div className="mb-8 flex items-center justify-between border-b pb-6">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Jobs</h1>
-            <p className="mt-2 text-sm text-muted-foreground mr-10">
-              View, Create, and Manage all your Jobs.
-            </p>
-          </div>
-          <div className="flex items-center justify-between space-x-4">
-            <Button onClick={() => fetchJobs()} variant="secondary">
-              <RefreshCcw size={16} />
+    <div className="min-h-screen p-4 bg-background text-foreground">
+      {/* HEADER / CONTROLS */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
+        <h1 className="text-2xl font-semibold tracking-tight">Jobs</h1>
+        <div className="flex flex-col sm:flex-row sm:space-x-4 gap-4 sm:gap-0">
+          {/* SEARCH INPUT */}
+          <Input
+            ref={inputRef}
+            type="text"
+            placeholder="Search jobs..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="w-full"
+          />
+          <div className="flex gap-4">
+            {/* TOGGLE VIEW */}
+            <Button variant="outline" size="icon" onClick={toggleView}>
+              <AdjustmentsHorizontalIcon className="w-4 h-4" />
             </Button>
-            <Button
-              onClick={() => {
-                router.push("/dashboard/jobs/new");
-                console.log("Create new job");
-              }}
-              variant="default"
-            >
-              <Plus size={16} />
-              New
+            {/* REFRESH */}
+            <Button variant="outline" size="icon" onClick={() => fetchJobs()}>
+              <RotateCcw className="w-4 h-4" />
+            </Button>
+            {/* NEW JOB */}
+            <Button variant="outline" asChild>
+              <Link href="/dashboard/jobs/new">
+                <FolderPlusIcon className="w-4 h-4" />
+                Add
+              </Link>
             </Button>
           </div>
         </div>
+      </div>
 
-        <div className="mb-10">
-          <div className="flex items-center space-x-2">
-            <Activity
-              size={24}
-              className="text-green-500 dark:text-green-400"
-            />
-            <h2 className="text-xl font-semibold tracking-tight dark:text-zinc-100">
-              Active Jobs
-            </h2>
-          </div>
-          <p className="my-3 text-sm text-muted-foreground">
-            Here are the jobs currently in progress.
-          </p>
-
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 mt-6">
-            {activeJobs.length > 0 ? (
-              activeJobs.map((job) => (
+      {/* TOGGLE: CARDS or TABLE */}
+      {view === "cards" ? (
+        <motion.div
+          className="grid gap-6 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3"
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: { opacity: 0, y: 20 },
+            visible: {
+              opacity: 1,
+              y: 0,
+              transition: { staggerChildren: 0.1 },
+            },
+          }}
+        >
+          {filteredJobs.length > 0 ? (
+            filteredJobs.map((job) => (
+              <motion.div
+                key={job.id}
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  visible: { opacity: 1, y: 0 },
+                }}
+              >
                 <Card
-                  key={job.id}
-                  onClick={() => {
-                    router.push(`/dashboard/jobs/${job.id}`);
-                  }}
-                  className="border dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 cursor-pointer hover:scale-105 transition-all"
+                  className="
+                    group
+                    relative
+                    overflow-hidden
+                    rounded-lg
+                    border
+                    bg-zinc-100
+                    dark:bg-zinc-900
+                    text-card-foreground
+                    shadow-sm
+                    transition-transform
+                    hover:scale-105
+                    hover:shadow-lg
+                    dark:border-zinc-800
+                    p-2
+                  "
                 >
-                  <CardHeader className="flex flex-row items-center space-x-4">
-                    <Avatar>
-                      <AvatarImage src={job.image ?? ""} alt="Job Avatar" />
-                      <AvatarFallback className="bg-zinc-200 dark:bg-zinc-700">
-                        #
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col justify-center w-full">
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="text-lg font-medium">
-                          {job.jobName}
-                        </CardTitle>
+                  {/* Header */}
+                  <CardHeader className="border-b border-zinc-200 dark:border-zinc-800 px-4 py-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0 sm:space-x-4">
+                      <div className="flex items-center space-x-3">
+                        {/* Avatar */}
+                        <Avatar className="w-14 h-14">
+                          <AvatarImage src={job.image ?? ""} alt="Job Avatar" />
+                          <AvatarFallback className="bg-zinc-200 dark:bg-zinc-700">
+                            <FolderIcon className="w-5 h-5" />
+                          </AvatarFallback>
+                        </Avatar>
+
+                        {/* Title & Created Date */}
+                        <div className="flex flex-col">
+                          <CardTitle className="text-lg font-semibold line-clamp-1">
+                            {job.jobName}
+                          </CardTitle>
+                          <span className="mt-0.5 text-xs text-muted-foreground">
+                            Created on{" "}
+                            {new Date(job.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* StatusTag (right aligned on larger screens) */}
+                      <div className="w-fit">
                         <StatusTag
                           status={job.status}
                           jobId={job.id}
                           companyId={companyId}
-                          onStatusChange={(newStatus) => {
+                          onStatusChange={(newStatus) =>
                             setJobs((prevJobs) =>
                               prevJobs.map((j) =>
                                 j.id === job.id
                                   ? { ...j, status: newStatus }
                                   : j
                               )
-                            );
-                          }}
+                            )
+                          }
                         />
                       </div>
-                      <span className="text-xs text-muted-foreground">
-                        Created on{" "}
-                        {new Date(job.createdAt).toLocaleDateString()}
-                      </span>
                     </div>
                   </CardHeader>
-                  <CardContent className="space-y-2">
-                    <CardDescription>
+
+                  {/* Content */}
+                  <CardContent className="p-4">
+                    <CardDescription className="text-sm line-clamp-3 mb-4">
                       {job.description || "No description provided."}
                     </CardDescription>
+
+                    {/* View button with Link */}
+                    <Link href={`/dashboard/jobs/${job.id}`} passHref>
+                      <Button variant="default" asChild>
+                        <span>View Job</span>
+                      </Button>
+                    </Link>
                   </CardContent>
                 </Card>
-              ))
-            ) : (
-              <p>No active jobs found.</p>
-            )}
-          </div>
-        </div>
-
-        <div>
-          <div className="flex items-center space-x-2">
-            <FileStack size={24} className="text-blue-500" />
-            <h2 className="text-xl font-semibold tracking-tight flex">
-              Total Jobs
-            </h2>
-          </div>
-          <p className="my-3 text-sm text-muted-foreground">
-            View the history and details of all jobs.
-          </p>
-
-          <div className="grid gap-6 mt-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
-            {currentJobs.map((job) => (
-              <Card
-                key={job.id}
-                onClick={() => {
-                  router.push(`/dashboard/jobs/${job.id}`);
-                }}
-                className="border dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 cursor-pointer hover:scale-105 transition-all"
-              >
-                <CardHeader className="flex flex-row items-center space-x-4">
-                  <Avatar>
-                    <AvatarImage src={job.image ?? ""} alt="Job Avatar" />
-                    <AvatarFallback className="bg-zinc-200 dark:bg-zinc-700">
-                      J
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col justify-center w-full">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg font-medium">
-                        {job.jobName}
-                      </CardTitle>
-                      <StatusTag
-                        status={job.status}
-                        jobId={job.id}
-                        companyId={companyId}
-                        onStatusChange={(newStatus) => {
-                          setJobs((prevJobs) =>
-                            prevJobs.map((j) =>
-                              j.id === job.id ? { ...j, status: newStatus } : j
-                            )
-                          );
-                        }}
-                      />
-                    </div>
-                    <span className="text-xs text-muted-foreground">
-                      Created on {new Date(job.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <CardDescription>
-                    {job.description || "No description provided."}
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-
-        {totalPages > 1 && (
-          <div className="mt-6 flex justify-center">
-            <Pagination>
-              <PaginationContent>
-                <PaginationPrevious
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handlePreviousPage();
-                  }}
-                  className={
-                    currentPage === 1 ? "pointer-events-none opacity-50" : ""
-                  }
-                />
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (page) => (
-                    <PaginationItem key={page}>
-                      <PaginationLink
-                        href="#"
-                        isActive={currentPage === page}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setCurrentPage(page);
-                        }}
-                      >
-                        {page}
-                      </PaginationLink>
-                    </PaginationItem>
-                  )
-                )}
-                <PaginationNext
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleNextPage();
-                  }}
-                  className={
-                    currentPage === totalPages
-                      ? "pointer-events-none opacity-50"
-                      : ""
-                  }
-                />
-              </PaginationContent>
-            </Pagination>
-          </div>
-        )}
-      </motion.div>
+              </motion.div>
+            ))
+          ) : (
+            <p className="col-span-full text-center text-sm text-muted-foreground">
+              No jobs found.
+            </p>
+          )}
+        </motion.div>
+      ) : (
+        // TABLE VIEW
+        <DataTable
+          columns={columns}
+          data={filteredJobs}
+          onRowClick={(row) => router.push(`/dashboard/jobs/${row.id}`)}
+        />
+      )}
     </div>
   );
-};
-
-export default JobsDashboard;
+}
