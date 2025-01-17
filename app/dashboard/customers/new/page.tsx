@@ -63,7 +63,7 @@ export default function AddCustomerPage() {
         createdBy: user.uid,
       });
       console.log("Customer added successfully");
-      router.push("/dashboard/customers");
+      router.push(`/dashboard/customers`);
       reset();
     } catch (error) {
       console.error("Error adding customer:", error);

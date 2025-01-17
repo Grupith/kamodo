@@ -238,7 +238,7 @@ const JobDetails = () => {
         className="max-w-6xl px-4 sm:px-4 lg:px-6"
       >
         {/* Page Header */}
-        <div className="mb-6 flex items-center justify-between border-b border-zinc-400 dark:border-zinc-600 pb-4">
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-zinc-400 dark:border-zinc-600 pb-4">
           <div>
             <div className="flex items-center space-x-4">
               {isEditing ? (
@@ -266,10 +266,11 @@ const JobDetails = () => {
               Manage the details, status, and finances of this job.
             </p>
           </div>
-          <section className="flex items-center space-x-4">
+
+          <section className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-4 sm:mt-0">
             {/* Edit / Save Buttons */}
             {isEditing ? (
-              <div className="flex justify-between items-center space-x-2">
+              <div className="flex flex-col sm:flex-row sm:space-x-2">
                 <Button
                   onClick={handleCancelEdit}
                   variant="outline"
@@ -289,20 +290,20 @@ const JobDetails = () => {
                 </Button>
               </div>
             ) : (
-              <div className="flex flex-col sm:flex-row justify-between items-center sm:space-x-2">
+              <div className="flex flex-row sm:flex-row space-x-4">
                 {/* REFRESH */}
                 <Button
                   variant="outline"
-                  size="icon"
                   onClick={handleFetchJobDetails}
                   disabled={loading}
+                  size="icon"
                 >
                   <RotateCcw className="w-6 h-6" />
                 </Button>
                 <Button
                   onClick={() => setIsEditing(true)}
                   variant="default"
-                  className="w-full sm:w-auto"
+                  className="w-fit md:w-auto"
                 >
                   <Pencil className="w-5 h-5 mr-0.5" />
                   Edit
@@ -319,7 +320,7 @@ const JobDetails = () => {
 
         {/* Main Grid of Cards */}
 
-        <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <section className="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
           {/* Job Information */}
           <Card className="bg-zinc-100 dark:bg-zinc-900 dark:border-zinc-800 border mt-4">
             <CardHeader className="flex flex-row items-center justify-between space-x-4">
@@ -340,7 +341,7 @@ const JobDetails = () => {
                 <h3 className="text-md font-medium">Description</h3>
                 {isEditing ? (
                   <Textarea
-                    className="w-full"
+                    className="w-full mt-1"
                     value={job.description}
                     onChange={(e) =>
                       setJob({ ...job, description: e.target.value })
@@ -412,12 +413,14 @@ const JobDetails = () => {
                   </p>
                 )}
               </div>
+
               {/* Total Days & Repeats Section */}
+
               <div className="flex flex-col sm:flex-row sm:space-x-8">
                 {/* Total Days */}
                 <div className="w-full sm:w-1/2">
                   <h3 className="text-md font-medium">Total Days</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xl text-muted-foreground">
                     {job.totalDays ?? "N/A"}
                   </p>
                 </div>

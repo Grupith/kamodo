@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase/firebase";
+import { useToast } from "@/hooks/use-toast";
 
 // Icon from lucide-react. You can swap with any icon you prefer:
 import { ChevronDown } from "lucide-react";
@@ -42,6 +43,7 @@ export default function StatusTag({
   onStatusChange,
 }: StatusTagProps) {
   const [currentStatus, setCurrentStatus] = useState(status);
+  const { toast } = useToast();
 
   const handleStatusChange = async (newStatus: string) => {
     try {
@@ -52,6 +54,13 @@ export default function StatusTag({
       await updateDoc(jobDocRef, { status: newStatus });
 
       console.log(`Status updated to "${newStatus}" for job ${jobId}`);
+      toast({
+        title: `Success! Status changed to ${
+          newStatus.charAt(0).toUpperCase() + newStatus.slice(1)
+        }`,
+        description: "The job status has been updated successfully.",
+        variant: "success",
+      });
     } catch (error) {
       console.error("Failed to update status:", error);
     }

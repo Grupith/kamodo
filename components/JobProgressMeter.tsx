@@ -25,8 +25,8 @@ const JobProgressMeter: React.FC = () => {
       </CardHeader>
 
       <CardContent className="pb-4">
-        <span className="text-sm mb-0.5 font-semibold">Current</span>
-        <Progress value={33} className="my-0.5" />
+        <span className="text-xs mb-0.5 font-medium">Status: 33%</span>
+        <Progress value={33} className="my-1" />
       </CardContent>
     </Card>
   );
