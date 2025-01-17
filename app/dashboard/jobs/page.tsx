@@ -183,10 +183,10 @@ export default function JobsDashboard() {
               <RotateCcw className="w-4 h-4" />
             </Button>
             {/* NEW JOB */}
-            <Button variant="outline" asChild>
+            <Button variant="default" asChild>
               <Link href="/dashboard/jobs/new">
                 <FolderPlusIcon className="w-4 h-4" />
-                Add
+                Create Job
               </Link>
             </Button>
           </div>

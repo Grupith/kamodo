@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useCompany } from "@/contexts/CompanyContext"; // Import the CompanyContext hook
+import { useCompany } from "@/contexts/CompanyContext";
 import { createJob } from "@/firebase/firestore";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "@/firebase/firebase"; // Import your Firestore configuration
+import { db } from "@/firebase/firebase";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -24,27 +24,36 @@ import {
   Clock,
   Hammer,
   UserPlus,
+  X,
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { DatePickerWithRange } from "@/components/DatePickerWithRange";
 import type { DateRange } from "react-day-picker";
 import { differenceInDays } from "date-fns";
 import StatusSelector from "@/components/StatusSelector";
+import { MultiSelectField } from "@/components/MultiSelectField";
 
 interface Customer {
   id: string;
   name: string;
 }
 
+interface Employee {
+  id: string;
+  name: string;
+  // Add other fields as necessary
+}
+
 const CreateJob = () => {
   const { user } = useAuth();
   const { id: companyId } = useCompany(); // Get the companyId from CompanyContext
   const router = useRouter();
+  const { toast } = useToast();
 
+  // State for form fields
   const [jobName, setJobName] = useState("");
   const [repeats, setRepeats] = useState("no");
-  const [assignedEmployees, setAssignedEmployees] = useState<string[]>([]);
-  const [selectedCustomer, setSelectedCustomer] = useState("");
+  const [employees, setEmployees] = useState<Employee[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [selectedEquipment, setSelectedEquipment] = useState<string[]>([]);
   const [costs, setCosts] = useState("");
@@ -52,7 +61,8 @@ const CreateJob = () => {
   const [taxes, setTaxes] = useState("");
   const [expenses, setExpenses] = useState("");
   const [status, setStatus] = useState("active");
-  const { toast } = useToast();
+  const [selectedEmployees, setSelectedEmployees] = useState<string[]>([]);
+  const [selectedCustomers, setSelectedCustomers] = useState<string[]>([]);
 
   // Set date range state for the job
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
@@ -64,6 +74,43 @@ const CreateJob = () => {
   // Extract start/end from dateRange
   const startDate = dateRange?.from;
   const endDate = dateRange?.to;
+
+  // Fetch Employees for the multi-select
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      if (!companyId) {
+        console.log("No companyId available, skipping fetch.");
+        return;
+      }
+
+      try {
+        console.log("Fetching employees for companyId:", companyId);
+        const employeesRef = collection(
+          db,
+          "companies",
+          companyId,
+          "employees"
+        );
+        const snapshot = await getDocs(employeesRef);
+        const employeeList = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Employee[];
+
+        console.log("Fetched employee list:", employeeList);
+        setEmployees(employeeList);
+      } catch (error) {
+        console.error("Error fetching employees:", error);
+      }
+    };
+
+    fetchEmployees();
+  }, [companyId]);
+
+  // Log the updated state
+  useEffect(() => {
+    console.log("Updated employees in state:", employees);
+  }, [employees]);
 
   // Fetch customers for the select
   useEffect(() => {
@@ -91,6 +138,7 @@ const CreateJob = () => {
     fetchCustomers();
   }, [companyId]);
 
+  // Calculate total days when dateRange changes
   useEffect(() => {
     if (dateRange?.from && dateRange?.to) {
       // Inclusive count of days
@@ -104,7 +152,7 @@ const CreateJob = () => {
 
   // Handle form submission
   const handleSaveJob = async () => {
-    if (!jobName || !selectedCustomer || !startDate || !endDate) {
+    if (!jobName || !selectedCustomers || !startDate || !endDate) {
       alert(
         "Please fill out all required fields (Job Name, Customer, Start/End Dates)."
       );
@@ -119,8 +167,8 @@ const CreateJob = () => {
     const jobData = {
       jobName,
       repeats,
-      assignedEmployees,
-      selectedCustomer,
+      selectedEmployees,
+      selectedCustomers,
       selectedEquipment,
       costs: parseFloat(costs) || 0,
       charge: parseFloat(charge) || 0,
@@ -142,12 +190,21 @@ const CreateJob = () => {
         description: "View your job on the jobs page",
         variant: "default",
       });
-      router.push("/dashboard/jobs");
+      router.push(`/dashboard/jobs/${jobId}`);
     } catch (error) {
       console.error("Error creating job:", error);
       alert("Failed to create job. Please try again.");
     }
   };
+
+  const employeeOptions = employees.map((employee) => ({
+    value: employee.id, // or another unique identifier
+    label: employee.name, // or any other field you'd like to display
+  }));
+  const customerOptions = customers.map((employee) => ({
+    value: employee.id, // or another unique identifier
+    label: employee.name, // or any other field you'd like to display
+  }));
 
   return (
     <div className="sm:py-4 bg-background min-h-screen">
@@ -179,20 +236,17 @@ const CreateJob = () => {
                 value={jobName}
                 onChange={(e) => setJobName(e.target.value)}
                 required
-                className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700"
+                className="mt-2 bg-white dark:bg-black border border-zinc-300 dark:border-zinc-800"
               />
             </div>
-
             {/* Description */}
             <div>
               <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
                 Description
               </label>
-              <Textarea className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700" />
+              <Textarea className="mt-2 bg-white dark:bg-black border border-zinc-300 dark:border-zinc-800" />
             </div>
-
             {/* Date & Time Section */}
-
             <CardTitle className="py-2 flex items-center text-lg font-semibold text-zinc-900 dark:text-zinc-100 border-b border-zinc-400 dark:border-zinc-700">
               <Clock className="w-5 h-5 mr-2 text-zinc-700 dark:text-zinc-300" />
               Date & Time
@@ -200,7 +254,6 @@ const CreateJob = () => {
                 ({totalDays} {totalDays === 1 ? "day" : "days"})
               </span>
             </CardTitle>
-
             {/* Date Range Picker */}
             <div className="mb-4">
               <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
@@ -212,7 +265,6 @@ const CreateJob = () => {
                 className="mt-2"
               />
             </div>
-
             <div className="flex justify-start space-x-10">
               {/* Repeats */}
               <div className="w-2/5">
@@ -220,7 +272,7 @@ const CreateJob = () => {
                   Repeat
                 </label>
                 <Select value={repeats} onValueChange={setRepeats}>
-                  <SelectTrigger className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700">
+                  <SelectTrigger className="mt-2 bg-white dark:bg-black border border-zinc-300 dark:border-zinc-800">
                     <SelectValue placeholder="Select repeat frequency" />
                   </SelectTrigger>
                   <SelectContent className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700">
@@ -243,31 +295,42 @@ const CreateJob = () => {
                 />
               </div>
             </div>
-
             {/* Assigned Employees Section */}
-
             <CardTitle className="py-2 flex items-center text-lg font-semibold text-zinc-900 dark:text-zinc-100 border-b border-zinc-400 dark:border-zinc-700">
               <UserPlus className="w-5 h-5 mr-2 text-zinc-700 dark:text-zinc-300" />
               Assign Employees
             </CardTitle>
             {/* Select Employees */}
             <div>
-              <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                Select your employees for this job
-              </label>
-              <Input
-                placeholder="e.g. Alice, Bob, Charlie"
-                className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 w-1/2"
-                value={assignedEmployees.join(", ")}
-                onChange={(e) =>
-                  setAssignedEmployees(
-                    e.target.value
-                      .split(",")
-                      .map((emp) => emp.trim())
-                      .filter(Boolean)
-                  )
-                }
+              <MultiSelectField
+                label="Select Employees"
+                description="Choose employees for the job."
+                options={employeeOptions}
+                value={selectedEmployees}
+                onChange={setSelectedEmployees}
               />
+            </div>
+            {/* Display selected employees */}
+            <div className="flex flex-wrap gap-2">
+              {selectedEmployees.map((employeeId) => {
+                const employee = employees.find((e) => e.id === employeeId);
+                return (
+                  <div
+                    key={employeeId}
+                    className="flex justify-center items-center border border-zinc-300 dark:border-zinc-700 bg-zinc-200 dark:bg-zinc-800 py-1 px-2 text-xs rounded-md"
+                  >
+                    {employee?.name}
+                    <X
+                      className="w-4 h-4 ml-1 cursor-pointer"
+                      onClick={() =>
+                        setSelectedEmployees((prev) =>
+                          prev.filter((id) => id !== employeeId)
+                        )
+                      }
+                    />
+                  </div>
+                );
+              })}
             </div>
 
             {/* Customer Section */}
@@ -278,28 +341,35 @@ const CreateJob = () => {
             </CardTitle>
             {/* Select customer for job */}
             <div>
-              <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                Customer <span className="text-red-500">*</span>
-              </label>
-              <Select
-                onValueChange={setSelectedCustomer}
-                value={selectedCustomer}
-              >
-                <SelectTrigger className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 w-1/2">
-                  <SelectValue placeholder="Select a Customer" />
-                </SelectTrigger>
-                <SelectContent className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700">
-                  {customers.map((customer) => (
-                    <SelectItem
-                      key={customer.id}
-                      value={customer.id}
-                      className="cursor-pointer"
+              <MultiSelectField
+                label="Select Customer"
+                description="Choose customers for the job."
+                options={customerOptions}
+                value={selectedCustomers}
+                onChange={setSelectedCustomers}
+              />
+
+              <div className="flex flex-wrap gap-2">
+                {selectedCustomers.map((customerId) => {
+                  const customer = customers.find((c) => c.id === customerId);
+                  return (
+                    <div
+                      key={customerId}
+                      className="flex justify-center items-center border border-zinc-300 dark:border-zinc-700 bg-zinc-200 dark:bg-zinc-800 py-1 px-2 mt-2 text-xs rounded-md"
                     >
-                      {customer.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                      {customer?.name}
+                      <X
+                        className="w-4 h-4 ml-1 cursor-pointer"
+                        onClick={() =>
+                          setSelectedCustomers((prev) =>
+                            prev.filter((id) => id !== customerId)
+                          )
+                        }
+                      />
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Equipment Section */}
@@ -308,7 +378,6 @@ const CreateJob = () => {
               <Hammer className="w-5 h-5 mr-2 text-zinc-700 dark:text-zinc-300" />
               Choose Equipment
             </CardTitle>
-
             {/* Select equipment for job */}
             <div>
               <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
@@ -335,7 +404,6 @@ const CreateJob = () => {
               <CircleDollarSign className="w-5 h-5 mr-2 text-zinc-700 dark:text-zinc-300" />
               Financial
             </CardTitle>
-
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
@@ -347,7 +415,7 @@ const CreateJob = () => {
                   placeholder="e.g. 100.00"
                   value={costs}
                   onChange={(e) => setCosts(e.target.value)}
-                  className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700"
+                  className="mt-2 bg-white dark:bg-black border border-zinc-300 dark:border-zinc-800"
                 />
               </div>
               <div>
@@ -360,7 +428,7 @@ const CreateJob = () => {
                   placeholder="e.g. 150.00"
                   value={charge}
                   onChange={(e) => setCharge(e.target.value)}
-                  className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700"
+                  className="mt-2 bg-white dark:bg-black border border-zinc-300 dark:border-zinc-800"
                 />
               </div>
               <div>
@@ -373,7 +441,7 @@ const CreateJob = () => {
                   placeholder="e.g. 15.00"
                   value={taxes}
                   onChange={(e) => setTaxes(e.target.value)}
-                  className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700"
+                  className="mt-2 bg-white dark:bg-black border border-zinc-300 dark:border-zinc-800"
                 />
               </div>
               <div>
@@ -386,11 +454,10 @@ const CreateJob = () => {
                   placeholder="e.g. 25.00"
                   value={expenses}
                   onChange={(e) => setExpenses(e.target.value)}
-                  className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700"
+                  className="mt-2 bg-white dark:bg-black border border-zinc-300 dark:border-zinc-800"
                 />
               </div>
             </div>
-
             {/* Save Job */}
             <div className="flex justify-center pt-4">
               <Button
