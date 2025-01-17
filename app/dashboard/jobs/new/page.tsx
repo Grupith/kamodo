@@ -55,7 +55,6 @@ const CreateJob = () => {
   const [repeats, setRepeats] = useState("no");
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [selectedEquipment, setSelectedEquipment] = useState<string[]>([]);
   const [costs, setCosts] = useState("");
   const [charge, setCharge] = useState("");
   const [taxes, setTaxes] = useState("");
@@ -63,6 +62,7 @@ const CreateJob = () => {
   const [status, setStatus] = useState("active");
   const [selectedEmployees, setSelectedEmployees] = useState<string[]>([]);
   const [selectedCustomers, setSelectedCustomers] = useState<string[]>([]);
+  const [description, setDescription] = useState("");
 
   // Set date range state for the job
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
@@ -166,10 +166,10 @@ const CreateJob = () => {
 
     const jobData = {
       jobName,
+      description,
       repeats,
       selectedEmployees,
       selectedCustomers,
-      selectedEquipment,
       costs: parseFloat(costs) || 0,
       charge: parseFloat(charge) || 0,
       taxes: parseFloat(taxes) || 0,
@@ -188,7 +188,7 @@ const CreateJob = () => {
       toast({
         title: "Job Created Successfully!",
         description: "View your job on the jobs page",
-        variant: "default",
+        variant: "success",
       });
       router.push(`/dashboard/jobs/${jobId}`);
     } catch (error) {
@@ -208,7 +208,7 @@ const CreateJob = () => {
 
   return (
     <div className="sm:py-4 bg-background min-h-screen">
-      <div className="max-w-4xl mx-auto px-4 lg:px-4">
+      <div className="max-w-4xl md:px-6">
         <div className="my-4">
           <h1 className="text-2xl font-bold tracking-tight">Create Job</h1>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -244,7 +244,11 @@ const CreateJob = () => {
               <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
                 Description
               </label>
-              <Textarea className="mt-2 bg-white dark:bg-black border border-zinc-300 dark:border-zinc-800" />
+              <Textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="mt-2 bg-white dark:bg-black border border-zinc-300 dark:border-zinc-800"
+              />
             </div>
             {/* Date & Time Section */}
             <CardTitle className="py-2 flex items-center text-lg font-semibold text-zinc-900 dark:text-zinc-100 border-b border-zinc-400 dark:border-zinc-700">
@@ -267,7 +271,7 @@ const CreateJob = () => {
             </div>
             <div className="flex justify-start space-x-10">
               {/* Repeats */}
-              <div className="w-2/5">
+              <div className="sm:w-1/6">
                 <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   Repeat
                 </label>
@@ -379,28 +383,11 @@ const CreateJob = () => {
               Choose Equipment
             </CardTitle>
             {/* Select equipment for job */}
-            <div>
-              <label className="block mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                Selected Equipment (comma-separated)
-              </label>
-              <Input
-                placeholder="e.g. Backhoe, Crane"
-                value={selectedEquipment.join(", ")}
-                className="mt-2 bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 w-1/2"
-                onChange={(e) =>
-                  setSelectedEquipment(
-                    e.target.value
-                      .split(",")
-                      .map((eq) => eq.trim())
-                      .filter(Boolean)
-                  )
-                }
-              />
-            </div>
+            <p>{"(Coming-soon)"}</p>
 
             {/* Costs, Charge, Taxes, Expenses */}
 
-            <CardTitle className="py-2 flex items-center text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+            <CardTitle className="py-2 flex items-center text-lg font-semibold text-zinc-900 dark:text-zinc-100 border-b border-zinc-400 dark:border-zinc-700">
               <CircleDollarSign className="w-5 h-5 mr-2 text-zinc-700 dark:text-zinc-300" />
               Financial
             </CardTitle>

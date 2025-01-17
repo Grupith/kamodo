@@ -1,17 +1,13 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter, useParams } from "next/navigation";
-
-import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import { doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { db } from "@/firebase/firebase";
 import { useCompany } from "@/contexts/CompanyContext";
-
-// Custom components
 import StatusTag from "@/components/StatusTag";
 
-// shadcn/ui components
 import {
   Card,
   CardHeader,
@@ -29,9 +25,20 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { Pencil, Trash } from "lucide-react";
+import {
+  CalendarDays,
+  ClipboardPen,
+  Pencil,
+  RotateCcw,
+  Save,
+  Trash,
+} from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { fetchJobDetails } from "@/utils/fetchJobDetails";
+import LoadingSkeleton from "@/components/LoadingSkeleton";
+import JobProgressMeter from "@/components/JobProgressMeter";
+import { DatePickerWithRange } from "@/components/DatePickerWithRange";
 
 interface Job {
   id: string;
@@ -39,8 +46,8 @@ interface Job {
   createdAt: number;
   status: string;
   description?: string;
-  startDate: number;
-  endDate: number;
+  startDate: number | undefined;
+  endDate: number | undefined;
   assignedEmployees?: string[];
   selectedCustomer?: string;
   selectedEquipment?: string[];
@@ -48,6 +55,8 @@ interface Job {
   charge: number;
   taxes: number;
   expenses: number;
+  totalDays?: number;
+  repeats?: string;
 }
 
 const JobDetails = () => {
@@ -66,35 +75,61 @@ const JobDetails = () => {
   // Extract the job ID from the route params
   const jobId = Array.isArray(params?.jobId) ? params.jobId[0] : params?.jobId;
 
-  // Fetch the job details once on mount
   useEffect(() => {
+    if (job?.startDate && job?.endDate) {
+      const totalDays = Math.ceil(
+        (job.endDate - job.startDate) / (1000 * 60 * 60 * 24)
+      );
+      setJob((prevJob) => (prevJob ? { ...prevJob, totalDays } : null));
+    }
+  }, [job?.startDate, job?.endDate]);
+
+  // Memoize the handleFetchJobDetails function
+  const handleFetchJobDetails = useCallback(async () => {
     if (!companyId || !jobId) return;
 
-    const fetchJobDetails = async () => {
-      setLoading(true);
-      try {
-        const jobDocRef = doc(db, "companies", companyId, "jobs", jobId);
-        const jobSnapshot = await getDoc(jobDocRef);
-
-        if (jobSnapshot.exists()) {
-          const jobData = {
-            id: jobSnapshot.id,
-            ...jobSnapshot.data(),
-          } as Job;
-          setJob(jobData);
-          setOriginalJob(jobData);
-        } else {
-          console.error("Job not found");
+    setLoading(true);
+    try {
+      const jobData = await fetchJobDetails(companyId, jobId);
+      if (jobData) {
+        interface TimestampNormalizer {
+          (timestamp: number): number;
         }
-      } catch (error) {
-        console.error("Error fetching job details:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
 
-    fetchJobDetails();
+        const normalizeToMidnight: TimestampNormalizer = (timestamp) => {
+          const date = new Date(timestamp);
+          date.setHours(0, 0, 0, 0);
+          return date.getTime();
+        };
+
+        const startDate = jobData.startDate
+          ? normalizeToMidnight(jobData.startDate)
+          : undefined;
+        const endDate = jobData.endDate
+          ? normalizeToMidnight(jobData.endDate)
+          : undefined;
+
+        const totalDays =
+          startDate && endDate
+            ? Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24))
+            : undefined;
+
+        setJob({ ...jobData, startDate, endDate, totalDays });
+        setOriginalJob({ ...jobData, startDate, endDate, totalDays });
+        console.log("Job details fetched:", { startDate, endDate, totalDays });
+      } else {
+        console.error("Job not found");
+      }
+    } catch (error) {
+      console.error("Error fetching job details:", error);
+    } finally {
+      setLoading(false);
+    }
   }, [companyId, jobId]);
+  // Fetch job details on mount and when dependencies change
+  useEffect(() => {
+    handleFetchJobDetails();
+  }, [handleFetchJobDetails]);
 
   // Handle saving updated job details to Firestore
   const handleSave = async () => {
@@ -108,7 +143,7 @@ const JobDetails = () => {
       const sanitizedJobData = Object.fromEntries(
         Object.entries({
           jobName: job.jobName,
-          description: job.description,
+          description: job.description || "",
           startDate: job.startDate,
           endDate: job.endDate,
           assignedEmployees: job.assignedEmployees,
@@ -128,9 +163,9 @@ const JobDetails = () => {
       setOriginalJob(job);
       setIsEditing(false);
       toast({
-        title: "Job Updated",
-        description: "Job details have been successfully updated.",
-        variant: "default",
+        title: "Job Updated!",
+        description: "The job details have been successfully updated.",
+        variant: "success",
       });
     } catch (error) {
       console.error("Error updating job:", error);
@@ -161,9 +196,9 @@ const JobDetails = () => {
       await deleteDoc(jobDocRef);
 
       toast({
-        title: "Job Deleted",
+        title: "Job Deleted!",
         description: "The job has been successfully deleted.",
-        variant: "default",
+        variant: "success",
       });
 
       // Redirect to the jobs list after deletion
@@ -182,11 +217,7 @@ const JobDetails = () => {
 
   // Render a loading state
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <p>Loading job details...</p>
-      </div>
-    );
+    return <LoadingSkeleton />;
   }
 
   // If job was not found
@@ -207,77 +238,21 @@ const JobDetails = () => {
         className="max-w-6xl px-4 sm:px-4 lg:px-6"
       >
         {/* Page Header */}
-        <div className="mb-8 flex items-center justify-between border-b border-zinc-500 dark:border-zinc-300 pb-4">
+        <div className="mb-6 flex items-center justify-between border-b border-zinc-400 dark:border-zinc-600 pb-4">
           <div>
-            {isEditing ? (
-              <Input
-                className="text-2xl font-semibold tracking-tight w-full md:w-auto"
-                value={job.jobName}
-                onChange={(e) => setJob({ ...job, jobName: e.target.value })}
-              />
-            ) : (
-              <h1 className="text-2xl font-semibold tracking-tight">
-                {job.jobName}
-              </h1>
-            )}
-            <p className="mt-2 text-sm text-muted-foreground">
-              Manage the details, status, and finances of this job.
-            </p>
-          </div>
-
-          {/* Edit / Save Buttons */}
-          {isEditing ? (
-            <div className="flex justify-between items-center space-x-4">
-              <Button
-                onClick={handleSave}
-                disabled={saving}
-                variant="default"
-                className="w-full sm:w-auto"
-              >
-                {saving ? "Saving..." : "Save Changes"}
-              </Button>
-              <Button
-                onClick={handleCancelEdit}
-                variant="outline"
-                className="w-full sm:w-auto"
-                disabled={saving}
-              >
-                Cancel
-              </Button>
-            </div>
-          ) : (
-            <div className="flex flex-col sm:flex-row justify-between items-center sm:space-x-2">
-              <Button
-                onClick={() => setIsEditing(true)}
-                variant="default"
-                className="w-full sm:w-auto"
-              >
-                <Pencil className="w-5 h-5 mr-0.5" />
-                Edit Job
-              </Button>
-            </div>
-          )}
-        </div>
-
-        <Separator />
-
-        {/* MAIN CARD */}
-        {/* Existing Cards and Details */}
-        <Card className="bg-zinc-100 dark:bg-zinc-900 dark:border-zinc-800 border mt-4">
-          <CardHeader className="flex flex-row items-center justify-between space-x-4">
-            <div>
-              <CardTitle className="text-lg font-medium">Job Details</CardTitle>
-              <CardDescription>
-                Created on {new Date(job.createdAt).toLocaleDateString()}
-              </CardDescription>
-            </div>
-            {isEditing ? (
-              <Input
-                className="w-36"
-                value={job.status}
-                onChange={(e) => setJob({ ...job, status: e.target.value })}
-              />
-            ) : (
+            <div className="flex items-center space-x-4">
+              {isEditing ? (
+                <Input
+                  className="text-2xl font-semibold tracking-tight w-full md:w-auto"
+                  value={job.jobName}
+                  onChange={(e) => setJob({ ...job, jobName: e.target.value })}
+                />
+              ) : (
+                <h1 className="text-2xl font-semibold tracking-tight">
+                  {job.jobName}
+                </h1>
+              )}
+              {/* Job Status */}
               <StatusTag
                 status={job.status}
                 jobId={job.id}
@@ -286,35 +261,213 @@ const JobDetails = () => {
                   setJob({ ...job, status: newStatus })
                 }
               />
+            </div>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Manage the details, status, and finances of this job.
+            </p>
+          </div>
+          <section className="flex items-center space-x-4">
+            {/* Edit / Save Buttons */}
+            {isEditing ? (
+              <div className="flex justify-between items-center space-x-2">
+                <Button
+                  onClick={handleCancelEdit}
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                  disabled={saving}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleSave}
+                  disabled={saving}
+                  variant="default"
+                  className="w-full sm:w-auto"
+                >
+                  <Save className="w-5 h-5 mr-0.5" />
+                  {saving ? "Saving..." : "Save"}
+                </Button>
+              </div>
+            ) : (
+              <div className="flex flex-col sm:flex-row justify-between items-center sm:space-x-2">
+                {/* REFRESH */}
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={handleFetchJobDetails}
+                  disabled={loading}
+                >
+                  <RotateCcw className="w-6 h-6" />
+                </Button>
+                <Button
+                  onClick={() => setIsEditing(true)}
+                  variant="default"
+                  className="w-full sm:w-auto"
+                >
+                  <Pencil className="w-5 h-5 mr-0.5" />
+                  Edit
+                </Button>
+              </div>
             )}
-          </CardHeader>
+          </section>
+        </div>
 
-          <CardContent className="space-y-6">
-            {/* Add your detailed content */}
-          </CardContent>
-        </Card>
+        {/* Job Progress Meter */}
+        <div>
+          <JobProgressMeter />
+        </div>
 
-        {/* DELETE JOB CARD */}
-        <div className="mt-8">
-          <Card className="w-fit bg-zinc-100 dark:bg-zinc-900 border dark:border-zinc-800 hover:shadow-lg transition-transform">
-            <CardHeader>
-              <CardTitle className="text-black-600">Delete Job</CardTitle>
-              <CardDescription>
-                Deleting this job is permanent and cannot be undone.
-              </CardDescription>
+        {/* Main Grid of Cards */}
+
+        <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Job Information */}
+          <Card className="bg-zinc-100 dark:bg-zinc-900 dark:border-zinc-800 border mt-4">
+            <CardHeader className="flex flex-row items-center justify-between space-x-4">
+              <div>
+                <CardTitle className="text-lg font-semibold flex items-center mb-0.5">
+                  <ClipboardPen className="w-6 h-6 mr-2 text-blue-600" />
+                  Job Information
+                </CardTitle>
+                <CardDescription>
+                  Created on {new Date(job.createdAt).toLocaleDateString()}
+                </CardDescription>
+              </div>
             </CardHeader>
-            <CardContent>
-              <Button
-                variant="destructive"
-                className="w-full lg:w-1/2"
-                onClick={() => setShowDeleteModal(true)}
-              >
-                <Trash className="w-5 h-5 mr-0.5" />
-                Delete Job
-              </Button>
+
+            <CardContent className="space-y-6">
+              {/* Add your detailed content */}
+              <div>
+                <h3 className="text-md font-medium">Description</h3>
+                {isEditing ? (
+                  <Textarea
+                    className="w-full"
+                    value={job.description}
+                    onChange={(e) =>
+                      setJob({ ...job, description: e.target.value })
+                    }
+                  />
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    {job.description || "No description provided."}
+                  </p>
+                )}
+              </div>
             </CardContent>
           </Card>
-        </div>
+          {/* Scheduling Card */}
+          <Card className="bg-zinc-100 dark:bg-zinc-900 dark:border-zinc-800 border mt-4">
+            <CardHeader className="flex flex-row items-center justify-between space-x-4">
+              <div>
+                <CardTitle className="text-lg font-semibold flex items-center mb-0.5">
+                  {/* Replace with any icon you prefer — e.g., CalendarDays from lucide-react */}
+                  <CalendarDays className="w-6 h-6 mr-2 text-blue-600" />
+                  Schedule
+                </CardTitle>
+                <CardDescription>Manage job dates and repeats</CardDescription>
+              </div>
+            </CardHeader>
+
+            <CardContent className="space-y-6">
+              {/* Start Date & End Date Section */}
+              <div className="w-full">
+                <h3 className="text-md font-medium">Date Range</h3>
+                {isEditing ? (
+                  <DatePickerWithRange
+                    dateRange={{
+                      from: job.startDate ? new Date(job.startDate) : undefined,
+                      to: job.endDate ? new Date(job.endDate) : undefined,
+                    }}
+                    onDateChange={(range) => {
+                      if (!range) {
+                        console.error("Invalid range: range is undefined");
+                        return;
+                      }
+
+                      const startDate = range.from
+                        ? range.from.getTime()
+                        : undefined;
+                      const endDate = range.to ? range.to.getTime() : undefined;
+
+                      setJob((prevJob) =>
+                        prevJob
+                          ? {
+                              ...prevJob,
+                              startDate: startDate ?? undefined,
+                              endDate: endDate ?? undefined,
+                            }
+                          : null
+                      );
+                    }}
+                    className="mt-2"
+                  />
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    {job.startDate && job.endDate
+                      ? `${new Date(
+                          job.startDate
+                        ).toLocaleDateString()} - ${new Date(
+                          job.endDate
+                        ).toLocaleDateString()}`
+                      : "Date range not set"}
+                  </p>
+                )}
+              </div>
+              {/* Total Days & Repeats Section */}
+              <div className="flex flex-col sm:flex-row sm:space-x-8">
+                {/* Total Days */}
+                <div className="w-full sm:w-1/2">
+                  <h3 className="text-md font-medium">Total Days</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {job.totalDays ?? "N/A"}
+                  </p>
+                </div>
+                {/* Repeats */}
+                <div className="w-full sm:w-1/2 mt-4 sm:mt-0">
+                  <h3 className="text-md font-medium">Repeats</h3>
+                  {isEditing ? (
+                    <Input
+                      value={job.repeats || ""}
+                      onChange={(e) =>
+                        setJob({
+                          ...job,
+                          repeats: e.target.value,
+                        })
+                      }
+                    />
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      {job.repeats || "No repeats"}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* Render delete job card in editor view */}
+        {isEditing && (
+          <div className="mt-8">
+            <Card className="w-fit bg-zinc-100 dark:bg-zinc-900 border dark:border-zinc-800 hover:shadow-lg transition-transform">
+              <CardHeader>
+                <CardTitle className="text-black-600">Delete Job</CardTitle>
+                <CardDescription>
+                  Deleting this job is permanent and cannot be undone.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button
+                  variant="destructive"
+                  className="w-full lg:w-1/2"
+                  onClick={() => setShowDeleteModal(true)}
+                >
+                  <Trash className="w-5 h-5 mr-0.5" />
+                  Delete Job
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* DELETE MODAL */}
         <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>

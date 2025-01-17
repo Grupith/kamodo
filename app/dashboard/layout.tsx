@@ -52,7 +52,9 @@ export default function DashboardLayout({
                     {index > 0 && <BreadcrumbSeparator />}
                     <BreadcrumbItem>
                       {index === breadcrumbItems.length - 1 ? (
-                        <BreadcrumbPage>{item.label}</BreadcrumbPage>
+                        <BreadcrumbPage className="dark:text-zinc-300">
+                          Id: {item.label}
+                        </BreadcrumbPage>
                       ) : (
                         <BreadcrumbLink href={item.href}>
                           {item.label}
