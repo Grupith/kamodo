@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
@@ -27,12 +28,15 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const { id: companyId } = useCompany();
 
+  // State for breadcrumbs
   const [breadcrumbItems, setBreadcrumbItems] = useState<
     { href: string; label: string }[]
   >([]);
 
-  // 1. Always render children + a fallback breadcrumb first
-  // 2. Then fetch the real breadcrumb data in an effect
+  // State to track whether the sidebar is expanded or collapsed
+  const [defaultOpen, setDefaultOpen] = useState<boolean | null>(null);
+
+  // Fetch breadcrumb items
   useEffect(() => {
     let isMounted = true;
 
@@ -43,7 +47,7 @@ export default function DashboardLayout({
           const href = `/${paths.slice(0, index + 1).join("/")}`;
           let label = path.charAt(0).toUpperCase() + path.slice(1);
 
-          // For job routes
+          // Handle dynamic route for job details
           if (index > 0 && paths[index - 1] === "jobs" && companyId) {
             try {
               const jobId = paths[index];
@@ -66,19 +70,28 @@ export default function DashboardLayout({
     };
   }, [pathname, companyId]);
 
+  // Read sidebar state from cookies after the component mounts
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+
+    const match = document.cookie.match(/sidebar:state=(true|false)/);
+    const openState = match ? match[1] === "true" : true; // Default to open if no cookie
+    setDefaultOpen(openState);
+  }, []);
+
+  // Render nothing until the defaultOpen state is determined
+  if (defaultOpen === null) {
+    return null; // Optional: Render a skeleton or loading state
+  }
+
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={defaultOpen}>
       <AppSidebar />
       <SidebarInset>
         <header className="flex h-16 items-center gap-2">
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
-            {/* 
-              1. If breadcrumbItems is empty, 
-                 show some placeholder or skeleton. 
-              2. Otherwise, render the real breadcrumb. 
-            */}
             <Breadcrumb>
               <BreadcrumbList>
                 {breadcrumbItems.length === 0 ? (
@@ -103,7 +116,6 @@ export default function DashboardLayout({
             </Breadcrumb>
           </div>
         </header>
-        {/* Children render immediately, even if breadcrumb fetch is still in progress */}
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
       </SidebarInset>
     </SidebarProvider>
