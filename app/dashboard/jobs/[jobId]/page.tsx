@@ -39,6 +39,9 @@ import { fetchJobDetails } from "@/utils/fetchJobDetails";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
 import JobProgressMeter from "@/components/JobProgressMeter";
 import { DatePickerWithRange } from "@/components/DatePickerWithRange";
+import { MultiSelectField } from "@/components/MultiSelectField";
+import { fetchCustomers, getEmployeesForCompany } from "@/firebase/firestore";
+import Link from "next/link";
 
 interface Job {
   id: string;
@@ -49,7 +52,7 @@ interface Job {
   startDate: number | undefined;
   endDate: number | undefined;
   assignedEmployees?: string[];
-  selectedCustomer?: string;
+  assignedCustomers?: string[];
   selectedEquipment?: string[];
   costs: number;
   charge: number;
@@ -59,6 +62,23 @@ interface Job {
   repeats?: string;
 }
 
+interface Option {
+  value: string;
+  label: string;
+}
+
+interface Employee {
+  id: string;
+  name: string;
+  // Add other properties relevant to employees
+}
+
+interface Customer {
+  id: string;
+  name: string;
+  // Add other properties relevant to customers
+}
+
 const JobDetails = () => {
   const router = useRouter();
   const params = useParams();
@@ -66,12 +86,15 @@ const JobDetails = () => {
 
   const [job, setJob] = useState<Job | null>(null);
   const [originalJob, setOriginalJob] = useState<Job | null>(null);
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [employeeOptions, setEmployeeOptions] = useState<Option[]>([]); // Formatted options
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [customerOptions, setCustomerOptions] = useState<Option[]>([]); // Formatted options
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const { toast } = useToast();
-
   // Extract the job ID from the route params
   const jobId = Array.isArray(params?.jobId) ? params.jobId[0] : params?.jobId;
 
@@ -131,6 +154,50 @@ const JobDetails = () => {
     handleFetchJobDetails();
   }, [handleFetchJobDetails]);
 
+  // Fetch employees and customers for MultiSelectField
+  useEffect(() => {
+    if (!companyId) return;
+
+    // Fetch employees
+    const fetchEmployees = async () => {
+      try {
+        const fetchedEmployees = await getEmployeesForCompany(companyId);
+        setEmployees(fetchedEmployees);
+
+        // Map employees to the format required by MultiSelectField
+        const employeeOptions = fetchedEmployees.map((employee) => ({
+          key: employee.id,
+          value: employee.id,
+          label: employee.name || "Unknown", // Fallback for missing names
+        }));
+        setEmployeeOptions(employeeOptions);
+      } catch (error) {
+        console.error("Error fetching employees:", error);
+      }
+    };
+
+    // Fetch customers
+    const handleFetchCustomers = async () => {
+      try {
+        const fetchedCustomers = await fetchCustomers(companyId);
+        setCustomers(fetchedCustomers);
+
+        // Map customers to the format required by MultiSelectField
+        const customerOptions = fetchedCustomers.map((customer) => ({
+          key: customer.id,
+          value: customer.id,
+          label: customer.name || "Unknown", // Fallback for missing names
+        }));
+        setCustomerOptions(customerOptions);
+      } catch (error) {
+        console.error("Error fetching customers:", error);
+      }
+    };
+
+    fetchEmployees();
+    handleFetchCustomers();
+  }, [companyId]);
+
   // Handle saving updated job details to Firestore
   const handleSave = async () => {
     if (!job || !companyId || !jobId) return;
@@ -147,7 +214,7 @@ const JobDetails = () => {
           startDate: job.startDate,
           endDate: job.endDate,
           assignedEmployees: job.assignedEmployees,
-          selectedCustomer: job.selectedCustomer,
+          assignedCustomers: job.assignedCustomers,
           selectedEquipment: job.selectedEquipment,
           costs: job.costs,
           charge: job.charge,
@@ -238,33 +305,42 @@ const JobDetails = () => {
         className="max-w-6xl px-4 sm:px-4 lg:px-6"
       >
         {/* Page Header */}
+
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-zinc-400 dark:border-zinc-600 pb-4">
-          <div>
-            <div className="flex items-center space-x-4">
-              {isEditing ? (
-                <Input
-                  className="text-2xl font-semibold tracking-tight w-full md:w-auto"
-                  value={job.jobName}
-                  onChange={(e) => setJob({ ...job, jobName: e.target.value })}
-                />
-              ) : (
-                <h1 className="text-2xl font-semibold tracking-tight">
-                  {job.jobName}
-                </h1>
-              )}
-              {/* Job Status */}
-              <StatusTag
-                status={job.status}
-                jobId={job.id}
-                companyId={companyId}
-                onStatusChange={(newStatus) =>
-                  setJob({ ...job, status: newStatus })
-                }
-              />
+          <div className="flex items-center space-x-4">
+            {/* Job avatar */}
+            <div className="w-16 h-16 bg-zinc-200 dark:bg-zinc-800 rounded-full flex items-center justify-center">
+              <ClipboardPen className="w-7 h-7 text-zinc-600 dark:text-zinc-400" />
             </div>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Manage the details, status, and finances of this job.
-            </p>
+            <div>
+              <div className="flex items-center space-x-4">
+                {isEditing ? (
+                  <Input
+                    className="text-2xl font-semibold tracking-tight w-full md:w-auto"
+                    value={job.jobName}
+                    onChange={(e) =>
+                      setJob({ ...job, jobName: e.target.value })
+                    }
+                  />
+                ) : (
+                  <h1 className="text-2xl font-semibold tracking-tight">
+                    {job.jobName}
+                  </h1>
+                )}
+                {/* Job Status */}
+                <StatusTag
+                  status={job.status}
+                  jobId={job.id}
+                  companyId={companyId}
+                  onStatusChange={(newStatus) =>
+                    setJob({ ...job, status: newStatus })
+                  }
+                />
+              </div>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Manage the details, status, and finances of this job.
+              </p>
+            </div>
           </div>
 
           <section className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-4 sm:mt-0">
@@ -290,7 +366,7 @@ const JobDetails = () => {
                 </Button>
               </div>
             ) : (
-              <div className="flex flex-row sm:flex-row space-x-4">
+              <div className="flex flex-row sm:flex-row space-x-3">
                 {/* REFRESH */}
                 <Button
                   variant="outline"
@@ -350,6 +426,102 @@ const JobDetails = () => {
                 ) : (
                   <p className="text-sm text-muted-foreground">
                     {job.description || "No description provided."}
+                  </p>
+                )}
+              </div>
+
+              {/* Assigned Customer */}
+              <div>
+                <h3 className="text-md font-medium">Customer</h3>
+                {isEditing ? (
+                  <MultiSelectField
+                    label="Select Customers"
+                    description="Choose the customers assigned to this job"
+                    options={customerOptions}
+                    placeholder="Select customers..."
+                    value={job.assignedCustomers || []} // Current selected employees
+                    onChange={(selectedValues) =>
+                      setJob((prevJob) =>
+                        prevJob
+                          ? {
+                              ...prevJob,
+                              assignedCustomers: selectedValues, // Update the job state
+                            }
+                          : null
+                      )
+                    }
+                  />
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    {job.assignedCustomers && job.assignedCustomers.length > 0
+                      ? job.assignedCustomers.map((customerId, index) => {
+                          const foundCustomer = customers.find(
+                            (customer) => customer.id === customerId
+                          );
+                          return foundCustomer ? (
+                            <React.Fragment key={customerId}>
+                              <Link
+                                href={`/dashboard/customers/${customerId}`}
+                                className="text-blue-600 hover:underline"
+                              >
+                                {foundCustomer.name}
+                              </Link>
+                              {job.assignedCustomers &&
+                                index < job.assignedCustomers.length - 1 &&
+                                ", "}
+                            </React.Fragment>
+                          ) : (
+                            <span key={customerId}>Unknown</span>
+                          );
+                        })
+                      : "No customers assigned"}
+                  </p>
+                )}
+              </div>
+              {/* Assigned Employees */}
+              <div>
+                <h3 className="text-md font-medium">Assigned Employees</h3>
+                {isEditing ? (
+                  <MultiSelectField
+                    label="Select Employees"
+                    description="Choose the employees assigned to this job"
+                    options={employeeOptions}
+                    placeholder="Select employees..."
+                    value={job.assignedEmployees || []} // Current selected employees
+                    onChange={(selectedValues) =>
+                      setJob((prevJob) =>
+                        prevJob
+                          ? {
+                              ...prevJob,
+                              assignedEmployees: selectedValues, // Update the job state
+                            }
+                          : null
+                      )
+                    }
+                  />
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    {job.assignedEmployees && job.assignedEmployees.length > 0
+                      ? job.assignedEmployees.map((employeeId, index) => {
+                          const foundEmployee = employees.find(
+                            (emp) => emp.id === employeeId
+                          );
+                          return foundEmployee ? (
+                            <React.Fragment key={employeeId}>
+                              <Link
+                                href={`/dashboard/employees/${employeeId}`}
+                                className="text-blue-600 hover:underline"
+                              >
+                                {foundEmployee.name}
+                              </Link>
+                              {index < job.assignedEmployees!.length - 1 &&
+                                ", "}
+                            </React.Fragment>
+                          ) : (
+                            <span key={employeeId}>Unknown</span>
+                          );
+                        })
+                      : "No employees assigned"}
                   </p>
                 )}
               </div>
@@ -430,6 +602,7 @@ const JobDetails = () => {
                   {isEditing ? (
                     <Input
                       value={job.repeats || ""}
+                      className="bg-white mt-1"
                       onChange={(e) =>
                         setJob({
                           ...job,
@@ -450,24 +623,25 @@ const JobDetails = () => {
 
         {/* Render delete job card in editor view */}
         {isEditing && (
-          <div className="mt-8">
-            <Card className="w-fit bg-zinc-100 dark:bg-zinc-900 border dark:border-zinc-800 hover:shadow-lg transition-transform">
-              <CardHeader>
-                <CardTitle className="text-black-600">Delete Job</CardTitle>
-                <CardDescription>
-                  Deleting this job is permanent and cannot be undone.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+          <div className="mt-4">
+            <Card className="w-full md:w-1/2 bg-zinc-100 dark:bg-zinc-900 border dark:border-zinc-800 hover:shadow-lg transition-transform">
+              <div className="flex items-center justify-between p-4">
+                {/* Title */}
+                <CardTitle className="text-black-600 text-md font-semibold">
+                  Delete Job
+                </CardTitle>
+
+                {/* Button */}
                 <Button
                   variant="destructive"
-                  className="w-full lg:w-1/2"
+                  size="sm"
                   onClick={() => setShowDeleteModal(true)}
+                  className="ml-4"
                 >
-                  <Trash className="w-5 h-5 mr-0.5" />
+                  <Trash className="w-5 h-5" />
                   Delete Job
                 </Button>
-              </CardContent>
+              </div>
             </Card>
           </div>
         )}
@@ -476,25 +650,26 @@ const JobDetails = () => {
         <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
           <DialogContent className="rounded-lg dark:bg-zinc-900 dark:border-zinc-800 border">
             <DialogHeader>
-              <DialogTitle className="mb-4">Are you sure?</DialogTitle>
+              <DialogTitle className="mb-2">Are you sure?</DialogTitle>
               <DialogDescription>
                 This action cannot be undone. This will permanently delete the
                 job and its associated data.
               </DialogDescription>
             </DialogHeader>
-            <DialogFooter>
+            <DialogFooter className="flex justify-center items-center">
               <Button
-                variant="secondary"
+                variant="outline"
                 onClick={() => setShowDeleteModal(false)}
-                className="my-2"
+                className="my-1 w-3/5"
               >
                 Cancel
               </Button>
               <Button
                 variant="destructive"
                 onClick={handleDeleteJob}
-                className="my-2"
+                className="my-1 w-3/5"
               >
+                <Trash className="w-5 h-5" />
                 Delete Job
               </Button>
             </DialogFooter>

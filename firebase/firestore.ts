@@ -80,7 +80,7 @@ export const fetchCompanyDataByOwnerId = async (
   };
 };
 
-// FetchCustomers
+// Fetch Customers
 export async function fetchCustomers(companyId: string): Promise<Customer[]> {
   const customersRef = collection(db, "companies", companyId, "customers");
   const querySnapshot = await getDocs(customersRef);

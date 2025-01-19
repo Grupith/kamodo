@@ -11,7 +11,7 @@ import { ChartNoAxesCombined } from "lucide-react";
 
 const JobProgressMeter: React.FC = () => {
   return (
-    <Card className="bg-zinc-100 dark:bg-zinc-900 dark:border-zinc-800 border mt-2">
+    <Card className="bg-zinc-100 dark:bg-zinc-900 dark:border-zinc-800 border mt-1">
       <CardHeader className="flex flex-row items-center justify-between space-x-4">
         <div>
           <CardTitle className="text-lg font-semibold flex items-center mb-0.5">

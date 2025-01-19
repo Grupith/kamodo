@@ -74,7 +74,7 @@ export default function StatusTag({
         onClick={(e) => e.stopPropagation()} // Prevents navigation or click propagation
       >
         <button
-          className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium transition-colors duration-200 ${getColorClasses(
+          className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium transition-colors duration-200 ${getColorClasses(
             currentStatus
           )}`}
         >

@@ -13,6 +13,11 @@ export const handleGoogleLogin = async ({
   onError: (message: string) => void;
 }) => {
   try {
+    // Set the prompt to force account selection
+    googleProvider.setCustomParameters({
+      prompt: "select_account",
+    });
+
     const result = await signInWithPopup(auth, googleProvider);
     const firebaseUser = result.user;
 
@@ -34,8 +39,8 @@ export const handleGoogleLogin = async ({
     }
   }
 };
+
 // Sign out user
-// returns A promise that resolves when the sign-out is complete.
 export const signOutUser = async (): Promise<void> => {
   try {
     await signOut(auth);
