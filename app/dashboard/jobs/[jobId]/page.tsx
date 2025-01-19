@@ -28,6 +28,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import {
   CalendarDays,
+  CheckCheck,
   ClipboardPen,
   Pencil,
   RotateCcw,
@@ -42,6 +43,7 @@ import { DatePickerWithRange } from "@/components/DatePickerWithRange";
 import { MultiSelectField } from "@/components/MultiSelectField";
 import { fetchCustomers, getEmployeesForCompany } from "@/firebase/firestore";
 import Link from "next/link";
+import Ping from "@/components/Ping";
 
 interface Job {
   id: string;
@@ -232,7 +234,7 @@ const JobDetails = () => {
       toast({
         title: "Job Updated!",
         description: "The job details have been successfully updated.",
-        variant: "success",
+        variant: "info",
       });
     } catch (error) {
       console.error("Error updating job:", error);
@@ -305,7 +307,6 @@ const JobDetails = () => {
         className="max-w-6xl px-4 sm:px-4 lg:px-6"
       >
         {/* Page Header */}
-
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-zinc-400 dark:border-zinc-600 pb-4">
           <div className="flex items-center space-x-4">
             {/* Job avatar */}
@@ -346,11 +347,11 @@ const JobDetails = () => {
           <section className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-4 sm:mt-0">
             {/* Edit / Save Buttons */}
             {isEditing ? (
-              <div className="flex flex-col sm:flex-row sm:space-x-2">
+              <div className="flex flex-row sm:flex-row sm:space-x-2">
                 <Button
                   onClick={handleCancelEdit}
                   variant="outline"
-                  className="w-full sm:w-auto"
+                  className="w-full sm:w-auto mx-2"
                   disabled={saving}
                 >
                   Cancel
@@ -359,10 +360,12 @@ const JobDetails = () => {
                   onClick={handleSave}
                   disabled={saving}
                   variant="default"
-                  className="w-full sm:w-auto"
+                  className="relative w-full sm:w-auto"
                 >
-                  <Save className="w-5 h-5 mr-0.5" />
+                  <Save className="w-5 h-5" />
                   {saving ? "Saving..." : "Save"}
+                  {/* Ping Effect */}
+                  {!saving && <Ping />}
                 </Button>
               </div>
             ) : (
@@ -376,13 +379,29 @@ const JobDetails = () => {
                 >
                   <RotateCcw className="w-6 h-6" />
                 </Button>
+
                 <Button
                   onClick={() => setIsEditing(true)}
-                  variant="default"
+                  variant="outline"
                   className="w-fit md:w-auto"
                 >
                   <Pencil className="w-5 h-5 mr-0.5" />
                   Edit
+                </Button>
+                <Button
+                  variant="default"
+                  onClick={() =>
+                    router.push(
+                      `/dashboard/jobs/${jobId}/tasks?jobName=${encodeURIComponent(
+                        job.jobName
+                      )}`
+                    )
+                  }
+                  className="relative"
+                >
+                  <CheckCheck className="w-5 h-5" />
+                  Tasks
+                  <Ping />
                 </Button>
               </div>
             )}
@@ -432,7 +451,7 @@ const JobDetails = () => {
 
               {/* Assigned Customer */}
               <div>
-                <h3 className="text-md font-medium">Customer</h3>
+                <h3 className="text-md font-medium">Assigned Customer</h3>
                 {isEditing ? (
                   <MultiSelectField
                     label="Select Customers"
